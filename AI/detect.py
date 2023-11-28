@@ -1,5 +1,6 @@
 from preprocess import *
 
+THRESHOLD = 200
 
 def detect_dark_cells(img):
 
