@@ -116,10 +116,70 @@ def detect_dark_cells(img):
     return contours, input_image, min_enclosing_circles
 
 def detect_light_cells(img):
-    contours =[]
     input_image = img
+    contours, _  = cv2.findContours(input_image,mode = cv2.RETR_LIST,method=cv2.CHAIN_APPROX_NONE)
+    
     min_enclosing_circles = []
+    large_contours =[]
+    small_contours = []
 
+    default_radius = 70
+
+    for contour in contours:
+        (x, y), radius = cv2.minEnclosingCircle(contour)
+        center = (int(x), int(y))
+        radius = int(radius)
+
+        if radius > 100:
+            large_contours.append(contour)
+            continue
+
+        elif radius < 50:
+            small_contours.append(contour)
+            continue 
+        
+        min_enclosing_circles.append((center, default_radius))
+
+    large_areas = np.zeros_like(img)
+    large_areas = cv2.drawContours(large_areas,large_contours,-1,255,cv2.FILLED)
+
+    
+    kernel_size = 55
+    kernel = np.ones((kernel_size, kernel_size), np.uint8)
+
+    large_areas = cv2.morphologyEx(large_areas, cv2.MORPH_OPEN, kernel)
+    
+    fixed_large_contours, _  = cv2.findContours(large_areas,mode = cv2.RETR_LIST,method=cv2.CHAIN_APPROX_NONE)
+    
+    for contour in fixed_large_contours:
+        (x, y), radius = cv2.minEnclosingCircle(contour)
+        center = (int(x), int(y))
+        radius = int(radius)
+
+        if radius > 120:
+            continue
+
+        min_enclosing_circles.append((center, default_radius))
+
+    small_areas = np.zeros_like(img)
+    small_areas = cv2.drawContours(small_areas,small_contours,-1,255,cv2.FILLED)
+    
+    kernel_size = 23
+    kernel = np.ones((kernel_size, kernel_size), np.uint8)
+    small_areas = cv2.dilate(small_areas,kernel)
+
+    fixed_small_contours, _  = cv2.findContours(small_areas,mode = cv2.RETR_LIST,method=cv2.CHAIN_APPROX_NONE)
+    
+    for contour in fixed_small_contours:
+        (x, y), radius = cv2.minEnclosingCircle(contour)
+        center = (int(x), int(y))
+        radius = int(radius)
+
+        if radius < 50:
+            continue
+
+        min_enclosing_circles.append((center, default_radius))
+    
     return contours, input_image, min_enclosing_circles
 
 def detect_circles(img):
