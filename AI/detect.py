@@ -182,6 +182,42 @@ def detect_light_cells(img):
     
     return contours, input_image, min_enclosing_circles
 
+def light_detect_procedure():
+    bee_hive_image = cv2.imread('mini_dataset/close_up_1.jpg')
+    gray_bee_hive = cv2.cvtColor(bee_hive_image, cv2.COLOR_BGR2GRAY)
+    #blurred_bee_hive = cv2.GaussianBlur(gray_bee_hive, (7, 7), 0)
+    #equalized_bee_hive = cv2.equalizeHist(blurred_bee_hive)
+    #_, thresholded_bee_hive = cv2.threshold(blurred_bee_hive, 127, 255, cv2.THRESH_BINARY)
+
+    sample_light_cell_image = cv2.imread('kernel.png')
+    gray_sample_light_cell = cv2.cvtColor(sample_light_cell_image, cv2.COLOR_BGR2GRAY)
+    #blurred_sample_light_cell = cv2.GaussianBlur(gray_sample_light_cell, (5, 5), 0)
+    #equalized_sample_light_cell = cv2.equalizeHist(blurred_sample_light_cell)
+    #_, thresholded_sample_light_cell = cv2.threshold(blurred_sample_light_cell, 127, 255, cv2.THRESH_BINARY)
+
+    plt.figure(figsize=(8, 4))
+
+    plt.subplot(131)
+    plt.imshow(bee_hive_image, cmap='gray')
+    plt.title('Image 1')
+
+    plt.subplot(132)
+    plt.imshow(gray_sample_light_cell, cmap='gray')
+    plt.title('Image 2')
+
+    result = convolve(gray_bee_hive, gray_sample_light_cell, THRESHOLD)
+    masked_image = np.where(result > 0, gray_bee_hive, 0)
+    #masked_image = 255 - masked_image
+    dark_contours, dark_image, dark_circles = detect_dark_cells(masked_image)
+    if dark_circles is not None:
+        for circle in np.array(dark_circles)[:, 0]:
+            cv2.circle(gray_bee_hive, (circle[0], circle[1]), color=0, radius=70, thickness=3)
+            
+    plt.subplot(133)
+    plt.imshow(gray_bee_hive, cmap='gray')
+    plt.title(f"Inverted image (threshold: {THRESHOLD})")
+    plt.show()
+
 def detect_circles(img):
 
     light_contours, light_image, light_circles = detect_light_cells(img)
