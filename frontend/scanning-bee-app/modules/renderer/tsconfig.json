@@ -1,0 +1,33 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "./dist",
+        "baseUrl": "./",
+        "noEmit": false,
+        "paths": {
+            "@frontend/*": [
+                "./src/*"
+            ],
+            "@utils/*": [
+                "./src/utils/*"
+            ],
+            "@assets/*": [
+                "./assets/*"
+            ]
+        }
+    },
+    "include": [
+        "assets",
+        "src",
+        "src/**/*.json",
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ],
+    "references": [
+        {
+            "path": "../ipc-interfaces"
+        }
+    ]
+}
