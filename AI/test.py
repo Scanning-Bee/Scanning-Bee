@@ -42,13 +42,11 @@ def test_dark():
 
         detected_contours, detected_dark_img, min_enclosing_circles = detect_dark_cells(img)
 
-        # Create subplot for processed image
         plt.subplot(3, 4, 4 * i - 3)
         plt.imshow(processed_img, cmap='gray')
         plt.title(f'Processed Image {i}')
         plt.axis('off')
 
-        # Create subplot for original image with processed circles
         plt.subplot(3, 4, 4 * i - 2)
         img_rgb = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
         if processed_circles is not None:
@@ -58,15 +56,14 @@ def test_dark():
         plt.title(f'Original with Processed Circles {i}')
         plt.axis('off')
 
-        # Create subplot for detected image
         plt.subplot(3, 4, 4 * i - 1)
         plt.imshow(detected_dark_img, cmap='gray')
         plt.title(f'Detected Image {i}')
         plt.axis('off')
 
-        # Create subplot for original image with detected circles
+
         plt.subplot(3, 4, 4 * i)
-        original_img_rgb = cv2.cvtColor(org_img, cv2.COLOR_GRAY2RGB)  # Convert to 3-channel RGB
+        original_img_rgb = cv2.cvtColor(org_img, cv2.COLOR_GRAY2RGB)  #Convert to 3-channel RGB
         if detected_contours is not None:
             cv2.drawContours(original_img_rgb, detected_contours, -1, (255, 0, 0), 5)
             for center, radius in min_enclosing_circles:
