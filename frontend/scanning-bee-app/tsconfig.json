@@ -1,0 +1,23 @@
+{
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "./dist",
+    },
+    "include": [],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "modules"
+    ],
+    "references": [
+        {
+            "path": "./modules/ipc-interfaces"
+        },
+        {
+            "path": "./modules/main"
+        },
+        {
+            "path": "./modules/renderer"
+        },
+    ]
+}

@@ -1,0 +1,23 @@
+{
+    "name": "@scanning_bee/ipc-interfaces",
+    "version": "0.0.0",
+    "private": true,
+    "main": "dist/src/index.js",
+    "types": "dist/src/index.d.ts",
+    "scripts": {
+        "build": "ttsc --build",
+        "watch": "ttsc --build --watch",
+        "clean": "rimraf dist"
+    },
+    "dependencies": {
+        "@blueprintjs/core": "3.52.0",
+        "ts-results": "^3.3.0"
+    },
+    "devDependencies": {
+        "@types/node": "^18.11.7",
+        "rimraf": "^3.0.2",
+        "ts-node": "^10.9.1",
+        "ttypescript": "^1.5.15",
+        "typescript": "^4.9.0"
+    }
+}
