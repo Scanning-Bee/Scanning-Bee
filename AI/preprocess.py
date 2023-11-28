@@ -2,6 +2,15 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from scipy.signal import convolve2d
+
+def convolve(image, kernel, threshold):
+    result_scipy = convolve2d(image / 255, kernel / 255, mode='same')
+    normalized_result = cv2.normalize(result_scipy, None, 0, 255, cv2.NORM_MINMAX)
+    normalized_result[normalized_result < threshold] = 0
+
+    return normalized_result
+
 
 def contrast_stretching(img):
     min_intensity = 0
