@@ -1,0 +1,1 @@
+uvicorn annotate_db_api:app --reload
