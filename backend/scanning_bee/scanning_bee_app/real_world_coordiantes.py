@@ -2,19 +2,6 @@ import numpy as np
 import cv2
 import pandas as pd
 
-camera_info_file_path = 'backend/scanning_bee/scanning_bee_app/camera_info.csv'
-camera_info = pd.read_csv(camera_info_file_path)
-
-D_values = camera_info.filter(like='field.D').iloc[0].values
-K_values = camera_info.filter(like='field.K').iloc[0].values
-
-
-# the distortion coefficients array
-D = np.array(D_values)
-
-# the intrinsic matrix
-K = np.array(K_values).reshape((3, 3))
-
 def project_point(point_3d, K, D):
     """
     Projects a 3D point to 2D using the camera intrinsic matrix and distortion coefficients.
@@ -43,12 +30,11 @@ def find_real_world_coordinates(point_2d, depth, K, D):
     """
     Find the real-world 3D coordinates from 2D image coordinates.
 
-    point_2d: The 2D point in image coordinates (numpy array or list)
     depth: The depth value at the 2D point
     K: The intrinsic camera matrix
     D: The distortion coefficients
     """
-    
+
     # Checks shape
     point_2d = np.array(point_2d, dtype=np.float64).reshape(-1, 1, 2)
 
@@ -60,19 +46,42 @@ def find_real_world_coordinates(point_2d, depth, K, D):
     normalized_y = undistorted_point_2d[0,0,1]
 
     # Scale by depth to get real-world coordinates in the camera frame
-    real_world_x = normalized_x * depth
-    real_world_y = normalized_y * depth
+    # Adjust the scaling by focal length and principal point
+    fx, fy = K[0,0], K[1,1] # Focal lengths
+    cx, cy = K[0,2], K[1,2] # Principal point
+    real_world_x = (normalized_x - cx) * depth / fx
+    real_world_y = (normalized_y - cy) * depth / fy
     real_world_z = depth
 
     return np.array([real_world_x, real_world_y, real_world_z])
 
 
+if __name__ == "__main__":
+    # Load camera calibration data
+    camera_info_file_path = 'backend/scanning_bee/scanning_bee_app/camera_info.csv'
+    camera_info = pd.read_csv(camera_info_file_path)
 
-# Test the functions
-point_3d = [0, 0, 5]
-point_2d = project_point(point_3d, K, D)
-print("Projected 2D point:", point_2d)
+    D_values = camera_info.filter(like='field.D').iloc[0].values
+    K_values = camera_info.filter(like='field.K').iloc[0].values
 
-depth = 5
-real_world_coordinates = find_real_world_coordinates(point_2d, depth, K, D)
-print("Real-world coordinates:", real_world_coordinates)
+    D = np.array(D_values) # the distortion coefficients array
+    K = np.array(K_values).reshape((3, 3)) # the intrinsic matrix
+
+
+    # Test the functions
+    point_3d = [0, 0, 5]
+    point_2d = project_point(point_3d, K, D)
+    print("Projected 2D point:", point_2d)
+    
+    depth = 5
+    real_world_coordinates = find_real_world_coordinates(point_2d, depth, K, D)
+    print("Real-world coordinates:", real_world_coordinates)
+
+
+
+
+
+
+
+
+
