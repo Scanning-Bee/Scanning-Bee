@@ -101,6 +101,7 @@ export const ManualAnnotatorPage = () => {
                     resizerStyle={{ backgroundColor: lightTheme.secondaryBackground }}
                     allowResize={leftPanelOpen}
                     pane1Style={{ display: 'unset' }}
+                    resizerClassName='resizer'
                 >
                     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'start' }}>
                         <h2>Annotations</h2>

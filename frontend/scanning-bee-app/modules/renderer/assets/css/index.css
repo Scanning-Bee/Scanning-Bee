@@ -309,3 +309,16 @@ a {
 .inline-box-important{
   display: -webkit-inline-box !important;
 }
+
+.resizer {
+  display: inline-block;
+  width: 100%;
+  height: 20px;
+  border: 1px solid #313131;
+  background-color: #313131;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 100;
+  margin: 10px 0;
+  cursor: row-resize;
+}
