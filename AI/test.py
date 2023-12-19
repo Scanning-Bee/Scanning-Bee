@@ -28,7 +28,7 @@ def process_image(img: np.ndarray):
     return detected_circles, th3
 
 
-def test_dark():
+def test_circles():
     image_folder = "./AI/test_images/"
     image_files = ["close_up_1.jpg", "close_up_2.jpg", "close_up_3.jpg"]
 
@@ -40,14 +40,14 @@ def test_dark():
 
         processed_circles, processed_img = process_image(img)
 
-        detected_contours, detected_dark_img, min_enclosing_circles = detect_dark_cells(img)
+        detected_contours, min_enclosing_circles = detect_circles(img)
 
-        plt.subplot(3, 4, 4 * i - 3)
+        plt.subplot(3, 3, 3 * i - 2)
         plt.imshow(processed_img, cmap='gray')
         plt.title(f'Processed Image {i}')
         plt.axis('off')
 
-        plt.subplot(3, 4, 4 * i - 2)
+        plt.subplot(3, 3, 3 * i - 1)
         img_rgb = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
         if processed_circles is not None:
             for circle in processed_circles[0, :]:
@@ -56,13 +56,7 @@ def test_dark():
         plt.title(f'Original with Processed Circles {i}')
         plt.axis('off')
 
-        plt.subplot(3, 4, 4 * i - 1)
-        plt.imshow(detected_dark_img, cmap='gray')
-        plt.title(f'Detected Image {i}')
-        plt.axis('off')
-
-
-        plt.subplot(3, 4, 4 * i)
+        plt.subplot(3, 3, 3 * i)
         original_img_rgb = cv2.cvtColor(org_img, cv2.COLOR_GRAY2RGB)  #Convert to 3-channel RGB
         if detected_contours is not None:
             cv2.drawContours(original_img_rgb, detected_contours, -1, (255, 0, 0), 5)
@@ -76,4 +70,4 @@ def test_dark():
     plt.show()
 
 if __name__ == "__main__":
-    test_dark()
+    test_circles()
