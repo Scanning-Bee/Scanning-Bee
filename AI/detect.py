@@ -47,8 +47,6 @@ def detect_contours(
         center = (int(x), int(y))
         radius = int(radius)
 
-        if radius < img.shape[1]*0.25:
-            all_radii.append(radius)
         if radius > max_radius:
             large_contours.append(contour)
             continue
