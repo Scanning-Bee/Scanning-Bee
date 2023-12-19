@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.gis.db import models as geo_models
 
 
 class UserType(models.Model):
@@ -10,11 +11,11 @@ class User(models.Model):
 
 
 class Frame(models.Model):
-    location = models.CharField(max_length=100)
+    pass
 
 
 class Cell(models.Model):
-    location_on_frame = models.CharField(max_length=100)
+    location_on_frame = geo_models.MultiPointField(dim=3)
     frame = models.ForeignKey(Frame, on_delete=models.CASCADE)
 
 
