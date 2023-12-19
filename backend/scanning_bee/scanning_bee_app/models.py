@@ -20,6 +20,7 @@ class Cell(models.Model):
 
 
 class Content(models.Model):
+    name = models.CharField(max_length=100)
     content_description = models.TextField()
 
 

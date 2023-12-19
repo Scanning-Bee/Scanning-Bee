@@ -53,7 +53,37 @@ def find_real_world_coordinates(point_2d, depth, K, D):
     real_world_y = (normalized_y - cy) * depth / fy
     real_world_z = depth
 
-    return np.array([real_world_x, real_world_y, real_world_z])
+    return np.array([real_world_x, real_world_y])
+
+
+def calculate_annotation_position(center_x, center_y, x_pos, y_pos, K, D, depth, image_width, image_height):
+    """
+    Calculate the normalized position of an annotation in the larger frame.
+
+    Args:
+    - center_x, center_y: Pixel coordinates of the annotation in the image.
+    - x_pos, y_pos: Normalized position of the camera in the larger frame.
+    - K: Intrinsic matrix of the camera.
+    - D: Distortion coefficients of the camera.
+    - depth: Constant depth for all annotations.
+    - image_width, image_height: Dimensions of the captured image.
+
+    Returns:
+    - combined_x, combined_y: Normalized position of the annotation in the larger frame.
+    """
+
+    # Convert the annotation's position using the camera's intrinsic properties
+    real_world_coords = find_real_world_coordinates([center_x, center_y], depth, K, D)
+
+    # Normalize the adjusted 2D coordinates
+    norm_real_world_x = real_world_coords[0] / image_width
+    norm_real_world_y = real_world_coords[1] / image_height
+
+    # Combine with the camera's normalized position
+    combined_x = x_pos + norm_real_world_x
+    combined_y = y_pos + norm_real_world_y
+
+    return combined_x, combined_y
 
 
 # if __name__ == "__main__":
