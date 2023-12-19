@@ -1,5 +1,6 @@
 from preprocess import *
 
+THRESHOLD = 200
 
 def detect_dark_cells(img):
 
@@ -116,11 +117,107 @@ def detect_dark_cells(img):
     return contours, input_image, min_enclosing_circles
 
 def detect_light_cells(img):
-    contours =[]
     input_image = img
+    contours, _  = cv2.findContours(input_image,mode = cv2.RETR_LIST,method=cv2.CHAIN_APPROX_NONE)
+    
     min_enclosing_circles = []
+    large_contours =[]
+    small_contours = []
 
+    default_radius = 70
+
+    for contour in contours:
+        (x, y), radius = cv2.minEnclosingCircle(contour)
+        center = (int(x), int(y))
+        radius = int(radius)
+
+        if radius > 100:
+            large_contours.append(contour)
+            continue
+
+        elif radius < 50:
+            small_contours.append(contour)
+            continue 
+        
+        min_enclosing_circles.append((center, default_radius))
+
+    large_areas = np.zeros_like(img)
+    large_areas = cv2.drawContours(large_areas,large_contours,-1,255,cv2.FILLED)
+
+    
+    kernel_size = 55
+    kernel = np.ones((kernel_size, kernel_size), np.uint8)
+
+    large_areas = cv2.morphologyEx(large_areas, cv2.MORPH_OPEN, kernel)
+    
+    fixed_large_contours, _  = cv2.findContours(large_areas,mode = cv2.RETR_LIST,method=cv2.CHAIN_APPROX_NONE)
+    
+    for contour in fixed_large_contours:
+        (x, y), radius = cv2.minEnclosingCircle(contour)
+        center = (int(x), int(y))
+        radius = int(radius)
+
+        if radius > 120:
+            continue
+
+        min_enclosing_circles.append((center, default_radius))
+
+    small_areas = np.zeros_like(img)
+    small_areas = cv2.drawContours(small_areas,small_contours,-1,255,cv2.FILLED)
+    
+    kernel_size = 23
+    kernel = np.ones((kernel_size, kernel_size), np.uint8)
+    small_areas = cv2.dilate(small_areas,kernel)
+
+    fixed_small_contours, _  = cv2.findContours(small_areas,mode = cv2.RETR_LIST,method=cv2.CHAIN_APPROX_NONE)
+    
+    for contour in fixed_small_contours:
+        (x, y), radius = cv2.minEnclosingCircle(contour)
+        center = (int(x), int(y))
+        radius = int(radius)
+
+        if radius < 50:
+            continue
+
+        min_enclosing_circles.append((center, default_radius))
+    
     return contours, input_image, min_enclosing_circles
+
+def light_detect_procedure():
+    bee_hive_image = cv2.imread('mini_dataset/close_up_1.jpg')
+    gray_bee_hive = cv2.cvtColor(bee_hive_image, cv2.COLOR_BGR2GRAY)
+    #blurred_bee_hive = cv2.GaussianBlur(gray_bee_hive, (7, 7), 0)
+    #equalized_bee_hive = cv2.equalizeHist(blurred_bee_hive)
+    #_, thresholded_bee_hive = cv2.threshold(blurred_bee_hive, 127, 255, cv2.THRESH_BINARY)
+
+    sample_light_cell_image = cv2.imread('kernel.png')
+    gray_sample_light_cell = cv2.cvtColor(sample_light_cell_image, cv2.COLOR_BGR2GRAY)
+    #blurred_sample_light_cell = cv2.GaussianBlur(gray_sample_light_cell, (5, 5), 0)
+    #equalized_sample_light_cell = cv2.equalizeHist(blurred_sample_light_cell)
+    #_, thresholded_sample_light_cell = cv2.threshold(blurred_sample_light_cell, 127, 255, cv2.THRESH_BINARY)
+
+    plt.figure(figsize=(8, 4))
+
+    plt.subplot(131)
+    plt.imshow(bee_hive_image, cmap='gray')
+    plt.title('Image 1')
+
+    plt.subplot(132)
+    plt.imshow(gray_sample_light_cell, cmap='gray')
+    plt.title('Image 2')
+
+    result = convolve(gray_bee_hive, gray_sample_light_cell, THRESHOLD)
+    masked_image = np.where(result > 0, gray_bee_hive, 0)
+    #masked_image = 255 - masked_image
+    dark_contours, dark_image, dark_circles = detect_dark_cells(masked_image)
+    if dark_circles is not None:
+        for circle in np.array(dark_circles)[:, 0]:
+            cv2.circle(gray_bee_hive, (circle[0], circle[1]), color=0, radius=70, thickness=3)
+            
+    plt.subplot(133)
+    plt.imshow(gray_bee_hive, cmap='gray')
+    plt.title(f"Inverted image (threshold: {THRESHOLD})")
+    plt.show()
 
 def detect_circles(img):
 
