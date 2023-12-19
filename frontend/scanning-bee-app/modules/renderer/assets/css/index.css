@@ -278,7 +278,6 @@ a {
 .annotated-images-panel{
   width: 250px;
   height: 90vh;
-  display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: self-start;

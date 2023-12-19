@@ -298,8 +298,14 @@ class MainController {
             }).then((result) => {
                 if (!result.canceled) {
                     const folderPath = result.filePaths[0];
+                    const annotationsFilePath = path.join(folderPath, 'annotations', 'annotations.yaml');
 
-                    const annotations = loadAnnotations(path.join(folderPath, 'annotations', 'annotations.yaml'));
+                    if (!fs.pathExistsSync(annotationsFilePath)) {
+                        fs.ensureDirSync(path.join(folderPath, 'annotations'));
+                        saveAnnotations([], folderPath);
+                    }
+
+                    const annotations = loadAnnotations(annotationsFilePath);
 
                     const imageUrls = loadImages(folderPath);
 

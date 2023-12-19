@@ -28,6 +28,7 @@ const annotationSlice = createSlice({
             state.annotationsFolder = folder;
             state.annotationObjects = annotations;
             state.images = images;
+            state.activeAnnotationId = null;
         },
         addAnnotation(state, action: PayloadAction<AnnotationPropsWithID>) {
             state.annotationObjects = [...state.annotationObjects, action.payload];
