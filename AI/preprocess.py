@@ -107,4 +107,23 @@ def preprocess_light_img(img,blur_kernel_size:int=11, open_kernel_size:int=15):
     opening_result = cv2.morphologyEx(binary_img, cv2.MORPH_OPEN, kernel)
 
     return opening_result
+
+def crop_from_annotation(img: np.ndarray, annot: Annotation, offset: int = 0):
+    try:
+        boundary_x, boundary_y, _ = img.shape
+    except Exception as _:
+        boundary_x, boundary_y = img.shape
+
+    c1, c2 = (
+        max(annot.center[0] - annot.radius - offset, 0),
+        min(annot.center[0] + annot.radius + offset, boundary_y),
+    )
+    c3, c4 = (
+        max(annot.center[1] - annot.radius - offset, 0),
+        min(annot.center[1] + annot.radius + offset, boundary_x),
+    )
+
+    cropped_img = img[c3:c4, c1:c2]
+    return cropped_img
+
    
