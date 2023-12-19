@@ -1,34 +1,40 @@
-import React from 'react';
+import React, { StrictMode } from 'react';
 import { render } from 'react-dom';
 
 // Import main App component
 import App from './App';
 
-export type PageType = 'start' | 'other';
+export type PageType = 'home' | 'manual-annotator' | 'beehive' | 'settings';
 
 export class RendererController {
-    page: PageType = 'start';
+    page: PageType = 'home';
 
     static getInstance(): RendererController {
         return (window as any).RendererController;
     }
 
     constructor() {
+        this.setPage = this.setPage.bind(this);
+
         this.initialize();
     }
 
     public setPage(page: PageType) : void {
         this.page = page;
 
+        console.log('Page set to: ', page);
+
         this.renderAgain();
     }
 
     renderAgain() {
         render(
-            <App
-                page = {this.page}
-                setPage = {this.setPage}
-            />,
+            <StrictMode>
+                <App
+                    page = {this.page}
+                    setPage = {this.setPage}
+                />
+            </StrictMode>,
             document.getElementById('root'),
         );
     }

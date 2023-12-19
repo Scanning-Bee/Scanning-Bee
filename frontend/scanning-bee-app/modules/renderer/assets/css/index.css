@@ -53,9 +53,11 @@
 
   --buttonOffset:-30px;
   --buttonOffsetInactive:-15px;
-  --leftPanelWidth:260px;
 
   --headerSpace:48px;
+
+  --primaryColor: #2d72d2;
+
   font-family: Saira-Regular;
 }
 
@@ -87,7 +89,7 @@ a {
   justify-content: space-between;
 }
 
-#content {
+#main-content {
   position: fixed;
   left: 0px;
   width: 100%;
@@ -97,7 +99,9 @@ a {
   flex-direction: column;
   justify-content:center;
 
-  height: 60vh /* TODO: change this */
+  height: calc(100% - var(--headerSpace));
+  
+  overflow-y: scroll;
 }
 
 .header-container{
@@ -195,4 +199,34 @@ a {
   font-weight: bold;
   color: #333;
   width: 200px;
+}
+
+.disabled{
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.homepage-card{
+  width: 250px;
+  height: 150px;
+  object-fit: cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+  padding: 10px;
+  text-align: center;
+  color: var(--primaryColor);
+}
+
+.floating-button{
+  position: absolute;
+  height:var(--buttonWidth);
+  width:var(--buttonWidth);
+  box-shadow:   -1px 2px 6px 1px rgba(0,0,0,0.2) !important   ;
+  border-radius: 6px;
+  z-index: 100;
+  right: 8px;
+  top: 8px !important;
 }
