@@ -40,7 +40,7 @@ def test_circles():
 
         processed_circles, processed_img = process_image(img)
 
-        detected_contours, min_enclosing_circles = detect_circles(img)
+        detected_contours, min_enclosing_circles = detect_circles(img,70, 120, 50)
 
         plt.subplot(3, 3, 3 * i - 2)
         plt.imshow(processed_img, cmap='gray')

@@ -13,14 +13,7 @@ def convolve(image, kernel, threshold):
 
 def contrast_stretching(img):
 
-    # if (0 <= pix and pix <= r1): 
-    #     return (s1 / r1)*pix 
-    # elif (r1 < pix and pix <= r2): 
-    #     return ((s2 - s1)/(r2 - r1)) * (pix - r1) + s1 
-    # else: 
-    #     return ((255 - s2)/(255 - r2)) * (pix - r2) + s2 
-    
-
+    ### TODO try a sigmoid like contrast stretching
     min_intensity = 0
     max_intensity = 255
     min_pixel = np.min(img)
@@ -77,10 +70,7 @@ def find_first_peak(img):
 
     return first_peak_value
 
-def preprocess_dark_img(img):
-
-    blur_kernel_size = 11
-    open_kernel_size =15
+def preprocess_dark_img(img,blur_kernel_size:int=11, open_kernel_size:int=15):
     
     blurred_image = cv2.medianBlur(img, blur_kernel_size)
     better_light = contrast_stretching(blurred_image)
@@ -97,10 +87,8 @@ def preprocess_dark_img(img):
     return opening_result
 
 
-def preprocess_light_img(img):
+def preprocess_light_img(img,blur_kernel_size:int=11, open_kernel_size:int=15):
 
-    blur_kernel_size=11
-    open_kernel_size=15
     inverse_img = cv2.bitwise_not(img)
     blurred_image = cv2.medianBlur(inverse_img, blur_kernel_size)
 
@@ -119,17 +107,4 @@ def preprocess_light_img(img):
     opening_result = cv2.morphologyEx(binary_img, cv2.MORPH_OPEN, kernel)
 
     return opening_result
-    second_derivative = np.diff(first_derivative)
-
-    # Find indices where the 1st derivative changes sign
-    zero_crossings_first = np.where(np.diff(np.sign(first_derivative)))[0]+1  # 0-based index
-
-    # Find indices where the 2nd derivative changes sign
-    zero_crossings_second = np.where(np.diff(np.sign(second_derivative)))[0]+2  # 0-based index
-
-    # Determine local maxima using the 2nd derivative
-    local_maxima_indices = zero_crossings_second[second_derivative[zero_crossings_second - 1] < 0]
-
-    first_peak_value = (local_maxima_indices[0]+2) * q_int
-
-    return first_peak_value
+   

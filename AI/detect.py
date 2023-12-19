@@ -3,15 +3,14 @@ from preprocess import *
 THRESHOLD = 200
 
 def detect_contours(
-        img
+        img,
+        default_radius:int = 70, 
+        max_radius:int = 100, 
+        min_radius:int = 60, 
+        open_kernel_size:int=55, 
+        close_kernel_size:int=23
     ):
 
-    
-    default_radius = 70, 
-    max_radius = 100, 
-    min_radius = 60, 
-    open_kernel_size = 55, 
-    close_kernel_size = 23
 
     contours, _ = cv2.findContours(
         img, mode=cv2.RETR_LIST, method=cv2.CHAIN_APPROX_NONE
