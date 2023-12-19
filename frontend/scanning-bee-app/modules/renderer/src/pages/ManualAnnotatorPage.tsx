@@ -28,10 +28,11 @@ export const ManualAnnotatorPage = () => {
     const images = useImages();
 
     useEffect(() => {
-        if (images.length > 0 && !shownImageUrl) {
+        // if no image is shown or the image shown is not in the folder, set the shown image to the first image in the folder
+        if (images.length > 0 && (!shownImageUrl || !images.includes(shownImageUrl))) {
             setShownImageUrl(images[0]);
         }
-    }, [images, shownImageUrl]);
+    }, [images, folder, shownImageUrl]);
 
     useEffect(() => {
         const panelElement = document.getElementById('left-panel');
@@ -128,7 +129,7 @@ export const ManualAnnotatorPage = () => {
                         />
                     </div>
                     <div className='annotated-images-panel'>
-                        <h2>Images</h2>
+                        <h2 style={{ margin: '0 35px 10px '}}>Images</h2>
                         <Divider style={{ width: '240px' }}/>
                         {sortedImages.map(image => (
                             <Button
