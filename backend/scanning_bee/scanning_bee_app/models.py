@@ -15,7 +15,8 @@ class Frame(models.Model):
 
 
 class Cell(models.Model):
-    location_on_frame = geo_models.MultiPointField(dim=3)
+    location_on_frame_x = models.FloatField()
+    location_on_frame_y = models.FloatField()
     frame = models.ForeignKey(Frame, on_delete=models.CASCADE)
 
 
@@ -29,3 +30,7 @@ class CellContent(models.Model):
     timestamp = models.DateTimeField()
     content = models.ForeignKey(Content, on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
+    center_x = models.IntegerField()
+    center_y = models.IntegerField()
+    radius = models.IntegerField()
+    image_name = models.CharField(max_length=100)

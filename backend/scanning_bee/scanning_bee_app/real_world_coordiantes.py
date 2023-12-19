@@ -2,7 +2,17 @@ import numpy as np
 import cv2
 import pandas as pd
 
-def project_point(point_3d, K, D):
+def get_camera_info(camera_info_file_path):
+    camera_info = pd.read_csv(camera_info_file_path)
+    D_values = camera_info.filter(like='field.D').iloc[0].values
+    K_values = camera_info.filter(like='field.K').iloc[0].values
+
+    D = np.array(D_values) # the distortion coefficients array
+    K = np.array(K_values).reshape((3, 3)) # the intrinsic matrix
+
+    return K, D
+
+def project_point(point_3d, camera_info_file_path='backend/scanning_bee/scanning_bee_app/camera_info.csv'):
     """
     Projects a 3D point to 2D using the camera intrinsic matrix and distortion coefficients.
 
@@ -10,6 +20,8 @@ def project_point(point_3d, K, D):
     K: The intrinsic camera matrix
     D: The distortion coefficients
     """
+
+    K, D = get_camera_info(camera_info_file_path)
 
     # Checks shape
     points_3d = np.array([point_3d], dtype=np.float64).reshape(-1, 1, 3)
@@ -26,7 +38,7 @@ def project_point(point_3d, K, D):
     return point_2d
 
 
-def find_real_world_coordinates(point_2d, depth, K, D):
+def find_real_world_coordinates(point_2d, depth, camera_info_file_path='backend/scanning_bee/scanning_bee_app/camera_info.csv'):
     """
     Find the real-world 3D coordinates from 2D image coordinates.
 
@@ -34,6 +46,7 @@ def find_real_world_coordinates(point_2d, depth, K, D):
     K: The intrinsic camera matrix
     D: The distortion coefficients
     """
+    K, D = get_camera_info(camera_info_file_path)
 
     # Checks shape
     point_2d = np.array(point_2d, dtype=np.float64).reshape(-1, 1, 2)
@@ -56,7 +69,7 @@ def find_real_world_coordinates(point_2d, depth, K, D):
     return np.array([real_world_x, real_world_y])
 
 
-def calculate_annotation_position(center_x, center_y, x_pos, y_pos, K, D, depth, image_width, image_height):
+def calculate_annotation_position(center_x, center_y, x_pos, y_pos, image_width=1980, image_height=1080, camera_info_file_path='backend/scanning_bee/scanning_bee_app/camera_info.csv'):
     """
     Calculate the normalized position of an annotation in the larger frame.
 
@@ -71,6 +84,9 @@ def calculate_annotation_position(center_x, center_y, x_pos, y_pos, K, D, depth,
     Returns:
     - combined_x, combined_y: Normalized position of the annotation in the larger frame.
     """
+    K, D = get_camera_info(camera_info_file_path)
+
+    depth = 1 
 
     # Convert the annotation's position using the camera's intrinsic properties
     real_world_coords = find_real_world_coordinates([center_x, center_y], depth, K, D)
@@ -85,27 +101,6 @@ def calculate_annotation_position(center_x, center_y, x_pos, y_pos, K, D, depth,
 
     return combined_x, combined_y
 
-
-# if __name__ == "__main__":
-#     # Load camera calibration data
-#     camera_info_file_path = 'backend/scanning_bee/scanning_bee_app/camera_info.csv'
-#     camera_info = pd.read_csv(camera_info_file_path)
-
-#     D_values = camera_info.filter(like='field.D').iloc[0].values
-#     K_values = camera_info.filter(like='field.K').iloc[0].values
-
-#     D = np.array(D_values) # the distortion coefficients array
-#     K = np.array(K_values).reshape((3, 3)) # the intrinsic matrix
-
-
-#     # Test the functions
-#     point_3d = [0, 0, 5]
-#     point_2d = project_point(point_3d, K, D)
-#     print("Projected 2D point:", point_2d)
-    
-#     depth = 5
-#     real_world_coordinates = find_real_world_coordinates(point_2d, depth, K, D)
-#     print("Real-world coordinates:", real_world_coordinates)
 
 
 
