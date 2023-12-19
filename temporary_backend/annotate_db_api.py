@@ -20,6 +20,10 @@ class CellState(BaseModel):
     timestamp: datetime
     ContentID: int
     UserID: int
+    # Location coordinates
+    x: float
+    y: float
+    z: float
 
 
 # Function to get a database connection
@@ -32,8 +36,8 @@ def get_db_connection():
 def create_cell_state(cell_state: CellState):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO cell_state (timestamp, ContentID, UserID) VALUES (%s, %s, %s)",
-                   (cell_state.timestamp, cell_state.ContentID, cell_state.UserID))
+    cursor.execute("INSERT INTO cell_state (timestamp, ContentID, UserID, x, y, z) VALUES (%s, %s, %s, %s, %s, %s)",
+                   (cell_state.timestamp, cell_state.ContentID, cell_state.UserID, cell_state.x, cell_state.y, cell_state.z))
     conn.commit()
     cell_state.CellID = cursor.lastrowid
     cursor.close()
@@ -53,6 +57,11 @@ def get_cell_state_by_id(cell_id):
     if row is None:
         raise HTTPException(status_code=404, detail="CellState not found")
     return CellState(CellID=row[0], timestamp=row[1], ContentID=row[2], UserID=row[3])
+
+
+@app.get("/cell_state/location/")
+def get_cell_states_by_location_xy(x: float, y: float, tolerance: float = 0.5):
+    return get_cell_states_by_location_from_database(x, y, tolerance)
 
 
 @app.put("/cell_state/{cell_id}")
@@ -82,6 +91,28 @@ def update_cell_state_in_database(cell_state: CellState):
     conn.commit()
     cursor.close()
     conn.close()
+
+
+def get_cell_states_by_location_from_database(x: float, y: float, tolerance: float):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    query = """
+        SELECT * FROM cell_state 
+        WHERE ABS(x - %s) <= %s AND ABS(y - %s) <= %s
+    """
+    cursor.execute(query, (x, tolerance, y, tolerance))
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    cell_states = []
+    for row in rows:
+        cell_states.append(CellState(CellID=row[0], timestamp=row[1], ContentID=row[2], UserID=row[3], x=row[4], y=row[5], z=row[6]))
+
+    if not cell_states:
+        raise HTTPException(status_code=404, detail="No CellState found for the given location")
+
+    return cell_states
 
 
 # Delete a cell state by CellID
