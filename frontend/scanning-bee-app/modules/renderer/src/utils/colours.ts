@@ -1,3 +1,5 @@
+import CellType from '@frontend/models/cellType';
+
 export type Theme = {
     primaryForeground: string;
     secondaryForeground: string;
@@ -41,4 +43,16 @@ export const darkTheme: Theme = {
     primaryBorder: '#F9C62A',
     secondaryBorder: '#F4AC18',
     tertiaryBorder: '#E89C08',
+};
+
+export const CellTypeColours: { [key in CellType]: string } = {
+    [CellType.BEE_OCCLUDED]: 'rgb(255, 255, 0)',
+    [CellType.EGG]: 'rgb(0, 255, 0)',
+    [CellType.EMPTY]: 'rgb(0, 0, 255)',
+    [CellType.HONEY_CLOSED]: 'rgb(255, 140, 0)',
+    [CellType.LARVAE]: 'rgb(255, 255, 255)',
+    [CellType.NECTAR]: 'rgb(255, 255, 204)',
+    [CellType.NOT_CLASSIFIED]: 'rgb(255, 128, 128)',
+    [CellType.POLLEN]: 'rgb(0, 0, 139)',
+    [CellType.PUPPA]: 'rgb(165, 42, 42)',
 };
