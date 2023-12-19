@@ -56,26 +56,26 @@ def find_real_world_coordinates(point_2d, depth, K, D):
     return np.array([real_world_x, real_world_y, real_world_z])
 
 
-if __name__ == "__main__":
-    # Load camera calibration data
-    camera_info_file_path = 'backend/scanning_bee/scanning_bee_app/camera_info.csv'
-    camera_info = pd.read_csv(camera_info_file_path)
+# if __name__ == "__main__":
+#     # Load camera calibration data
+#     camera_info_file_path = 'backend/scanning_bee/scanning_bee_app/camera_info.csv'
+#     camera_info = pd.read_csv(camera_info_file_path)
 
-    D_values = camera_info.filter(like='field.D').iloc[0].values
-    K_values = camera_info.filter(like='field.K').iloc[0].values
+#     D_values = camera_info.filter(like='field.D').iloc[0].values
+#     K_values = camera_info.filter(like='field.K').iloc[0].values
 
-    D = np.array(D_values) # the distortion coefficients array
-    K = np.array(K_values).reshape((3, 3)) # the intrinsic matrix
+#     D = np.array(D_values) # the distortion coefficients array
+#     K = np.array(K_values).reshape((3, 3)) # the intrinsic matrix
 
 
-    # Test the functions
-    point_3d = [0, 0, 5]
-    point_2d = project_point(point_3d, K, D)
-    print("Projected 2D point:", point_2d)
+#     # Test the functions
+#     point_3d = [0, 0, 5]
+#     point_2d = project_point(point_3d, K, D)
+#     print("Projected 2D point:", point_2d)
     
-    depth = 5
-    real_world_coordinates = find_real_world_coordinates(point_2d, depth, K, D)
-    print("Real-world coordinates:", real_world_coordinates)
+#     depth = 5
+#     real_world_coordinates = find_real_world_coordinates(point_2d, depth, K, D)
+#     print("Real-world coordinates:", real_world_coordinates)
 
 
 
