@@ -30,10 +30,9 @@ class CellState(BaseModel):
 def get_db_connection():
     return mysql.connector.connect(**db_config)
 
-
 # API route to create a new cell state
 @app.post("/new_cell_state/")
-def create_cell_state(cell_state: CellState):
+def create_cell_state_rest(cell_state: CellState) -> CellState:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("INSERT INTO cell_state (timestamp, ContentID, UserID, x, y, z) VALUES (%s, %s, %s, %s, %s, %s)",
@@ -47,7 +46,7 @@ def create_cell_state(cell_state: CellState):
 
 # Get a cell state by ID
 @app.get("/cell_state/{cell_id}")
-def get_cell_state_by_id(cell_id):
+def get_cell_state_by_id(cell_id) -> CellState:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM cell_state WHERE CellID = %s", (cell_id,))
@@ -65,7 +64,7 @@ def get_cell_states_by_location_xy(x: float, y: float, tolerance: float = 0.5):
 
 
 @app.put("/cell_state/{cell_id}")
-def update_cell_state(cell_id: int, updated_cell_state: CellState):
+def update_cell_state(cell_id: int, updated_cell_state: CellState) -> CellState:
     # Check if the cell state with the given CellID exists
     existing_cell_state = get_cell_state_by_id(cell_id)
     if existing_cell_state is None:
@@ -81,7 +80,7 @@ def update_cell_state(cell_id: int, updated_cell_state: CellState):
     return existing_cell_state
 
 
-def update_cell_state_in_database(cell_state: CellState):
+def update_cell_state_in_database(cell_state: CellState) -> None:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
@@ -117,7 +116,7 @@ def get_cell_states_by_location_from_database(x: float, y: float, tolerance: flo
 
 # Delete a cell state by CellID
 @app.delete("/cell_state/{cell_id}")
-def delete_cell_state(cell_id: int):
+def delete_cell_state(cell_id: int) -> dict:
     # Check if the cell state with the given CellID exists
     existing_cell_state = get_cell_state_by_id(cell_id)
     if existing_cell_state is None:
@@ -129,7 +128,7 @@ def delete_cell_state(cell_id: int):
     return {"message": "CellState deleted successfully"}
 
 
-def delete_cell_state_from_database(cell_id: int):
+def delete_cell_state_from_database(cell_id: int) -> None:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM cell_state WHERE CellID = %s", (cell_id,))
@@ -140,7 +139,7 @@ def delete_cell_state_from_database(cell_id: int):
 
 # get all Cell States as cell state objects with a given ContentID
 @app.get("/cell_state/content/{content_id}")
-def get_cell_state_by_content_id(content_id):
+def get_cell_state_by_content_id(content_id) -> list[CellState]:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM cell_state WHERE ContentID = %s", (content_id,))
@@ -160,7 +159,7 @@ def get_cell_state_by_content_id(content_id):
 
 # get all Cell States JSON objects with a given UserID
 @app.get("/cell_state/user/{user_id}")
-def get_cell_state_by_user_id(user_id):
+def get_cell_state_by_user_id(user_id) -> list[CellState]:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM cell_state WHERE UserID = %s", (user_id,))
@@ -179,7 +178,7 @@ def get_cell_state_by_user_id(user_id):
 
 # get all Cell States JSON objects
 @app.get("/cell_state/")
-def get_all_cell_states():
+def get_all_cell_states() -> list[CellState]:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM cell_state")
@@ -199,7 +198,7 @@ def get_all_cell_states():
 
 # Execute custom queries on cell states
 @app.get("/cell_state/custom_query/")
-def custom_query_cell_states(query: str):
+def custom_query_cell_states(query: str) -> list[CellState]:
     conn = get_db_connection()
     cursor = conn.cursor()
 
