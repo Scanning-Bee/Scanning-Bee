@@ -1,7 +1,7 @@
 import fs from 'fs';
 import yaml from 'js-yaml';
 
-type AnnotationYaml = {
+export type AnnotationYaml = {
     annotated_image: string;
     annotation: string;
     center_x: number;
@@ -42,4 +42,16 @@ export const loadImages = (folderPath: string) => {
         console.error(e);
         return null;
     }
+};
+
+export const saveAnnotations = (annotations: AnnotationYaml[], targetFolder: string) => {
+    const data = {
+        annotation_data: {
+            annotations,
+        },
+    };
+
+    const yamlString = yaml.dump(data);
+
+    fs.writeFileSync(`${targetFolder}/annotations/annotations.yaml`, yamlString);
 };

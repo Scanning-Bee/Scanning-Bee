@@ -305,3 +305,7 @@ a {
   transition: left 0.2s;
   transition: right 0.2s;
 }
+
+.inline-box-important{
+  display: -webkit-inline-box !important;
+}

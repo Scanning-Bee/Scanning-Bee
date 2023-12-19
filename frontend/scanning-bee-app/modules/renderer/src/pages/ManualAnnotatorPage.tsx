@@ -1,5 +1,5 @@
 import { Button, Divider, Icon } from '@blueprintjs/core';
-import { openFolderDialog } from '@frontend/controllers/backendInterface';
+import { openFolderDialog, saveAnnotations } from '@frontend/controllers/backendInterface';
 import CellType from '@frontend/models/cellType';
 import {
     setActiveAnnotation,
@@ -100,7 +100,32 @@ export const ManualAnnotatorPage = () => {
                     }}
                     resizerStyle={{ backgroundColor: lightTheme.secondaryBackground }}
                     allowResize={leftPanelOpen}
+                    pane1Style={{ display: 'unset' }}
                 >
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'start' }}>
+                        <h2>Annotations</h2>
+                        <Divider style={{ width: '240px' }}/>
+                        <Button
+                            text='Open a folder'
+                            onClick={() => {
+                                openFolderDialog();
+                            }}
+                            intent='primary'
+                            icon='folder-open'
+                            style={{ margin: '10px' }}
+                            className='inline-box-important'
+                        />
+                        <Button
+                            text='Save annotations'
+                            onClick={() => {
+                                saveAnnotations(annotations, folder);
+                            }}
+                            intent='primary'
+                            icon='floppy-disk'
+                            style={{ margin: '10px' }}
+                            className='inline-box-important'
+                        />
+                    </div>
                     <div className='annotated-images-panel'>
                         <h2>Images</h2>
                         <Divider style={{ width: '240px' }}/>
@@ -120,7 +145,6 @@ export const ManualAnnotatorPage = () => {
                             />
                         ))}
                     </div>
-                    <></>
                 </SplitPane>
             </div>
 

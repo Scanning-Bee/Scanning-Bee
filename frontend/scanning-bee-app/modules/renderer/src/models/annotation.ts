@@ -68,6 +68,29 @@ export default class Annotation {
         this.id = crypto.randomUUID() as UUID;
     }
 
+    static toYaml(annotation: Annotation): AnnotationYaml {
+        const {
+            radius,
+            center,
+            cell_type,
+            source_name,
+            timestamp,
+            poses,
+        } = annotation;
+
+        return {
+            radius,
+            center_x: center[0],
+            center_y: center[1],
+            annotation: cell_type,
+            orig_image: source_name,
+            sec: timestamp,
+            x_pos: poses[0],
+            y_pos: poses[1],
+            annotated_image: source_name,
+        };
+    }
+
     static fromYaml(yaml: AnnotationYaml): Annotation {
         const center = [yaml.center_x, yaml.center_y];
         const poses = [yaml.x_pos, yaml.y_pos];

@@ -6,7 +6,7 @@ import {
 } from 'electron';
 import fs from 'fs-extra';
 
-import { loadAnnotations, loadImages } from './annotationParser/annotationParser';
+import { AnnotationYaml, loadAnnotations, loadImages, saveAnnotations } from './annotationUtils';
 import { isRunningDevMode } from './utils';
 
 // Determine the mode (dev or production)
@@ -308,6 +308,10 @@ class MainController {
             }).catch((err) => {
                 console.log(err);
             });
+        });
+
+        ipcMain.on('saveAnnotations', (_event, { targetFolder, annotations }: { targetFolder: string, annotations: AnnotationYaml[] }) => {
+            saveAnnotations(annotations, targetFolder);
         });
 
         ipcMain.on('zoomChange', zoomChangeHandler);
