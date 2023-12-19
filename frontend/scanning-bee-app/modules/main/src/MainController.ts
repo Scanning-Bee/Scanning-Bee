@@ -2,10 +2,11 @@ import http from 'http';
 import { AddressInfo } from 'net';
 import path from 'path';
 import {
-    app, BrowserWindow, ipcMain, Menu, MenuItemConstructorOptions, nativeImage, nativeTheme, screen, shell, Tray,
+    app, BrowserWindow, dialog, ipcMain, Menu, MenuItemConstructorOptions, nativeImage, nativeTheme, screen, shell, Tray,
 } from 'electron';
 import fs from 'fs-extra';
 
+import { loadAnnotations, loadImages } from './annotationParser/annotationParser';
 import { isRunningDevMode } from './utils';
 
 // Determine the mode (dev or production)
@@ -290,6 +291,24 @@ class MainController {
                 }
             }
         };
+
+        ipcMain.on('selectFolder', (_event) => {
+            dialog.showOpenDialog({
+                properties: ['openDirectory'],
+            }).then((result) => {
+                if (!result.canceled) {
+                    const folderPath = result.filePaths[0];
+
+                    const annotations = loadAnnotations(path.join(folderPath, 'annotations', 'annotations.yaml'));
+
+                    const imageUrls = loadImages(folderPath);
+
+                    this.send('annotationsParsed', { folder: folderPath, annotations, images: imageUrls });
+                }
+            }).catch((err) => {
+                console.log(err);
+            });
+        });
 
         ipcMain.on('zoomChange', zoomChangeHandler);
         zoomChangeHandler();

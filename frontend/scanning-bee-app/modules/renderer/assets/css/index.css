@@ -58,6 +58,8 @@
 
   --primaryColor: #2d72d2;
 
+  --leftPanelWidth:260px;
+
   font-family: Saira-Regular;
 }
 
@@ -104,6 +106,27 @@ a {
   overflow-y: scroll;
 }
 
+#left-panel {
+  max-width: 50%;
+  left: 0 !important;
+  width: var(--leftPanelWidth);
+}
+
+.panel {
+  top:var(--headerSpace);
+  border-width: 5px;
+  position: fixed !important;
+  height: 100%;
+  box-shadow: 0px 3px 6px rgba(0,0,0,0.18);
+  z-index:49;
+  transition: ease-out width 0.2s;
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
 .header-container{
   flex-wrap: nowrap;
   width:auto;
@@ -140,6 +163,10 @@ a {
 
 .noselect{
   user-select: none;
+}
+
+.nomargin{
+  margin: 0px;
 }
 
 .App {
@@ -229,4 +256,52 @@ a {
   z-index: 100;
   right: 8px;
   top: 8px !important;
+}
+
+.panel-button {
+  position: absolute;
+  height:var(--buttonWidth);
+  width:var(--buttonWidth);
+  /* top: 4px; */
+  top: 40%;
+
+  box-shadow:   -1px 2px 6px 1px rgba(0,0,0,0.2) !important   ;
+  border-radius: 6px;
+  z-index: 100;
+}
+
+.page{
+  top: 0;
+  position: absolute;
+}
+
+.annotated-images-panel{
+  width: 250px;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: self-start;
+  overflow: scroll;
+}
+
+.open-margin-left {
+  /* position: relative !important; */
+  right:var(--buttonOffset);
+  right: 0px;
+  margin: -20px;
+  /* top: 4px !important;    */
+}
+.closed-margin-left {
+  /* left:var(--buttonOffset); */
+  /* position: relative !important; */
+  right: -58px;
+  /* margin: -20px; */
+   /* left: 4px; */
+  top: 8px !important;
+}
+
+.button-animation{
+  transition: left 0.2s;
+  transition: right 0.2s;
 }

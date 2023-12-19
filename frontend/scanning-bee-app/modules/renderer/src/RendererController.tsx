@@ -1,8 +1,11 @@
+import { ipcRenderer } from 'electron';
 import React, { StrictMode } from 'react';
 import { render } from 'react-dom';
 
 // Import main App component
 import App from './App';
+import Annotation, { AnnotationYaml } from './models/annotation';
+import { generateAnnotationsFromYaml, openFolder } from './slices/annotationSlice';
 
 export type PageType = 'home' | 'manual-annotator' | 'beehive' | 'settings';
 
@@ -15,14 +18,28 @@ export class RendererController {
 
     constructor() {
         this.setPage = this.setPage.bind(this);
+        this.handleParsedAnnotations = this.handleParsedAnnotations.bind(this);
+
+        // { folder: folderPath, annotations, images: imageUrls }
+        ipcRenderer.on('annotationsParsed', this.handleParsedAnnotations);
 
         this.initialize();
     }
 
+    private handleParsedAnnotations(_event, payload: { folder: string, annotations: AnnotationYaml[], images: string[] }) {
+        const { dispatch } = (window as any).store;
+
+        const annotations = generateAnnotationsFromYaml(payload.annotations);
+
+        dispatch(openFolder({
+            folder: payload.folder,
+            annotations: annotations.map(annotation => Annotation.toPlainObject(annotation)),
+            images: payload.images,
+        }));
+    }
+
     public setPage(page: PageType) : void {
         this.page = page;
-
-        console.log('Page set to: ', page);
 
         this.renderAgain();
     }
