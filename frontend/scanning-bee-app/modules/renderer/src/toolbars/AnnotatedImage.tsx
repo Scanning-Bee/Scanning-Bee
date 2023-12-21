@@ -15,6 +15,10 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
     const allAnnotations = useAnnotations();
     const dispatch = useDispatch();
 
+    if (!shownImageUrl) {
+        return <div />;
+    }
+
     const imageAnnotations = allAnnotations.filter(annotation => annotation.source_name === getFileName(shownImageUrl));
 
     window.onresize = () => {
