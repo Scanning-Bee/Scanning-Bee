@@ -109,12 +109,142 @@ def detect_contours(
 
     return contours, min_enclosing_circles
 
+def detect_hough(img,
+        default_radius:int = 70, 
+        max_radius:int = 100, 
+        min_radius:int = 60, 
+        open_kernel_size:int=55, 
+        close_kernel_size:int=23
+    ):
+
+    accepted_circles = np.array([])
+    large_circles = []
+    small_circles = []
+
+    found_circles = cv2.HoughCircles(
+                                    img,
+                                    cv2.HOUGH_GRADIENT,
+                                    2,
+                                    minDist=2*min_radius,
+                                    param1=200,
+                                    param2=50,
+                                    minRadius=min_radius,
+                                    maxRadius=max_radius,
+                                    ) 
+
+    
+    if isinstance(found_circles,type(None)):
+        return None
+
+    accepted_circles = found_circles.reshape((-1,3))[:3]
+    # List to store the centers and radii of the minimum enclosing circles
+    print(accepted_circles.shape)
+    print(accepted_circles)
+
+    def check_circle(x, y, radius):
+        h, w = img.shape
+
+        # check of bounds
+        if (
+            (x + radius >= w)
+            or (x - radius <= 0)
+            or (y + radius >= h)
+            or (y - radius <= 0)
+        ):
+            return False
+
+        # check of proximity
+        for x_c, y_c, _ in accepted_circles:
+            distance = np.sqrt((x_c - x) ** 2 + (y_c - y) ** 2)
+            if distance < 2 * default_radius:
+                return False
+
+        return True
+    
+    return accepted_circles
+
+    for contour in contours:
+        # Find minimum enclosing circle for each contour
+        (x, y), radius = cv2.minEnclosingCircle(contour)
+        center = (int(x), int(y))
+        radius = int(radius)
+
+        if radius > max_radius:
+            large_contours.append(contour)
+            continue
+
+        elif radius < min_radius:
+            small_contours.append(contour)
+            continue
+
+        if check_circle(x, y, radius):
+            min_enclosing_circles.append((int(x), int(y), radius))
+
+    ## Separate larger contours, apply opening on them to divide
+    large_areas = np.zeros_like(img)
+    large_areas = cv2.drawContours(large_areas, large_contours, -1, 255, cv2.FILLED)
+
+    kernel = np.ones((open_kernel_size, open_kernel_size), np.uint8)
+
+    # Apply opening operation
+    large_areas = cv2.morphologyEx(large_areas, cv2.MORPH_OPEN, kernel)
+
+    fixed_large_contours, _ = cv2.findContours(
+        large_areas, mode=cv2.RETR_LIST, method=cv2.CHAIN_APPROX_NONE
+    )
+
+    for contour in fixed_large_contours:
+        # Find minimum enclosing circle for each contour
+        (x, y), radius = cv2.minEnclosingCircle(contour)
+        center = (int(x), int(y))
+        radius = int(radius)
+
+        if radius > max_radius:
+            continue
+
+        if check_circle(x, y, radius):
+            min_enclosing_circles.append((int(x), int(y), radius))
+
+    ## Separate small contours, apply closure to merge close ones
+    small_areas = np.zeros_like(img)
+    small_areas = cv2.drawContours(small_areas, small_contours, -1, 255, cv2.FILLED)
+
+
+    kernel = np.ones((close_kernel_size, close_kernel_size), np.uint8)
+    small_areas = cv2.dilate(small_areas, kernel)
+
+    fixed_small_contours, _ = cv2.findContours(
+        small_areas, mode=cv2.RETR_LIST, method=cv2.CHAIN_APPROX_NONE
+    )
+
+    for contour in fixed_small_contours:
+        # Find minimum enclosing circle for each contour
+        (x, y), radius = cv2.minEnclosingCircle(contour)
+        center = (int(x), int(y))
+        radius = int(radius)
+
+        if radius < min_radius:
+            continue
+
+        if check_circle(x, y, radius):
+            min_enclosing_circles.append((int(x), int(y), radius))
+
+    return contours, min_enclosing_circles
+
+
+def return_hough(img):
+    dark_image, before_thres = preprocess_dark_img(img)
+    dark_circles = detect_hough(dark_image)
+
+    return dark_circles, before_thres, dark_image
+
+
 def detect_circles(img):
 
     light_image = preprocess_light_img(img)
     dark_image, before_thres = preprocess_dark_img(img)
     light_contours, light_circles = detect_contours(light_image)
-    dark_contours, dark_circles = detect_contours(dark_image)
+    dark_contours, dark_circles = detect_hough(dark_image)
 
     all_contours = light_contours + dark_contours
     all_circles = light_circles + dark_circles

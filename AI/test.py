@@ -30,10 +30,10 @@ def process_image(img: np.ndarray):
 
 
 def main():
-    image_files = glob.glob("AI/test_images/image_1*.jpg")
+    image_files = glob.glob("AI/test_images/image_*.jpg")
 
     # Set up the subplot grid
-    plt.figure(figsize=(15, 15))
+    plt.figure(figsize=(40, 15))
     
 
     for i, file in enumerate(image_files, 1):
@@ -43,22 +43,22 @@ def main():
         org_img = img.copy()
 
         # Detect circles using contour or blob detection
-        detected_contours, detected_circles, light_image, dark_image = detect_circles(img)
-        process_image(img)
+        
+        detected_circles, light_image, dark_image = return_hough(img)
         # Create subplot for original image contours
-        plt.subplot(3, 3, 3 * i - 2)
+        plt.subplot(8, 3, 3 * i - 2)
         original_img_rgb_dark = cv2.cvtColor(org_img, cv2.COLOR_GRAY2RGB)
-        if detected_contours is not None:
+        if detected_circles is not None:
             for x, y, radius in detected_circles:
-                cv2.circle(original_img_rgb_dark, (x, y), int(radius), (255, 0, 255), 5)
+                cv2.circle(original_img_rgb_dark, (int(x), int(y)), int(radius), (255, 0, 255), 5)
         plt.imshow(original_img_rgb_dark)
         plt.axis("off")
 
-        plt.subplot(3, 3, 3 * i - 1)
+        plt.subplot(8, 3, 3 * i - 1)
         plt.imshow(light_image,cmap="gray")
         plt.axis("off")
 
-        plt.subplot(3, 3, 3 * i)
+        plt.subplot(8, 3, 3 * i)
         plt.imshow(dark_image,cmap="gray")
         plt.axis("off")
 
