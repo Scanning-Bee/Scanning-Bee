@@ -11,6 +11,34 @@ def convolve(image, kernel, threshold):
 
     return normalized_result
 
+def sigmoid(x, a, b):
+    """
+    Sigmoid function with parameters 'a' and 'b'.
+    """
+    return 1 / (1 + np.exp(-a * (x - b)))
+
+def sigmoid_contrast_stretching(img, a, b):
+    """
+    Apply sigmoid-like contrast stretching to an image.
+    'a' and 'b' are parameters that control the shape of the sigmoid function.
+    """
+    min_intensity = 0
+    max_intensity = 255
+
+    # Normalize pixel values to the range [0, 1]
+    normalized_img = (img - np.min(img)) / (np.max(img) - np.min(img))
+
+    # Apply the sigmoid function
+    stretched_img = sigmoid(normalized_img, a, b)
+
+    # Map the stretched values to the desired intensity range
+    stretched_img = (stretched_img * (max_intensity - min_intensity)) + min_intensity
+
+    # Convert to unsigned 8-bit integer
+    stretched_img = np.uint8(stretched_img)
+
+    return stretched_img
+
 def contrast_stretching(img):
 
     ### TODO try a sigmoid like contrast stretching
@@ -73,10 +101,11 @@ def find_first_peak(img):
 def preprocess_dark_img(img,blur_kernel_size:int=11, open_kernel_size:int=15):
     
     blurred_image = cv2.medianBlur(img, blur_kernel_size)
-    better_light = contrast_stretching(blurred_image)
+
+    better_light = sigmoid_contrast_stretching(blurred_image,15,0.4)
 
     dark_thresh = find_first_peak(better_light)
-
+    
     _, binary_img = cv2.threshold(better_light, dark_thresh, 255, cv2.THRESH_BINARY_INV)
 
     kernel = np.ones((open_kernel_size, open_kernel_size), np.uint8)
@@ -84,7 +113,7 @@ def preprocess_dark_img(img,blur_kernel_size:int=11, open_kernel_size:int=15):
     # Apply opening operation
     opening_result = cv2.morphologyEx(binary_img, cv2.MORPH_OPEN, kernel)
 
-    return opening_result
+    return opening_result, better_light
 
 
 def preprocess_light_img(img,blur_kernel_size:int=11, open_kernel_size:int=15):

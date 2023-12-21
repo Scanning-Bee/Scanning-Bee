@@ -109,15 +109,17 @@ def detect_contours(
 
     return contours, min_enclosing_circles
 
-def detect_circles(img,default, max_r, min_r):
+def detect_circles(img):
 
-    light_contours, light_circles = detect_contours(preprocess_light_img(img),default, max_r, min_r)
-    dark_contours, dark_circles = detect_contours(preprocess_dark_img(img),default, max_r, min_r)
+    light_image = preprocess_light_img(img)
+    dark_image, before_thres = preprocess_dark_img(img)
+    light_contours, light_circles = detect_contours(light_image)
+    dark_contours, dark_circles = detect_contours(dark_image)
 
     all_contours = light_contours + dark_contours
     all_circles = light_circles + dark_circles
 
-    return all_contours, all_circles
+    return all_contours, all_circles, before_thres, dark_image
 
 def light_detect_procedure():
     bee_hive_image = cv2.imread('mini_dataset/close_up_1.jpg')

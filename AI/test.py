@@ -30,37 +30,41 @@ def process_image(img: np.ndarray):
 
 
 def main():
-    image_files = glob.glob("./mini_dataset/image*.jpg")
+    image_files = glob.glob("AI/test_images/image_1*.jpg")
 
     # Set up the subplot grid
-    plt.figure(figsize=(20, 10))
+    plt.figure(figsize=(15, 15))
+    
 
-    for default in range(65,105,10):
-        for min_r in range(30,65,10):
-            for max_r in range(100,130,10):
- 
-                
-                for i, file in enumerate(image_files, 1):
+    for i, file in enumerate(image_files, 1):
 
-                    # Read the image
-                    img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
-                    org_img = img.copy()
+        # Read the image
+        img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
+        org_img = img.copy()
 
-                    # Detect circles using contour or blob detection
-                    detected_contours, detected_circles = detect_circles(img,default, max_r, min_r)
+        # Detect circles using contour or blob detection
+        detected_contours, detected_circles, light_image, dark_image = detect_circles(img)
+        process_image(img)
+        # Create subplot for original image contours
+        plt.subplot(3, 3, 3 * i - 2)
+        original_img_rgb_dark = cv2.cvtColor(org_img, cv2.COLOR_GRAY2RGB)
+        if detected_contours is not None:
+            for x, y, radius in detected_circles:
+                cv2.circle(original_img_rgb_dark, (x, y), int(radius), (255, 0, 255), 5)
+        plt.imshow(original_img_rgb_dark)
+        plt.axis("off")
 
-                    # Create subplot for original image contours
-                    plt.subplot(4, 2, i)
-                    original_img_rgb_dark = cv2.cvtColor(org_img, cv2.COLOR_GRAY2RGB)
-                    if detected_contours is not None:
-                        for x, y, radius in detected_circles:
-                            cv2.circle(original_img_rgb_dark, (x,y), int(radius), (255, 0, 255), 5)
-                    plt.imshow(original_img_rgb_dark)
-                    plt.axis('off')
+        plt.subplot(3, 3, 3 * i - 1)
+        plt.imshow(light_image,cmap="gray")
+        plt.axis("off")
 
-                plt.suptitle(f"Results for def:{default},min:{min_r},max:{max_r}")                
-                plt.tight_layout()
-                plt.savefig(f'./results/grid_search/d{default}f{min_r}t{max_r}.png')
+        plt.subplot(3, 3, 3 * i)
+        plt.imshow(dark_image,cmap="gray")
+        plt.axis("off")
+
+    
+    plt.tight_layout()  # Adjust layout to prevent overlapping
+    plt.savefig("./AI/light_n_dark.png")
 
 if __name__ == "__main__":
     main()
