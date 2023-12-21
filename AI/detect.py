@@ -136,7 +136,7 @@ def detect_hough(img,
     if isinstance(found_circles,type(None)):
         return None
 
-    accepted_circles = found_circles.reshape((-1,3))[:3]
+    accepted_circles = found_circles.reshape((-1,3))
     # List to store the centers and radii of the minimum enclosing circles
     print(accepted_circles.shape)
     print(accepted_circles)
