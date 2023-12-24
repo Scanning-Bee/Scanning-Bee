@@ -38,7 +38,7 @@ def project_point(point_3d, camera_info_file_path='backend/scanning_bee/scanning
     return point_2d
 
 
-def find_real_world_coordinates(point_2d, depth, camera_info_file_path='backend/scanning_bee/scanning_bee_app/camera_info.csv'):
+def find_real_world_coordinates(point_2d, depth, K, D):
     """
     Find the real-world 3D coordinates from 2D image coordinates.
 
@@ -46,7 +46,6 @@ def find_real_world_coordinates(point_2d, depth, camera_info_file_path='backend/
     K: The intrinsic camera matrix
     D: The distortion coefficients
     """
-    K, D = get_camera_info(camera_info_file_path)
 
     # Checks shape
     point_2d = np.array(point_2d, dtype=np.float64).reshape(-1, 1, 2)
@@ -69,7 +68,7 @@ def find_real_world_coordinates(point_2d, depth, camera_info_file_path='backend/
     return np.array([real_world_x, real_world_y])
 
 
-def calculate_annotation_position(center_x, center_y, x_pos, y_pos, image_width=1980, image_height=1080, camera_info_file_path='backend/scanning_bee/scanning_bee_app/camera_info.csv'):
+def calculate_annotation_position(center_x, center_y, x_pos, y_pos, image_width=1980, image_height=1080, camera_info_file_path='/home/taner/Desktop/Bitirme/scanning-bee/backend/scanning_bee/scanning_bee_app/camera_info.csv'):
     """
     Calculate the normalized position of an annotation in the larger frame.
 
