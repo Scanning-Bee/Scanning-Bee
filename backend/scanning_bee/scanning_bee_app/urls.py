@@ -1,10 +1,20 @@
 from django.urls import path
-from .views import CellListView, CellContentView
-
 from . import views
 
 urlpatterns = [
-    path('cells/', CellListView.as_view(), name='cell-list'),
-    path('cell-contents/', CellContentView.as_view(), name='cell-content-list'),
+    path('usertypes/', views.UserTypeList.as_view(), name='usertype-list'),
+    path('usertypes/<int:id>/', views.SingleUserType.as_view(), name='usertype-detail'),
+    path('users/', views.UserList.as_view(), name='user-list'),
+    path('users/<int:id>/', views.SingleUser.as_view(), name='user-detail'),
+    path('frames/', views.FrameList.as_view(), name='frame-list'),
+    path('frames/<int:id>/', views.SingleFrame.as_view(), name='frame-detail'),
+    path('cells/', views.CellList.as_view(), name='cell-list'),
+    path('cells/<int:id>/', views.SingleCell.as_view(), name='cell-detail'),
+    path('cells/by-location/', views.CellListByLocation.as_view(), name='cell-list-by-location'),
+    path('contents/', views.ContentList.as_view(), name='content-list'),
+    path('contents/<int:id>/', views.SingleContent.as_view(), name='content-detail'),
+    path('cellcontents/', views.CellContentList.as_view(), name='cellcontent-list'),
+    path('cellcontents/<int:id>/', views.SingleCellContent.as_view(), name='cellcontent-detail'),
+
 ]
 
