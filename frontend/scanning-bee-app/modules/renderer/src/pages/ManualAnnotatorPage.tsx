@@ -133,7 +133,7 @@ export const ManualAnnotatorPage = () => {
                                 BackendInterface.getInstance().saveAnnotationsToDatabase(annotations);
                             }}
                             intent='primary'
-                            icon='floppy-disk'
+                            icon='database'
                             style={{ margin: '5px' }}
                             className='inline-box-important'
                         />
