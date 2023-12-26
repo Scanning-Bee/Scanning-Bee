@@ -118,7 +118,7 @@ export const ManualAnnotatorPage = () => {
                             className='inline-box-important'
                         />
                         <Button
-                            text='Save annotations'
+                            text='Save annotations locally'
                             onClick={() => {
                                 BackendInterface.getInstance().saveAnnotations(annotations, folder);
                             }}
