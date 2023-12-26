@@ -1,5 +1,5 @@
 import { Button, Divider, Icon } from '@blueprintjs/core';
-import { openFolderDialog, saveAnnotations } from '@frontend/controllers/backendInterface';
+import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
 import CellType from '@frontend/models/cellType';
 import {
     setActiveAnnotation,
@@ -51,7 +51,7 @@ export const ManualAnnotatorPage = () => {
                 minimal
                 large
                 onClick={() => {
-                    openFolderDialog();
+                    BackendInterface.getInstance().openFolderDialog();
                 }}
                 intent='primary'
                 icon='folder-open'
@@ -110,7 +110,7 @@ export const ManualAnnotatorPage = () => {
                         <Button
                             text='Open a folder'
                             onClick={() => {
-                                openFolderDialog();
+                                BackendInterface.getInstance().openFolderDialog();
                             }}
                             intent='primary'
                             icon='folder-open'
@@ -120,7 +120,7 @@ export const ManualAnnotatorPage = () => {
                         <Button
                             text='Save annotations'
                             onClick={() => {
-                                saveAnnotations(annotations, folder);
+                                BackendInterface.getInstance().saveAnnotations(annotations, folder);
                             }}
                             intent='primary'
                             icon='floppy-disk'
@@ -129,7 +129,7 @@ export const ManualAnnotatorPage = () => {
                         />
                     </div>
                     <div className='annotated-images-panel'>
-                        <h2 style={{ margin: '0 35px 10px '}}>Images</h2>
+                        <h2 style={{ margin: '0 35px 10px ' }}>Images</h2>
                         <Divider style={{ width: '240px' }}/>
                         {sortedImages.map(image => (
                             <Button
