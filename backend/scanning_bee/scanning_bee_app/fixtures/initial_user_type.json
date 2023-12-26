@@ -1,14 +1,23 @@
 [
   {
     "model": "scanning_bee_app.usertype",
-    "type": "AI"
+    "pk": 1,
+    "fields": {
+      "type": "AI"
+    }
   },
   {
     "model": "scanning_bee_app.usertype",
-    "type": "Biolog"
+    "pk": 2,
+    "fields": {
+      "type": "Biolog"
+    }
   },
   {
     "model": "scanning_bee_app.usertype",
-    "type": "Annotator"
+    "pk": 3,
+    "fields": {
+      "type": "Annotator"
+    }
   }
 ]
