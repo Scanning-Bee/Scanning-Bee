@@ -68,7 +68,7 @@ def find_real_world_coordinates(point_2d, depth, K, D):
     return np.array([real_world_x, real_world_y])
 
 
-def calculate_annotation_position(center_x, center_y, x_pos, y_pos, image_width=1980, image_height=1080, camera_info_file_path='/home/taner/Desktop/Bitirme/scanning-bee/backend/scanning_bee/scanning_bee_app/camera_info.csv'):
+def calculate_annotation_position(center_x, center_y, x_pos, y_pos, image_width=1980, image_height=1080, camera_info_file_path='scanning_bee_app/camera_info.csv'):
     """
     Calculate the normalized position of an annotation in the larger frame.
 
