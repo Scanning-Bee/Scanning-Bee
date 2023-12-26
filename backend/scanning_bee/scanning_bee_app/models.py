@@ -21,7 +21,6 @@ class User(models.Model):
 
 class Frame(models.Model):
     description = models.CharField(max_length=100, null=True)
-    pass
 
     def __str__(self):
         return str(self.id) + " - " + self.description

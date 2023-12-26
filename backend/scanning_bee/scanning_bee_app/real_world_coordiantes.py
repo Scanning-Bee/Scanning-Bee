@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import pandas as pd
 
+
 def get_camera_info(camera_info_file_path):
     camera_info = pd.read_csv(camera_info_file_path)
     D_values = camera_info.filter(like='field.D').iloc[0].values
@@ -11,6 +12,7 @@ def get_camera_info(camera_info_file_path):
     K = np.array(K_values).reshape((3, 3)) # the intrinsic matrix
 
     return K, D
+
 
 def project_point(point_3d, camera_info_file_path='backend/scanning_bee/scanning_bee_app/camera_info.csv'):
     """
