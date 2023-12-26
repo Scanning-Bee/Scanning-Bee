@@ -107,7 +107,11 @@ export class BackendInterface {
     public getUserTypes = async () => this.apiQuery<UserTypeDto[]>(BACKEND_ENDPOINTS.USER_TYPE.GET.LIST, 'get');
 
     public saveAnnotationsToDatabase = async (annotations: Annotation[]) => {
-        annotations.forEach((annotation) => {
+        let success = true;
+
+        for (let i = 0; i < annotations.length; i += 1) {
+            const annotation = annotations[i];
+
             const obj = {
                 radius: annotation.radius,
                 center_x: annotation.center[0],
@@ -120,7 +124,15 @@ export class BackendInterface {
                 image_name: annotation.source_name,
             } as CellContentDto;
 
-            this.createCellContent(obj);
-        });
+            // eslint-disable-next-line no-await-in-loop
+            const res = await this.createCellContent(obj);
+            if (!res) {
+                success = false;
+            }
+        }
+
+        if (success) {
+            console.log('Successfully saved annotations to the database.');
+        }
     };
 }
