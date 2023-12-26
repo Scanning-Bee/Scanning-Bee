@@ -219,9 +219,8 @@ def light_detect_procedure():
 
 def detect_circle_on_clip(sample_image):
     ## This is Görkem's function
-    sample_image = cv2.cvtColor(sample_image, cv2.COLOR_BGR2GRAY)
 
-    peak = plot_img_hist(sample_image)
+    peak = get_hist_max(sample_image)
     dark_flag = False
     if (peak <= 127):
         dark_flag = True

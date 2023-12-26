@@ -4,20 +4,20 @@ from preprocess import *
 
 FOUR_OVER_ROOT3 = 2.309401077
 TWO_OVER_ROOT3 = 1.154700538
+THREE_OVER_ROOT3 = 1.732050808
 ROOT3 = 1.732050808
 TAN120 = 1.732050808
 
 
-def draw_parallel_grid_n_circles(plot_img,detected_circles,slope = TAN120):
+def draw_parallel_grid(plot_img,detected_circles,slope = TAN120):
 
     height, width, _ = plot_img.shape
 
-    if detect_circles is not None:
-        for x,y,radius in detected_circles:
-            cv2.circle(plot_img, (int(x),int(y)), int(radius), (255, 0, 255), 5)
-            
     the_circle = detected_circles[0]
     x,y,r = [int(i) for i in the_circle]
+
+    r = int(np.mean(detected_circles,axis=0)[2])
+
 
     line_height = y + r 
     while (line_height < height):
@@ -79,7 +79,7 @@ def draw_parallel_grid_n_circles(plot_img,detected_circles,slope = TAN120):
     return plot_img
 
 
-def get_patches(img, detected_circles, cell_space = 0.15):
+def get_patches(img, detected_circles, cell_space = 0.15, error_margin = 0.5):
     height, width,_ = img.shape
 
     if detected_circles is None:
@@ -87,80 +87,221 @@ def get_patches(img, detected_circles, cell_space = 0.15):
     
     # get the most confidence circle
     x,y,r = [int(i) for i in detected_circles[0]]
-    inc_r = r + cell_space *r
+    r = int(np.mean(detected_circles,axis=0)[2])
+
+    ## first grid
 
     horizontal_lines = []
-
-    line_height = y + r 
-    while (line_height < height):
-        horizontal_lines.append(line_height)
-        cv2.line(img, (0, line_height),  (width - 1, line_height), (0, 0, 255), 1)
-        line_height += int(r * 3 * TWO_OVER_ROOT3 + 15)
-
-    line_height = y + r - int(r * 3 * TWO_OVER_ROOT3 + 15)
-    while (line_height > 0):
-        horizontal_lines.append(line_height)
-        cv2.line(img, (0, line_height),  (width - 1, line_height), (0, 0, 255), 1)
-        line_height -= int(r * 3 * TWO_OVER_ROOT3 + 15)
-
-    line_height = y - r 
-    while (line_height > 0):
-        horizontal_lines.append(line_height)
-        cv2.line(img, (0, line_height),  (width - 1, line_height), (0, 0, 255), 1)
-        line_height -= int(r * 3 *TWO_OVER_ROOT3 + 15)
-
-    line_height = y - r + int(r * 3 *TWO_OVER_ROOT3 + 15)
-    while (line_height < height):
-        horizontal_lines.append(line_height)
-        cv2.line(img, (0, line_height),  (width - 1, line_height), (0, 0, 255), 1)
-        line_height += int(r * 3 * TWO_OVER_ROOT3 + 15)
-
-    horizontal_lines.sort()
-
-    horizontal_pairs = [(horizontal_lines[i], horizontal_lines[i + 1]) for i in range(len(horizontal_lines) - 1)]
-
-
     vertical_lines = []
-    vertical_line = x + r
-    while (vertical_line < width):
-        vertical_lines.append(vertical_line)
-        vertical_line += int(2 * inc_r)
 
-    # the left boundaries for the circles
-    vertical_line = x - r
-    while (vertical_line > 0):
-        vertical_lines.append(vertical_line)
-        vertical_line -= int(2 * inc_r)
+    ## rows
+    line = y
+    while(line<height):
+        up = int(line-r)
+        down = int(line+r)
+        if up < 0 or down > height:
+            break
+        horizontal_lines.append((up,down)) 
+        line += int(r * 3 * TWO_OVER_ROOT3 * (1+cell_space))
+
+    line = y - int(r * 3 * TWO_OVER_ROOT3 * (1+cell_space))
+    while(line > 0):
+        up = int(line-r)
+        down = int(line+r)
+        if up < 0 or down > height:
+            break
+        horizontal_lines.append((up,down)) 
+        line -= int(r * 3 * TWO_OVER_ROOT3 * (1+cell_space))
+
+
+    ## columns
+    column = x
+    while(column < width):
+        left = int(column-r)
+        right = int(column+r)
+        if left < 0 or right > width:
+            break
+        vertical_lines.append((left,right))
+        # vertical_lines.append((left,right)) 
+        column += int(r * 2 * (1+cell_space))
+
+    column = x - int(r * 2 * (1+cell_space))
+    while(column >  0):
+        left = int(column-r)
+        right = int(column+r)
+        if left < 0 or right > width:
+            break
+        vertical_lines.append((left,right))
+        # vertical_lines.append((left,right)) 
+        column -= int(r * 2 * (1+cell_space))
+
+   
+    ## second, slided grid
+
+    slided_horizontal_lines = []
+    slided_vertical_lines = []
+
+
+    ## rows
+    line = y + THREE_OVER_ROOT3 * r
+    while(line<height):
+        up = int(line-r)
+        down = int(line+r)
+        if up < 0 or down > height:
+            break
+        slided_horizontal_lines.append((up,down)) 
+        line += int(r * 3 * TWO_OVER_ROOT3 * (1+cell_space))
+
+    line = y + THREE_OVER_ROOT3 *r - int(r * 3 * TWO_OVER_ROOT3 * (1+cell_space))
+    while(line > 0):
+        up = int(line-r)
+        down = int(line+r)
+        if up < 0 or down > height:
+            break
+        slided_horizontal_lines.append((up,down)) 
+        line -= int(r * 3 * TWO_OVER_ROOT3 * (1+cell_space))
+
+
+    ## columns
+    column = x +  r
+    while(column < width):
+        left = int(column-r)
+        right = int(column+r)
+        if left < 0 or right > width:
+            break
+        slided_vertical_lines.append((left,right))
+        # vertical_lines.append((left,right)) 
+        column += int(r * 2 * (1+cell_space))
+
+    column = x + r - int(r * 2 * (1+cell_space))
+    while(column >  0):
+        left = int(column-r)
+        right = int(column+r)
+        if left < 0 or right > width:
+            break
+        slided_vertical_lines.append((left,right))
+        # vertical_lines.append((left,right)) 
+        column -= int(r * 2 * (1+cell_space))
+
+    first_grid = []
+    second_grid = []
+
+    ## create and draw grids
+    for row in horizontal_lines:
+        for column in vertical_lines:
+            up = int(row[0] - error_margin * r)
+            down = int(row[1] + error_margin * r)
+            left = int(column[0] - error_margin * r)
+            right = int(column[1] + error_margin * r)
+            cv2.line(img,(left,up),(right,up),(255,255,0),3)
+            cv2.line(img,(right,up),(right,down),(255,255,0),3)
+            cv2.line(img,(right,down),(left,down),(255,255,0),3)
+            cv2.line(img,(left,down),(left,up),(255,255,0),3)
+            first_grid.append((left,right,up,down))
+
+    for row in slided_horizontal_lines:
+        for column in slided_vertical_lines:
+            up = int(row[0] - error_margin * r)
+            down = int(row[1] + error_margin * r)
+            left = int(column[0] - error_margin * r)
+            right = int(column[1] + error_margin * r)
+            cv2.line(img,(left,up),(right,up),(0,255,0),3)
+            cv2.line(img,(right,up),(right,down),(0,255,0),3)
+            cv2.line(img,(right,down),(left,down),(0,255,0),3)
+            cv2.line(img,(left,down),(left,up),(0,255,0),3)
+            second_grid.append((left,right,up,down))
     
-    vertical_lines.sort()
 
-    slided_vertical_lines = [int(i + inc_r) for i in vertical_lines]
-
-    vertical_pairs = [(vertical_lines[i], vertical_lines[i + 1]) for i in range(len(vertical_lines) - 1)]
-
-    slided_vertical_pairs = [(slided_vertical_lines[i], slided_vertical_lines[i + 1]) for i in range(len(slided_vertical_lines) - 1)]
+    return img,first_grid,second_grid
 
 
-    print(horizontal_lines)
-    print(horizontal_pairs)
+def detect_second_stage(img,first_grid,second_grid,first_detected):
+    
+    newly_detected = []
 
-    print(vertical_lines)
-    print(vertical_pairs)
+    patches = []
 
-    print(slided_vertical_lines)
-    print(slided_vertical_pairs)
+    radius = int(np.mean(first_detected,axis=0)[2])
+ 
+    for l,r,u,d in first_grid:
+        inside = False
+        for circle in first_detected:
+            x,y,_ = circle
+            if l < x and x < r and u < y and y < d:
+                inside = True
+                break
 
+        if not inside:
+            patch = img[u:d,l:r]
+            patches.append(patch)
+            try:
+                circles = detect_circle_on_clip(patch)[:1]
+            except:
+                circles = None
+            if circles is not None:
+                for circle in circles:
+                    x, y, _ = circle
+                    newly_detected.append([int(x+l),int(y+u),int(radius)])
 
-    color = (0, 255, 0)  # Green color
-    radius = 5  # You can adjust the size of the point by changing the radius
-    thickness = -1  # Negative thickness fills the circle
-    for y in horizontal_lines:
-        for x in vertical_lines:
-            cv2.circle(img, (x,y), radius, color, thickness)
+    for l,r,u,d in second_grid:
+        inside = False
+        for circle in first_detected:
+            x,y,_ = circle
+            if l < x and x < r and u < y and y < d:
+                inside = True
+                break
 
-    # color = (0, 0, 255)  # Green color
-    # for x in horizontal_lines:
-    #     for y in slided_vertical_lines:
-    #         cv2.circle(img, (x,y), radius, color, thickness)
+        if not inside:
+            patch = img[u:d,l:r]
+            patches.append(patch)
+            try:
+                circles = detect_circle_on_clip(patch)[:1]
+            except:
+                circles = None
+            if circles is not None:
+                for circle in circles:
+                    x, y, _ = circle
+                    newly_detected.append([int(x+l),int(y+u),int(radius)])
+
+    return newly_detected, patches
+
+def draw_circles(img,detected_circles,color = (0,255,255)):
+    
+    if detect_circles is not None:
+        for x,y,radius in detected_circles:
+            cv2.circle(img, (int(x),int(y)), int(radius), color, 3)
 
     return img
+            
+
+
+def tile_circles(img,first_grid,second_grid,first_detected):
+    
+    newly_detected = []
+
+    radius = int(np.mean(first_detected,axis=0)[2])
+ 
+    for l,r,u,d in first_grid:
+        inside = False
+        for circle in first_detected:
+            x,y,_ = circle
+            if l < x and x < r and u < y and y < d:
+                inside = True
+                break
+
+        if not inside:
+            newly_detected.append([int(l+radius),int(u+radius),int(radius)])
+
+    for l,r,u,d in second_grid:
+        inside = False
+        for circle in first_detected:
+            x,y,_ = circle
+            if l < x and x < r and u < y and y < d:
+                inside = True
+                break
+
+        if not inside:
+            newly_detected.append([int(l+radius),int(u+radius),int(radius)])
+
+    return newly_detected
+

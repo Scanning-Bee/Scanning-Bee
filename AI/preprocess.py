@@ -59,15 +59,21 @@ def plot_img_hist(img):
     hist = cv2.calcHist([img], [0], None, [256], [0, 256])
     hist = hist.ravel()
 
-    plt.figure(figsize=(8, 6))
-    plt.title("Grayscale Image Histogram")
-    plt.xlabel("Pixel Value")
-    plt.ylabel("Frequency")
-    plt.plot(hist, color="black")
-    plt.xlim(0, 256)
-    plt.grid(True)
-    plt.show()
-    plt.close()
+    # plt.figure(figsize=(8, 6))
+    # plt.title("Grayscale Image Histogram")
+    # plt.xlabel("Pixel Value")
+    # plt.ylabel("Frequency")
+    # plt.plot(hist, color="black")
+    # plt.xlim(0, 256)
+    # plt.grid(True)
+    # plt.show()
+    # plt.close()
+
+    return np.argmax(hist)
+
+def get_hist_max(img):
+    hist = cv2.calcHist([img], [0], None, [256], [0, 256])
+    hist = hist.ravel()
 
     return np.argmax(hist)
 
