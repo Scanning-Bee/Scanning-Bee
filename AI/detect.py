@@ -138,9 +138,7 @@ def detect_hough(img,
 
     accepted_circles = found_circles.reshape((-1,3))
     # List to store the centers and radii of the minimum enclosing circles
-    print(accepted_circles.shape)
-    print(accepted_circles)
-
+    
     def check_circle(x, y, radius):
         h, w = img.shape
 
@@ -162,75 +160,6 @@ def detect_hough(img,
         return True
     
     return accepted_circles
-
-    for contour in contours:
-        # Find minimum enclosing circle for each contour
-        (x, y), radius = cv2.minEnclosingCircle(contour)
-        center = (int(x), int(y))
-        radius = int(radius)
-
-        if radius > max_radius:
-            large_contours.append(contour)
-            continue
-
-        elif radius < min_radius:
-            small_contours.append(contour)
-            continue
-
-        if check_circle(x, y, radius):
-            min_enclosing_circles.append((int(x), int(y), radius))
-
-    ## Separate larger contours, apply opening on them to divide
-    large_areas = np.zeros_like(img)
-    large_areas = cv2.drawContours(large_areas, large_contours, -1, 255, cv2.FILLED)
-
-    kernel = np.ones((open_kernel_size, open_kernel_size), np.uint8)
-
-    # Apply opening operation
-    large_areas = cv2.morphologyEx(large_areas, cv2.MORPH_OPEN, kernel)
-
-    fixed_large_contours, _ = cv2.findContours(
-        large_areas, mode=cv2.RETR_LIST, method=cv2.CHAIN_APPROX_NONE
-    )
-
-    for contour in fixed_large_contours:
-        # Find minimum enclosing circle for each contour
-        (x, y), radius = cv2.minEnclosingCircle(contour)
-        center = (int(x), int(y))
-        radius = int(radius)
-
-        if radius > max_radius:
-            continue
-
-        if check_circle(x, y, radius):
-            min_enclosing_circles.append((int(x), int(y), radius))
-
-    ## Separate small contours, apply closure to merge close ones
-    small_areas = np.zeros_like(img)
-    small_areas = cv2.drawContours(small_areas, small_contours, -1, 255, cv2.FILLED)
-
-
-    kernel = np.ones((close_kernel_size, close_kernel_size), np.uint8)
-    small_areas = cv2.dilate(small_areas, kernel)
-
-    fixed_small_contours, _ = cv2.findContours(
-        small_areas, mode=cv2.RETR_LIST, method=cv2.CHAIN_APPROX_NONE
-    )
-
-    for contour in fixed_small_contours:
-        # Find minimum enclosing circle for each contour
-        (x, y), radius = cv2.minEnclosingCircle(contour)
-        center = (int(x), int(y))
-        radius = int(radius)
-
-        if radius < min_radius:
-            continue
-
-        if check_circle(x, y, radius):
-            min_enclosing_circles.append((int(x), int(y), radius))
-
-    return contours, min_enclosing_circles
-
 
 def return_hough(img):
     dark_image, before_thres = preprocess_dark_img(img)
@@ -286,3 +215,33 @@ def light_detect_procedure():
     plt.imshow(gray_bee_hive, cmap='gray')
     plt.title(f"Inverted image (threshold: {THRESHOLD})")
     plt.show()
+
+
+def detect_circle_on_clip(sample_image):
+    ## This is Görkem's function
+    sample_image = cv2.cvtColor(sample_image, cv2.COLOR_BGR2GRAY)
+
+    peak = plot_img_hist(sample_image)
+    dark_flag = False
+    if (peak <= 127):
+        dark_flag = True
+        sample_image = ~sample_image
+
+    sample_image[sample_image < (peak - 20)] = np.mean(sample_image[sample_image >= (peak - 20)])
+    sample_image = contrast_stretching(sample_image)
+    peak = plot_img_hist(sample_image)
+    sample_image[sample_image < (peak - 10)] = 0
+    sample_image[sample_image >= (peak - 10)] = 255
+    retval, sample_image = cv2.threshold(sample_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    circles = cv2.HoughCircles(
+                                sample_image,
+                                cv2.HOUGH_GRADIENT,
+                                2,
+                                minDist=120,
+                                param1=200,
+                                param2=20,
+                                minRadius=60,
+                                maxRadius=80,
+                                ) 
+    return circles[0]

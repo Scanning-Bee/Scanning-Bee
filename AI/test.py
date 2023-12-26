@@ -1,5 +1,7 @@
 from detect import *
+from set_grid import *
 import glob
+
 
 
 ## This function belongs to Ege Keyvan, we try to improve this detection, so we use this as a baseline for testing our detections
@@ -29,42 +31,54 @@ def process_image(img: np.ndarray):
     return detected_circles, th3
 
 
-def main():
-    image_files = glob.glob("AI/test_images/image_1*.jpg")
+def test_detection():
+    image_files = glob.glob("./mini_dataset/image*.jpg")
 
     # Set up the subplot grid
-    plt.figure(figsize=(20, 15))
-    
+    plt.figure(figsize=(20, 10))
 
-    for i, file in enumerate(image_files, 1):
+    for default in range(65,105,10):
+        for min_r in range(30,65,10):
+            for max_r in range(100,130,10):
+ 
+                
+                for i, file in enumerate(image_files, 1):
 
-        # Read the image
-        img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
-        org_img = img.copy()
+                    # Read the image
+                    img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
+                    org_img = img.copy()
 
-        # Detect circles using contour or blob detection
-        
-        detected_circles, light_image, dark_image = return_hough(img)
-        # Create subplot for original image contours
-        plt.subplot(4, 3, 3 * i - 2)
-        original_img_rgb_dark = cv2.cvtColor(org_img, cv2.COLOR_GRAY2RGB)
-        if detected_circles is not None:
-            for x, y, radius in detected_circles:
-                cv2.circle(original_img_rgb_dark, (int(x), int(y)), int(radius), (255, 0, 255), 5)
-        plt.imshow(original_img_rgb_dark)
-        plt.axis("off")
+                    # Detect circles using contour or blob detection
+                    detected_contours, detected_circles = detect_circles(img,default, max_r, min_r)
 
-        plt.subplot(4, 3, 3 * i - 1)
-        plt.imshow(light_image,cmap="gray")
-        plt.axis("off")
+                    # Create subplot for original image contours
+                    plt.subplot(4, 2, i)
+                    original_img_rgb_dark = cv2.cvtColor(org_img, cv2.COLOR_GRAY2RGB)
+                    if detected_contours is not None:
+                        for x, y, radius in detected_circles:
+                            cv2.circle(original_img_rgb_dark, (x,y), int(radius), (255, 0, 255), 5)
+                    plt.imshow(original_img_rgb_dark)
+                    plt.axis('off')
 
-        plt.subplot(4, 3, 3 * i)
-        plt.imshow(dark_image,cmap="gray")
-        plt.axis("off")
+                plt.suptitle(f"Results for def:{default},min:{min_r},max:{max_r}")                
+                plt.tight_layout()
+                plt.savefig(f'./results/grid_search/d{default}f{min_r}t{max_r}.png')
 
-    
-    plt.tight_layout()  # Adjust layout to prevent overlapping
-    plt.savefig("./AI/light_n_dark.png")
+
+def test_lines():
+    sample_image = cv2.imread('AI/test_images/image_654.jpg',cv2.IMREAD_GRAYSCALE)
+
+    plot_img = cv2.cvtColor(sample_image, cv2.COLOR_GRAY2RGB)
+    point_img = plot_img.copy()
+
+    detected_circles, _, _ =return_hough(sample_image)
+
+    plot_img = draw_parallel_grid_n_circles(plot_img,detected_circles)
+
+    point_img = get_patches(point_img,detected_circles)
+    plt.imshow(plot_img)
+    plt.show()
+
 
 if __name__ == "__main__":
-    main()
+    test_lines()

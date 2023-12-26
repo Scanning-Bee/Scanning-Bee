@@ -69,12 +69,13 @@ def plot_img_hist(img):
     plt.show()
     plt.close()
 
+    return np.argmax(hist)
+
 
 def find_first_peak(img):
     q_int = 8
     # Calculate the histogram
     hist, bins = np.histogram(img.flatten(), bins=256 // q_int, range=[0, 256])
-
     # Calculate the 1st and 2nd derivatives
     first_derivative = np.diff(hist)
     second_derivative = np.diff(first_derivative)
@@ -103,9 +104,10 @@ def preprocess_dark_img(img,blur_kernel_size:int=11, open_kernel_size:int=15):
     blurred_image = cv2.medianBlur(img, blur_kernel_size)
 
     better_light = sigmoid_contrast_stretching(blurred_image,15,0.4)
-
-    dark_thresh = find_first_peak(better_light)
-    
+    try:
+        dark_thresh = find_first_peak(better_light)
+    except:
+        dark_thresh = 30
     _, binary_img = cv2.threshold(better_light, dark_thresh, 255, cv2.THRESH_BINARY_INV)
 
     kernel = np.ones((open_kernel_size, open_kernel_size), np.uint8)
