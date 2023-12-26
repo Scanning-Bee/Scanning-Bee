@@ -30,17 +30,19 @@ export type ContentDto = {
 
 export type FrameDto = {
     id: number;
-    description: string;
+    name: string;
+    frame_description: string;
 };
 
 export type UserDto = {
     id: number;
+    name: string;
     user_type: number;
 };
 
 export type UserTypeDto = {
     id: number;
-    description: string;
+    type: string;
 };
 
 export const CellTypeDto = {

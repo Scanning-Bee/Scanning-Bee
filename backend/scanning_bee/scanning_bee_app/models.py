@@ -6,13 +6,14 @@ CELL_LOC_THRESHOLD = 0.01
 
 
 class UserType(models.Model):
-    description = models.CharField(max_length=100)
+    type = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.description
+        return self.type
 
 
 class User(models.Model):
+    name = models.CharField(max_length=100)
     user_type = models.ForeignKey(UserType, on_delete=models.PROTECT, null=True)
 
     def __str__(self):
@@ -21,7 +22,6 @@ class User(models.Model):
 
 class Frame(models.Model):
     description = models.CharField(max_length=100, null=True)
-    pass
 
     def __str__(self):
         return str(self.id) + " - " + self.description
