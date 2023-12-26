@@ -1,0 +1,39 @@
+annotation_data:
+  annotations:
+  - annotated_image: annotation_image_155_0.jpg
+    annotation: NOT_CLASSIFIED
+    center_x: 1190
+    center_y: 654
+    orig_image: image_155.jpg
+    radius: 70
+    sec: 1696671359.8026211
+    x_pos: 0.16250081360340118
+    y_pos: 0.012499617412686348
+  - annotated_image: annotation_image_155_1.jpg
+    annotation: NOT_CLASSIFIED
+    center_x: 1217
+    center_y: 693
+    orig_image: image_155.jpg
+    radius: 70
+    sec: 1696671359.8026211
+    x_pos: 0.16250081360340118
+    y_pos: 0.012499617412686348annotation_data:
+  annotations:
+  - annotated_image: annotation_image_155_0.jpg
+    annotation: NOT_CLASSIFIED
+    center_x: 1190
+    center_y: 654
+    orig_image: image_155.jpg
+    radius: 70
+    sec: 1696671359.8026211
+    x_pos: 0.16250081360340118
+    y_pos: 0.012499617412686348
+  - annotated_image: annotation_image_155_1.jpg
+    annotation: NOT_CLASSIFIED
+    center_x: 1217
+    center_y: 693
+    orig_image: image_155.jpg
+    radius: 70
+    sec: 1696671359.8026211
+    x_pos: 0.16250081360340118
+    y_pos: 0.012499617412686348

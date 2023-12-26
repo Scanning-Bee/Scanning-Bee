@@ -1,0 +1,74 @@
+[
+    {
+        "model": "scanning_bee_app.content",
+        "pk": 1,
+        "fields": {
+            "name": "EGG",
+            "content_description": "Cells with Eggs Annotation"
+        }
+    },
+    {
+        "model": "scanning_bee_app.content",
+        "pk": 2,
+        "fields": {
+            "name": "EMPTY",
+            "content_description": "Empty Cell Annotation"
+        }
+    },
+    {
+        "model": "scanning_bee_app.content",
+        "pk": 3,
+        "fields": {
+            "name": "LARVA",
+            "content_description": "Larvae Cell Annotation"
+        }
+    },
+    {
+        "model": "scanning_bee_app.content",
+        "pk": 4,
+        "fields": {
+            "name": "NECTAR",
+            "content_description": "Cells with Nectar Annotation"
+        }
+    },
+    {
+        "model": "scanning_bee_app.content",
+        "pk": 5,
+        "fields": {
+            "name": "POLLEN",
+            "content_description": "Cells with Pollen Annotation"
+        }
+    },
+    {
+        "model": "scanning_bee_app.content",
+        "pk": 6,
+        "fields": {
+            "name": "PUPA",
+            "content_description": "Puppa Cell Annotation"
+        }
+    },
+    {
+        "model": "scanning_bee_app.content",
+        "pk": 7,
+        "fields": {
+            "name": "HONEY_CLOSED",
+            "content_description": "Closed Cell with Honey Annotation"
+        }
+    },
+    {
+        "model": "scanning_bee_app.content",
+        "pk": 8,
+        "fields": {
+            "name": "BEE_OCCLUDED",
+            "content_description": "Cells with Bee Occlusion Annotation"
+        }
+    },
+    {
+        "model": "scanning_bee_app.content",
+        "pk": 9,
+        "fields": {
+            "name": "NOT_CLASSIFIED",
+            "content_description": "Unclassified Cells Annotation"
+        }
+    }
+]
