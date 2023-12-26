@@ -114,7 +114,7 @@ export const ManualAnnotatorPage = () => {
                             }}
                             intent='primary'
                             icon='folder-open'
-                            style={{ margin: '10px' }}
+                            style={{ margin: '5px' }}
                             className='inline-box-important'
                         />
                         <Button
@@ -124,7 +124,17 @@ export const ManualAnnotatorPage = () => {
                             }}
                             intent='primary'
                             icon='floppy-disk'
-                            style={{ margin: '10px' }}
+                            style={{ margin: '5px' }}
+                            className='inline-box-important'
+                        />
+                        <Button
+                            text='Save annotations to database'
+                            onClick={() => {
+                                BackendInterface.getInstance().saveAnnotationsToDatabase(annotations);
+                            }}
+                            intent='primary'
+                            icon='floppy-disk'
+                            style={{ margin: '5px' }}
                             className='inline-box-important'
                         />
                     </div>
