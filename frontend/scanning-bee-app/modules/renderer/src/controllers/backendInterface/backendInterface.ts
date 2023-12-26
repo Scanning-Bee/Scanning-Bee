@@ -4,7 +4,7 @@ import { ipcRenderer } from 'electron';
 import Annotation, { AnnotationYaml } from '@frontend/models/annotation';
 
 import { BACKEND_ENDPOINTS, ENDPOINT_URL } from './endpoints';
-import { CellContentDto, CellDto, ContentDto, FrameDto, UserDto, UserTypeDto } from './payloadTypes';
+import { CellContentDto, CellDto, CellTypeDto, ContentDto, FrameDto, UserDto, UserTypeDto } from './payloadTypes';
 
 type APIMethods = 'get' | 'post' | 'put' | 'delete';
 
@@ -16,7 +16,7 @@ export class BackendInterface {
     constructor() {
         this.apiClient = axios.create({
             baseURL: ENDPOINT_URL,
-            timeout: 1000,
+            timeout: 10_000,
         });
     }
 
@@ -50,7 +50,10 @@ export class BackendInterface {
             return res.data;
         } catch (error) {
             console.error(
-                `Error while trying to query the backend API.\n\tEndpoint: ${endpoint}\n\tMethod: ${method}\n\tData: ${data}`,
+                'Error while trying to query the backend API.',
+                endpoint,
+                method,
+                data,
                 error,
             );
             return null;
@@ -85,35 +88,39 @@ export class BackendInterface {
         this.apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.BY_IMAGE_NAME(imageName), 'get');
     };
 
-    public createCellContent = async (cellContent: CellContentDto) => {
-        this.apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.POST.CREATE, 'post', cellContent);
-    };
+    public createCellContent = async (cellContent: CellContentDto) => this
+        .apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.POST.CREATE, 'post', cellContent);
 
-    public deleteCellContent = async (id: number) => {
-        this.apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.DELETE.DELETE(id), 'delete');
-    };
+    public deleteCellContent = async (id: number) => this
+        .apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.DELETE.DELETE(id), 'delete');
 
-    public getContents = async () => {
-        this.apiQuery<ContentDto[]>(BACKEND_ENDPOINTS.CONTENT.GET.LIST, 'get');
-    };
+    public getContents = async () => this.apiQuery<ContentDto[]>(BACKEND_ENDPOINTS.CONTENT.GET.LIST, 'get');
 
-    public getFrames = async () => {
-        this.apiQuery<FrameDto[]>(BACKEND_ENDPOINTS.FRAME.GET.LIST, 'get');
-    };
+    public getFrames = async () => this.apiQuery<FrameDto[]>(BACKEND_ENDPOINTS.FRAME.GET.LIST, 'get');
 
-    public createFrame = async (frame: FrameDto) => {
-        this.apiQuery<FrameDto>(BACKEND_ENDPOINTS.FRAME.POST.CREATE, 'post', frame);
-    };
+    public createFrame = async (frame: FrameDto) => this.apiQuery<FrameDto>(BACKEND_ENDPOINTS.FRAME.POST.CREATE, 'post', frame);
 
-    public getUsers = async () => {
-        this.apiQuery<UserDto[]>(BACKEND_ENDPOINTS.USER.GET.LIST, 'get');
-    };
+    public getUsers = async () => this.apiQuery<UserDto[]>(BACKEND_ENDPOINTS.USER.GET.LIST, 'get');
 
-    public createUser = async (user: UserDto) => {
-        this.apiQuery<UserDto>(BACKEND_ENDPOINTS.USER.POST.CREATE, 'post', user);
-    };
+    public createUser = async (user: UserDto) => this.apiQuery<UserDto>(BACKEND_ENDPOINTS.USER.POST.CREATE, 'post', user);
 
-    public getUserTypes = async () => {
-        this.apiQuery<UserTypeDto[]>(BACKEND_ENDPOINTS.USER_TYPE.GET.LIST, 'get');
+    public getUserTypes = async () => this.apiQuery<UserTypeDto[]>(BACKEND_ENDPOINTS.USER_TYPE.GET.LIST, 'get');
+
+    public saveAnnotationsToDatabase = async (annotations: Annotation[]) => {
+        annotations.forEach((annotation) => {
+            const obj = {
+                radius: annotation.radius,
+                center_x: annotation.center[0],
+                center_y: annotation.center[1],
+                x_pos: annotation.poses[0],
+                y_pos: annotation.poses[1],
+                content: CellTypeDto[annotation.cell_type],
+                user: 1,
+                timestamp: `${annotation.timestamp}`,
+                image_name: annotation.source_name,
+            } as CellContentDto;
+
+            this.createCellContent(obj);
+        });
     };
 }
