@@ -277,11 +277,12 @@ a {
 
 .annotated-images-panel{
   width: 250px;
-  height: 90vh;
+  max-height: 60vh;
   flex-direction: column;
   justify-content: flex-start;
   align-items: self-start;
   overflow: scroll;
+  padding-bottom: '20px',
 }
 
 .open-margin-left {
