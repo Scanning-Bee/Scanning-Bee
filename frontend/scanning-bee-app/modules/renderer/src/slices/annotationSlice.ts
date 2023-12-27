@@ -8,14 +8,14 @@ type AnnotationsState = {
     // contains the plain object versions of the annotations. contains AnnotationProps and the id
     annotationObjects: AnnotationPropsWithID[];
     images: string[];
-    activeAnnotationId: UUID | null;
+    activeAnnotationIds: UUID[];
     annotationsFolder: string | null;
 };
 
 const initialState: AnnotationsState = {
     annotationObjects: [],
     images: [], // file://blahblahblah
-    activeAnnotationId: null,
+    activeAnnotationIds: [],
     annotationsFolder: null,
 };
 
@@ -28,7 +28,7 @@ const annotationSlice = createSlice({
             state.annotationsFolder = folder;
             state.annotationObjects = annotations;
             state.images = images;
-            state.activeAnnotationId = null;
+            state.activeAnnotationIds = [];
         },
         addAnnotation(state, action: PayloadAction<AnnotationPropsWithID>) {
             state.annotationObjects = [...state.annotationObjects, action.payload];
@@ -37,19 +37,28 @@ const annotationSlice = createSlice({
             state.annotationObjects = action.payload;
         },
         removeAnnotation(state, action: PayloadAction<UUID>) {
-            if (state.activeAnnotationId === action.payload) {
-                state.activeAnnotationId = null;
+            if (state.activeAnnotationIds.includes(action.payload)) {
+                state.activeAnnotationIds = state.activeAnnotationIds.filter(id => id !== action.payload);
             }
 
             state.annotationObjects = state.annotationObjects.filter(annotation => annotation.id !== action.payload);
         },
         resetAnnotations(state) {
             state.annotationObjects = [];
-            state.activeAnnotationId = null;
+            state.activeAnnotationIds = [];
             state.annotationsFolder = null;
         },
-        setActiveAnnotation(state, action: PayloadAction<UUID | null>) {
-            state.activeAnnotationId = action.payload;
+        setActiveAnnotations(state, action: PayloadAction<UUID[]>) {
+            state.activeAnnotationIds = action.payload;
+        },
+        setAnnotationAsActive(state, action: PayloadAction<{ id: UUID, active: boolean }>) {
+            const { id, active } = action.payload;
+
+            if (active) {
+                state.activeAnnotationIds = [...state.activeAnnotationIds, id];
+            } else {
+                state.activeAnnotationIds = state.activeAnnotationIds.filter(annotationId => annotationId !== id);
+            }
         },
         mutateAnnotation(state, action: PayloadAction<AnnotationMutation>) {
             const mutation = action.payload;
@@ -70,12 +79,13 @@ export const {
     setAnnotations,
     removeAnnotation,
     resetAnnotations,
-    setActiveAnnotation,
+    setAnnotationAsActive,
+    setActiveAnnotations,
     mutateAnnotation,
 } = annotationSlice.actions;
 
 export const selectAnnotations = (state: RootState) => state.annotation.annotationObjects.map(Annotation.fromPlainObject);
-export const selectActiveAnnotationId = (state: RootState) => state.annotation.activeAnnotationId;
+export const selectActiveAnnotationIds = (state: RootState) => state.annotation.activeAnnotationIds;
 export const selectAnnotationsFolder = (state: RootState) => state.annotation.annotationsFolder;
 export const selectImages = (state: RootState) => state.annotation.images;
 
@@ -83,17 +93,17 @@ export const useAnnotations = () => {
     const annotations = useSelector(selectAnnotations);
     return annotations;
 };
-export const useActiveAnnotation = () => {
-    const activeAnnotationId = useSelector(selectActiveAnnotationId);
+export const useActiveAnnotations = () => {
+    const activeAnnotationIds = useSelector(selectActiveAnnotationIds);
     const annotations = useSelector(selectAnnotations);
 
-    const activeAnnotation = annotations.find(annotation => annotation.id === activeAnnotationId);
+    const activeAnnotations = annotations.filter(annotation => activeAnnotationIds.includes(annotation.id));
 
-    return activeAnnotation;
+    return activeAnnotations;
 };
-export const useActiveAnnotationId = () => {
-    const activeAnnotationId = useSelector(selectActiveAnnotationId);
-    return activeAnnotationId;
+export const useActiveAnnotationIds = () => {
+    const activeAnnotationIds = useSelector(selectActiveAnnotationIds);
+    return activeAnnotationIds;
 };
 export const useAnnotationsFolder = () => {
     const annotationsFolder = useSelector(selectAnnotationsFolder);

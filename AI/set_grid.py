@@ -262,8 +262,8 @@ def detect_second_stage(img, first_grid, second_grid, first_detected):
 
 def draw_circles(img, detected_circles, color=(0, 255, 255)):
     if detect_circles is not None:
-        for x, y, radius in detected_circles:
-            cv2.circle(img, (int(x), int(y)), int(radius), color, 3)
+        for x,y,radius in detected_circles:
+            cv2.circle(img, (int(x),int(y)), int(radius), color, 7)
 
     return img
 

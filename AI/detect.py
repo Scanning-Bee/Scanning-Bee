@@ -133,30 +133,9 @@ def detect_hough(img,
     if isinstance(found_circles, type(None)):
         return None
 
-    accepted_circles = found_circles.reshape((-1, 3))
-
+    accepted_circles = found_circles.reshape((-1,3)).astype(np.int32)
     # List to store the centers and radii of the minimum enclosing circles
-
-    def check_circle(x, y, radius):
-        h, w = img.shape
-
-        # check of bounds
-        if (
-                (x + radius >= w)
-                or (x - radius <= 0)
-                or (y + radius >= h)
-                or (y - radius <= 0)
-        ):
-            return False
-
-        # check of proximity
-        for x_c, y_c, _ in accepted_circles:
-            distance = np.sqrt((x_c - x) ** 2 + (y_c - y) ** 2)
-            if distance < 2 * default_radius:
-                return False
-
-        return True
-
+    
     return accepted_circles
 
 
@@ -248,22 +227,42 @@ def detect_circle_on_clip(sample_image):
 def create_bee_mask(model, img):
     # Initialize an empty mask
     mask = np.zeros_like(img, dtype=np.uint8)
-    height, width, _ = img.shape
+
+    img = cv2.cvtColor(img,cv2.COLOR_GRAY2RGB)
+    height, width,_ = img.shape
 
     predictions = model.predict(source=img, conf=0.25)
 
-    print(predictions)
     # Iterate through each prediction
     for prediction in predictions:
-        # Extract points from the prediction
-        points = [(int(pt[0]* height), int(pt[1]*width)) for pt in prediction.masks]
 
-        # Convert the list of points to a NumPy array
-        points_array = np.array([points], dtype=np.int32)
+        import torch
+        masks = prediction.masks.data
+        boxes = prediction.boxes.data
 
+        clss = boxes[:, 5]
+
+        #EXTRACT A SINGLE MASK WITH ALL THE CLASSES
+        obj_indices = torch.where(clss != -1)
+        obj_masks = masks[obj_indices]
+        obj_mask = torch.any(obj_masks, dim=0).int() * 255
+
+        # Convert the PyTorch tensor to a NumPy array
+        obj_mask_numpy = obj_mask.cpu().numpy()
+
+        # Perform NumPy operations
+        obj_mask_numpy_processed = np.any(obj_mask_numpy, axis=0).astype(np.uint8) * 255
+        
+        print(obj_mask_numpy_processed.shape)
+        obj_mask_numpy_processed = cv2.resize(obj_mask_numpy_processed,(width,height))
+        print(mask.shape)
+        print(obj_mask_numpy_processed.shape)
+        
         # Draw a filled polygon on the mask using the points
-        cv2.fillPoly(mask, [points_array], color=(255, 255, 255))
+        mask = cv2.bitwise_and(mask,obj_mask_numpy_processed)
 
+    plt.imshow(mask)
+    plt.show()
     return mask
 
 
