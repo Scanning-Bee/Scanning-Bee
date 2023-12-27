@@ -3,7 +3,7 @@ import cv2
 import pandas as pd
 
 
-def get_camera_info(camera_info_file_path="backend/scanning_bee/scanning_bee_app/camera_info.csv"):
+def get_camera_info(camera_info_file_path="scanning_bee_app/camera_info.csv"):
     try:
         # Read the CSV file using Pandas
         camera_info = pd.read_csv(camera_info_file_path)
@@ -22,7 +22,7 @@ def get_camera_info(camera_info_file_path="backend/scanning_bee/scanning_bee_app
         raise ValueError(f"An error occurred while reading the camera info: {e}")
 
 
-def convert_to_world_coordinates(point_2d, x_pos, y_pos, Z=1, camera_info_path="backend/scanning_bee/scanning_bee_app/camera_info.csv"):
+def convert_to_world_coordinates(point_2d, x_pos, y_pos, Z=1, camera_info_path="scanning_bee_app/camera_info.csv"):
     """
     Converts a 2D point in image coordinates to 3D world coordinates using the camera's calibration data.
 
