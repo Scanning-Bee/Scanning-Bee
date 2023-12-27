@@ -244,3 +244,51 @@ def detect_circle_on_clip(sample_image):
                                 maxRadius=80,
                                 ) 
     return circles[0]
+
+
+def create_bee_mask(model, img):
+    # Initialize an empty mask
+    mask = np.zeros_like(img, dtype=np.uint8)
+    height, width, _ = img.shape
+
+    predictions = model.predict(source=img, conf=0.25)
+
+    print(predictions)
+    # Iterate through each prediction
+    for prediction in predictions:
+        # Extract points from the prediction
+        points = [(int(pt[0]* height), int(pt[1]*width)) for pt in prediction.masks]
+
+        # Convert the list of points to a NumPy array
+        points_array = np.array([points], dtype=np.int32)
+
+        # Draw a filled polygon on the mask using the points
+        cv2.fillPoly(mask, [points_array], color=(255, 255, 255))
+
+    return mask
+
+
+def create_circle_mask(center, radius, mask_shape):
+    mask = np.zeros(mask_shape, dtype=np.uint8)
+    cv2.circle(mask, center, radius, (255, 255, 255), thickness=cv2.FILLED)
+    return mask
+
+def filter_intersecting_circles(circles, binary_mask):
+    filtered_circles = []
+    
+    for x, y, radius in circles:
+        # Create a circular mask for the current circle
+        circle_mask = create_circle_mask((x, y), radius, binary_mask.shape[:2])
+
+        # Perform bitwise AND operation with the binary mask
+        intersection = cv2.bitwise_and(circle_mask, binary_mask)
+
+        # Check if there is any non-zero value in the intersection
+        if np.any(intersection):
+            # There is an intersection, filter out the circle
+            continue
+
+        # No intersection, add the circle to the filtered list
+        filtered_circles.append((x, y, radius))
+
+    return filtered_circles

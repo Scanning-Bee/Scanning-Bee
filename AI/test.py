@@ -1,6 +1,7 @@
 from detect import *
 from set_grid import *
 import glob
+from ultralytics import YOLO
 
 
 
@@ -65,42 +66,45 @@ def test_detection():
                 plt.savefig(f'./results/grid_search/d{default}f{min_r}t{max_r}.png')
 
 
-def test_lines():
-    sample_image = cv2.imread('AI/test_images/image_1219.jpg',cv2.IMREAD_GRAYSCALE)
+def test_lines(image_path, occlude = False):
+    
+    sample_image = cv2.imread(image_path,cv2.IMREAD_GRAYSCALE)
 
     plot_img = cv2.cvtColor(sample_image, cv2.COLOR_GRAY2RGB)
     point_img = plot_img.copy()
 
     all_detected_circles = []
 
-    first_detected_circles, _, _ =return_hough(sample_image)
-    plot_img = draw_circles(plot_img,first_detected_circles,(255,255,0))
+    first_detected_circles, _, _ = return_hough(sample_image)
+    # plot_img = draw_circles(plot_img,first_detected_circles,(255,255,0))
     all_detected_circles.extend(first_detected_circles)
 
-    
     # plot_img = draw_parallel_grid(plot_img,first_detected_circles)
 
     point_img,first_grid,second_grid, first_tight, second_tight = get_patches(point_img,first_detected_circles,cell_space = 0.03, error_margin=0.15)
 
     second_detect_circles,patches = detect_second_stage(sample_image,first_grid,second_grid,first_detected_circles)
     second_detect_circles = filter_circles(first_detected_circles,second_detect_circles)
-    plot_img = draw_circles(plot_img,second_detect_circles,(0,128,255))
+    # plot_img = draw_circles(plot_img,second_detect_circles,(0,128,255))
     all_detected_circles.extend(second_detect_circles)
 
     tiled_circles = tile_circles(sample_image,first_tight,second_tight, all_detected_circles)
     tiled_circles = filter_circles(all_detected_circles,tiled_circles)
-    plot_img = draw_circles(plot_img,tiled_circles,color=(255,128,0))
+    # plot_img = draw_circles(plot_img,tiled_circles,color=(255,128,0))
 
-
-    
     all_detected_circles.extend(tiled_circles)
 
-    plt.imshow(plot_img)
-    plt.show()
+    if occlude:
+        model = YOLO('AI/bee_segment_model.pt')
+        bee_mask = create_bee_mask(model,sample_image)
+        all_detected_circles = filter_intersecting_circles(all_detected_circles,bee_mask)
+    
+    # plot_img = draw_circles(plot_img,all_detected_circles)
+    # plt.imshow(plot_img)
+    # plt.show()
 
-
-
+    return all_detected_circles
 
 
 if __name__ == "__main__":
-    test_lines()
+    test_lines([])
