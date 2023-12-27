@@ -1,9 +1,13 @@
-import HeaderLogo from '@assets/images/header-logo.png';
 import { Overlay } from '@blueprintjs/core';
+import { PageType } from '@frontend/RendererController';
+import { isMac } from '@frontend/utils/platform';
 import { lightTheme, Theme } from '@utils/colours';
 import React from 'react';
 
-export default function Header() {
+import { HeaderButtons } from './HeaderButtons';
+import { HeaderLeft } from './HeaderLeft';
+
+export default function Header(props: { page: PageType, setPage: (page: PageType) => void }) {
     const theme: Theme = lightTheme;
 
     return (
@@ -16,18 +20,12 @@ export default function Header() {
                     background: theme.secondaryBackground,
                     borderBottom: theme.secondaryBackground === theme.primaryBackground
                         ? `1px solid ${theme.primaryBorder}` : 'none',
+                    color: theme.secondaryForeground,
+                    padding: isMac() ? '0px 0px 0px 60px' : '0px 60px 0px 0px',
                 }}
             >
-                <div className="header-container">
-                    <img
-                        src={HeaderLogo}
-                        alt="Scanning Bee Logo"
-                        className='header-logo'
-                    />
-                    <h1 className='header-title'>
-                        Scanning Bee
-                    </h1>
-                </div>
+                <HeaderLeft page={props.page} setPage={props.setPage} />
+                <HeaderButtons page={props.page} setPage={props.setPage} />
             </div>
         </Overlay>
     );

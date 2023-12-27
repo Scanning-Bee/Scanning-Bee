@@ -53,7 +53,7 @@ export const ManualAnnotatorPage = () => {
                 onClick={() => {
                     openFolderDialog();
                 }}
-                intent='primary'
+                intent='success'
                 icon='folder-open'
                 style={{ padding: '5px', margin: '2px' }}
             />
@@ -129,13 +129,13 @@ export const ManualAnnotatorPage = () => {
                         />
                     </div>
                     <div className='annotated-images-panel'>
-                        <h2 style={{ margin: '0 35px 10px '}}>Images</h2>
+                        <h2 style={{ margin: '0 35px 10px ' }}>Images</h2>
                         <Divider style={{ width: '240px' }}/>
                         {sortedImages.map(image => (
                             <Button
                                 key={image}
                                 text={getFileName(image)}
-                                minimal
+                                minimal={image !== shownImageUrl}
                                 onClick={() => {
                                     setShownImageUrl(image);
                                     dispatch(setActiveAnnotation(undefined));
