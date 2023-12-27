@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+
 def fit_diamond_grid(circles):
     # Sort circles by x-coordinate
     sorted_circles = sorted(circles, key=lambda c: c[0])
@@ -33,6 +34,7 @@ def fit_diamond_grid(circles):
 
     return diamond_corners
 
+
 def find_intersection(point1, slope1, point2, slope2):
     x1, y1 = point1
     x2, y2 = point2
@@ -41,6 +43,7 @@ def find_intersection(point1, slope1, point2, slope2):
     y = slope1 * (x - x1) + y1
 
     return int(x), int(y)
+
 
 # Example: Your three circles with known centers (x, y) and radii (r)
 circle1 = (100, 100, 50)

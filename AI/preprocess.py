@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os
 from scipy.signal import convolve2d
 
+
 def convolve(image, kernel, threshold):
     result_scipy = convolve2d(image / 255, kernel / 255, mode='same')
     normalized_result = cv2.normalize(result_scipy, None, 0, 255, cv2.NORM_MINMAX)
@@ -11,11 +12,13 @@ def convolve(image, kernel, threshold):
 
     return normalized_result
 
+
 def sigmoid(x, a, b):
     """
     Sigmoid function with parameters 'a' and 'b'.
     """
     return 1 / (1 + np.exp(-a * (x - b)))
+
 
 def sigmoid_contrast_stretching(img, a, b):
     """
@@ -39,8 +42,8 @@ def sigmoid_contrast_stretching(img, a, b):
 
     return stretched_img
 
-def contrast_stretching(img):
 
+def contrast_stretching(img):
     ### TODO try a sigmoid like contrast stretching
     min_intensity = 0
     max_intensity = 255
@@ -48,7 +51,7 @@ def contrast_stretching(img):
     max_pixel = np.max(img)
 
     stretched_img = (img - min_pixel) / (max_pixel - min_pixel) * (
-        max_intensity - min_intensity
+            max_intensity - min_intensity
     ) + min_intensity
     stretched_img = np.uint8(stretched_img)
 
@@ -71,6 +74,7 @@ def plot_img_hist(img):
 
     return np.argmax(hist)
 
+
 def get_hist_max(img):
     hist = cv2.calcHist([img], [0], None, [256], [0, 256])
     hist = hist.ravel()
@@ -88,28 +92,28 @@ def find_first_peak(img):
 
     # Find indices where the 1st derivative changes sign
     zero_crossings_first = (
-        np.where(np.diff(np.sign(first_derivative)))[0] + 1
+            np.where(np.diff(np.sign(first_derivative)))[0] + 1
     )  # 0-based index
 
     # Find indices where the 2nd derivative changes sign
     zero_crossings_second = (
-        np.where(np.diff(np.sign(second_derivative)))[0] + 2
+            np.where(np.diff(np.sign(second_derivative)))[0] + 2
     )  # 0-based index
 
     # Determine local maxima using the 2nd derivative
     local_maxima_indices = zero_crossings_second[
         second_derivative[zero_crossings_second - 1] < 0
-    ]
+        ]
 
     first_peak_value = (local_maxima_indices[0] + 2) * q_int
 
     return first_peak_value
 
-def preprocess_dark_img(img,blur_kernel_size:int=11, open_kernel_size:int=15):
-    
+
+def preprocess_dark_img(img, blur_kernel_size: int = 11, open_kernel_size: int = 15):
     blurred_image = cv2.medianBlur(img, blur_kernel_size)
 
-    better_light = sigmoid_contrast_stretching(blurred_image,15,0.4)
+    better_light = sigmoid_contrast_stretching(blurred_image, 15, 0.4)
     try:
         dark_thresh = find_first_peak(better_light)
     except:
@@ -124,8 +128,7 @@ def preprocess_dark_img(img,blur_kernel_size:int=11, open_kernel_size:int=15):
     return opening_result, better_light
 
 
-def preprocess_light_img(img,blur_kernel_size:int=11, open_kernel_size:int=15):
-
+def preprocess_light_img(img, blur_kernel_size: int = 11, open_kernel_size: int = 15):
     inverse_img = cv2.bitwise_not(img)
     blurred_image = cv2.medianBlur(inverse_img, blur_kernel_size)
 
@@ -144,4 +147,3 @@ def preprocess_light_img(img,blur_kernel_size:int=11, open_kernel_size:int=15):
     opening_result = cv2.morphologyEx(binary_img, cv2.MORPH_OPEN, kernel)
 
     return opening_result
-   

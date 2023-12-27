@@ -2,16 +2,15 @@ from preprocess import *
 
 THRESHOLD = 200
 
+
 def detect_contours(
         img,
-        default_radius:int = 70, 
-        max_radius:int = 100, 
-        min_radius:int = 60, 
-        open_kernel_size:int=55, 
-        close_kernel_size:int=23
-    ):
-
-
+        default_radius: int = 70,
+        max_radius: int = 100,
+        min_radius: int = 60,
+        open_kernel_size: int = 55,
+        close_kernel_size: int = 23
+):
     contours, _ = cv2.findContours(
         img, mode=cv2.RETR_LIST, method=cv2.CHAIN_APPROX_NONE
     )
@@ -26,10 +25,10 @@ def detect_contours(
 
         # check of bounds
         if (
-            (x + radius >= w)
-            or (x - radius <= 0)
-            or (y + radius >= h)
-            or (y - radius <= 0)
+                (x + radius >= w)
+                or (x - radius <= 0)
+                or (y + radius >= h)
+                or (y - radius <= 0)
         ):
             return False
 
@@ -58,7 +57,7 @@ def detect_contours(
         if check_circle(x, y, radius):
             min_enclosing_circles.append((int(x), int(y), radius))
 
-    ## Separate larger contours, apply opening on them to divide
+    # Separate larger contours, apply opening on them to divide
     large_areas = np.zeros_like(img)
     large_areas = cv2.drawContours(large_areas, large_contours, -1, 255, cv2.FILLED)
 
@@ -83,10 +82,9 @@ def detect_contours(
         if check_circle(x, y, radius):
             min_enclosing_circles.append((int(x), int(y), radius))
 
-    ## Separate small contours, apply closure to merge close ones
+    # Separate small contours, apply closure to merge close ones
     small_areas = np.zeros_like(img)
     small_areas = cv2.drawContours(small_areas, small_contours, -1, 255, cv2.FILLED)
-
 
     kernel = np.ones((close_kernel_size, close_kernel_size), np.uint8)
     small_areas = cv2.dilate(small_areas, kernel)
@@ -109,37 +107,37 @@ def detect_contours(
 
     return contours, min_enclosing_circles
 
-def detect_hough(img,
-        default_radius:int = 70, 
-        max_radius:int = 100, 
-        min_radius:int = 60, 
-        open_kernel_size:int=55, 
-        close_kernel_size:int=23
-    ):
 
+def detect_hough(img,
+                 default_radius: int = 70,
+                 max_radius: int = 100,
+                 min_radius: int = 60,
+                 open_kernel_size: int = 55,
+                 close_kernel_size: int = 23
+                 ):
     accepted_circles = np.array([])
     large_circles = []
     small_circles = []
 
     found_circles = cv2.HoughCircles(
-                                    img,
-                                    cv2.HOUGH_GRADIENT,
-                                    2,
-                                    minDist=2*min_radius,
-                                    param1=200,
-                                    param2=50,
-                                    minRadius=min_radius,
-                                    maxRadius=max_radius,
-                                    ) 
+        img,
+        cv2.HOUGH_GRADIENT,
+        2,
+        minDist=2 * min_radius,
+        param1=200,
+        param2=50,
+        minRadius=min_radius,
+        maxRadius=max_radius,
+    )
 
-    
-    if isinstance(found_circles,type(None)):
+    if isinstance(found_circles, type(None)):
         return None
 
     accepted_circles = found_circles.reshape((-1,3)).astype(np.int32)
     # List to store the centers and radii of the minimum enclosing circles
     
     return accepted_circles
+
 
 def return_hough(img):
     dark_image, before_thres = preprocess_dark_img(img)
@@ -149,7 +147,6 @@ def return_hough(img):
 
 
 def detect_circles(img):
-
     light_image = preprocess_light_img(img)
     dark_image, before_thres = preprocess_dark_img(img)
     light_contours, light_circles = detect_contours(light_image)
@@ -160,18 +157,19 @@ def detect_circles(img):
 
     return all_contours, all_circles, before_thres, dark_image
 
+
 def light_detect_procedure():
     bee_hive_image = cv2.imread('mini_dataset/close_up_1.jpg')
     gray_bee_hive = cv2.cvtColor(bee_hive_image, cv2.COLOR_BGR2GRAY)
-    #blurred_bee_hive = cv2.GaussianBlur(gray_bee_hive, (7, 7), 0)
-    #equalized_bee_hive = cv2.equalizeHist(blurred_bee_hive)
-    #_, thresholded_bee_hive = cv2.threshold(blurred_bee_hive, 127, 255, cv2.THRESH_BINARY)
+    # blurred_bee_hive = cv2.GaussianBlur(gray_bee_hive, (7, 7), 0)
+    # equalized_bee_hive = cv2.equalizeHist(blurred_bee_hive)
+    # _, thresholded_bee_hive = cv2.threshold(blurred_bee_hive, 127, 255, cv2.THRESH_BINARY)
 
     sample_light_cell_image = cv2.imread('kernel.png')
     gray_sample_light_cell = cv2.cvtColor(sample_light_cell_image, cv2.COLOR_BGR2GRAY)
-    #blurred_sample_light_cell = cv2.GaussianBlur(gray_sample_light_cell, (5, 5), 0)
-    #equalized_sample_light_cell = cv2.equalizeHist(blurred_sample_light_cell)
-    #_, thresholded_sample_light_cell = cv2.threshold(blurred_sample_light_cell, 127, 255, cv2.THRESH_BINARY)
+    # blurred_sample_light_cell = cv2.GaussianBlur(gray_sample_light_cell, (5, 5), 0)
+    # equalized_sample_light_cell = cv2.equalizeHist(blurred_sample_light_cell)
+    # _, thresholded_sample_light_cell = cv2.threshold(blurred_sample_light_cell, 127, 255, cv2.THRESH_BINARY)
 
     plt.figure(figsize=(8, 4))
 
@@ -185,12 +183,12 @@ def light_detect_procedure():
 
     result = convolve(gray_bee_hive, gray_sample_light_cell, THRESHOLD)
     masked_image = np.where(result > 0, gray_bee_hive, 0)
-    #masked_image = 255 - masked_image
+    # masked_image = 255 - masked_image
     dark_contours, dark_image, dark_circles = detect_dark_cells(masked_image)
     if dark_circles is not None:
         for circle in np.array(dark_circles)[:, 0]:
             cv2.circle(gray_bee_hive, (circle[0], circle[1]), color=0, radius=70, thickness=3)
-            
+
     plt.subplot(133)
     plt.imshow(gray_bee_hive, cmap='gray')
     plt.title(f"Inverted image (threshold: {THRESHOLD})")
@@ -198,11 +196,11 @@ def light_detect_procedure():
 
 
 def detect_circle_on_clip(sample_image):
-    ## This is Görkem's function
+    # This is Görkem's function
 
     peak = get_hist_max(sample_image)
     dark_flag = False
-    if (peak <= 127):
+    if peak <= 127:
         dark_flag = True
         sample_image = ~sample_image
 
@@ -214,15 +212,15 @@ def detect_circle_on_clip(sample_image):
     retval, sample_image = cv2.threshold(sample_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     circles = cv2.HoughCircles(
-                                sample_image,
-                                cv2.HOUGH_GRADIENT,
-                                2,
-                                minDist=120,
-                                param1=200,
-                                param2=20,
-                                minRadius=60,
-                                maxRadius=80,
-                                ) 
+        sample_image,
+        cv2.HOUGH_GRADIENT,
+        2,
+        minDist=120,
+        param1=200,
+        param2=20,
+        minRadius=60,
+        maxRadius=80,
+    )
     return circles[0]
 
 

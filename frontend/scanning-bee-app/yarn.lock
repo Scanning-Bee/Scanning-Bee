@@ -1329,6 +1329,7 @@ __metadata:
     react: ^17.0.2
     react-debounce-render: ^8.0.2
     react-dom: ^17.0.2
+    react-draggable: 4.4.6
     react-redux: ^8.0.5
     react-split-pane: ^0.1.92
     redux: ^4.1.2
@@ -3989,6 +3990,13 @@ __metadata:
   version: 1.0.4
   resolution: "clone@npm:1.0.4"
   checksum: d06418b7335897209e77bdd430d04f882189582e67bd1f75a04565f3f07f5b3f119a9d670c943b6697d0afb100f03b866b3b8a1f91d4d02d72c4ecf2bb64b5dd
+  languageName: node
+  linkType: hard
+
+"clsx@npm:^1.1.1":
+  version: 1.2.1
+  resolution: "clsx@npm:1.2.1"
+  checksum: 30befca8019b2eb7dbad38cff6266cf543091dae2825c856a62a8ccf2c3ab9c2907c4d12b288b73101196767f66812365400a227581484a05f968b0307cfaf12
   languageName: node
   linkType: hard
 
@@ -10250,7 +10258,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.5.4, prop-types@npm:^15.6.1, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2":
+"prop-types@npm:^15.5.4, prop-types@npm:^15.6.1, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -10414,6 +10422,19 @@ __metadata:
   peerDependencies:
     react: 17.0.2
   checksum: 1c1eaa3bca7c7228d24b70932e3d7c99e70d1d04e13bb0843bbf321582bc25d7961d6b8a6978a58a598af2af496d1cedcfb1bf65f6b0960a0a8161cb8dab743c
+  languageName: node
+  linkType: hard
+
+"react-draggable@npm:4.4.6":
+  version: 4.4.6
+  resolution: "react-draggable@npm:4.4.6"
+  dependencies:
+    clsx: ^1.1.1
+    prop-types: ^15.8.1
+  peerDependencies:
+    react: ">= 16.3.0"
+    react-dom: ">= 16.3.0"
+  checksum: 9b15aac59244873ac4561c5a2bead43a56e18d406e0a5f242bd4f9d151c074530c02b99387983104bf43417292f9cf8d063e554ed08d88792235e3fbc965f1b8
   languageName: node
   linkType: hard
 

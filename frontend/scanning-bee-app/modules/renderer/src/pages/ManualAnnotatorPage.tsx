@@ -1,9 +1,10 @@
-import { Button, Divider, Icon } from '@blueprintjs/core';
+import { Button, Divider, Icon, Menu, MenuItem, Popover } from '@blueprintjs/core';
 import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
+import Annotation from '@frontend/models/annotation';
 import CellType from '@frontend/models/cellType';
 import {
-    setActiveAnnotation,
-    useActiveAnnotation,
+    setActiveAnnotations,
+    useActiveAnnotations,
     useAnnotations,
     useAnnotationsFolder,
     useImages,
@@ -16,6 +17,42 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import SplitPane from 'react-split-pane';
 
+const SaveToDatabaseButton = (props: { annotations: Annotation[], shownImageUrl: string }) => (
+    <Popover
+        interactionKind='click'
+        position='right'
+        lazy
+        canEscapeKeyClose
+    >
+        <Button
+            text='Save annotations to database'
+            intent='primary'
+            icon='database'
+            style={{ margin: '5px' }}
+            className='inline-box-important'
+        />
+        <Menu>
+            <MenuItem
+                text={`Save annotations for ${getFileName(props.shownImageUrl)}`}
+                onClick={() => {
+                    const filteredAnnotations = props.annotations
+                        .filter(annotation => annotation.source_name === getFileName(props.shownImageUrl));
+
+                    BackendInterface.getInstance().saveAnnotationsToDatabase(filteredAnnotations);
+                }}
+                icon='media'
+            />
+            <MenuItem
+                text='Save all annotations'
+                onClick={() => {
+                    BackendInterface.getInstance().saveAnnotationsToDatabase(props.annotations);
+                }}
+                icon='tick'
+            />
+        </Menu>
+    </Popover>
+);
+
 export const ManualAnnotatorPage = () => {
     const dispatch = useDispatch();
 
@@ -23,7 +60,7 @@ export const ManualAnnotatorPage = () => {
     const [leftPanelOpen, setLeftPanelOpen] = useState<boolean>(true);
 
     const folder = useAnnotationsFolder();
-    const activeAnnotation = useActiveAnnotation();
+    const activeAnnotations = useActiveAnnotations();
     const annotations = useAnnotations();
     const images = useImages();
 
@@ -101,7 +138,7 @@ export const ManualAnnotatorPage = () => {
                     }}
                     resizerStyle={{ backgroundColor: lightTheme.secondaryBackground, height: '1px' }}
                     allowResize={leftPanelOpen}
-                    pane1Style={{ display: 'unset' }}
+                    pane1Style={{ display: 'unset', width: '245px' }}
                     resizerClassName='resizer'
                 >
                     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'start' }}>
@@ -127,16 +164,7 @@ export const ManualAnnotatorPage = () => {
                             style={{ margin: '5px' }}
                             className='inline-box-important'
                         />
-                        <Button
-                            text='Save annotations to database'
-                            onClick={() => {
-                                BackendInterface.getInstance().saveAnnotationsToDatabase(annotations);
-                            }}
-                            intent='primary'
-                            icon='database'
-                            style={{ margin: '5px' }}
-                            className='inline-box-important'
-                        />
+                        <SaveToDatabaseButton annotations={annotations} shownImageUrl={shownImageUrl} />
                     </div>
                     <div className='annotated-images-panel'>
                         <h2 style={{ margin: '0 35px 10px ' }}>Images</h2>
@@ -148,7 +176,7 @@ export const ManualAnnotatorPage = () => {
                                 minimal={image !== shownImageUrl}
                                 onClick={() => {
                                     setShownImageUrl(image);
-                                    dispatch(setActiveAnnotation(undefined));
+                                    dispatch(setActiveAnnotations([]));
                                 }}
                                 style={{ minWidth: 'fit-content', margin: '0 25px' }}
                                 intent={image === shownImageUrl ? 'primary' : 'none'}
@@ -165,7 +193,7 @@ export const ManualAnnotatorPage = () => {
                     shownImageUrl={images.find(image => image === shownImageUrl)}
                 />
                 <AnnotationEditorTools
-                    annotation={activeAnnotation}
+                    annotations={activeAnnotations}
                     newAnnotationProps={{
                         center: [480, 270],
                         radius: 86,
