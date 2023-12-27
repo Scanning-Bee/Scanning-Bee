@@ -317,7 +317,13 @@ class MainController {
         });
 
         ipcMain.on('saveAnnotations', (_event, { targetFolder, annotations }: { targetFolder: string, annotations: AnnotationYaml[] }) => {
-            saveAnnotations(annotations, targetFolder);
+            try {
+                saveAnnotations(annotations, targetFolder);
+
+                this.send('saveAnnotationsSuccess', { targetFolder });
+            } catch (e) {
+                this.send('saveAnnotationsError', { targetFolder });
+            }
         });
 
         ipcMain.on('zoomChange', zoomChangeHandler);

@@ -8,20 +8,24 @@ from .models import *
 from .serializers import *
 from .real_world_coordiantes import calculate_annotation_position
 
+
 ##################### USER TYPE #####################
 class UserTypeList(ListCreateAPIView):
     queryset = UserType.objects.all()
     serializer_class = UserTypeSerializer
+
 
 class SingleUserType(RetrieveUpdateDestroyAPIView):
     queryset = UserType.objects.all()
     serializer_class = UserTypeSerializer
     lookup_field = 'id'
 
+
 ##################### USER #####################
 class UserList(ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
 
 class SingleUser(RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
@@ -34,15 +38,18 @@ class FrameList(ListCreateAPIView):
     queryset = Frame.objects.all()
     serializer_class = FrameSerializer
 
+
 class SingleFrame(RetrieveUpdateDestroyAPIView):
     queryset = Frame.objects.all()
     serializer_class = FrameSerializer
     lookup_field = 'id'
 
+
 ##################### CELL #####################
 class CellList(ListCreateAPIView):
     queryset = Cell.objects.all()
     serializer_class = CellSerializer
+
 
 class CellListByLocation(ListCreateAPIView):
     serializer_class = CellSerializer
@@ -74,25 +81,36 @@ class CellListByLocation(ListCreateAPIView):
 
         return queryset
 
+
 class SingleCell(RetrieveUpdateDestroyAPIView):
     queryset = Cell.objects.all()
     serializer_class = CellSerializer
     lookup_field = 'id'
+
 
 ##################### CONTENT #####################
 class ContentList(ListCreateAPIView):
     queryset = Content.objects.all()
     serializer_class = ContentSerializer
 
+
 class SingleContent(RetrieveUpdateDestroyAPIView):
     queryset = Content.objects.all()
     serializer_class = ContentSerializer
     lookup_field = 'id'
 
+
 ##################### CELL CONTENT #####################
 class CellContentList(ListCreateAPIView):
-    queryset = CellContent.objects.all()
     serializer_class = CellContentSerializer
+
+    def get_queryset(self):
+        queryset = CellContent.objects.all()
+        filter_type = self.kwargs.get('filter_type')
+        if filter_type == "image_name":
+            image_name = self.kwargs.get('image_name')
+            queryset = queryset.filter(image_name=image_name)
+        return queryset
 
     def create(self, request, *args, **kwargs):
         if isinstance(request.data, list):  # Check if request is a list for bulk creation
@@ -118,6 +136,7 @@ class CellContentList(ListCreateAPIView):
 
         else:  # Fallback to original create method for single creations
             return super().create(request, *args, **kwargs)
+
 
 class SingleCellContent(RetrieveUpdateDestroyAPIView):
     queryset = CellContent.objects.all()
