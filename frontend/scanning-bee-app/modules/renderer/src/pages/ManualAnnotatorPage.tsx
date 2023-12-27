@@ -99,7 +99,7 @@ export const ManualAnnotatorPage = () => {
                         width: !leftPanelOpen && '0px',
                         transition: 'opacity 0.1s',
                     }}
-                    resizerStyle={{ backgroundColor: lightTheme.secondaryBackground }}
+                    resizerStyle={{ backgroundColor: lightTheme.secondaryBackground, height: '1px' }}
                     allowResize={leftPanelOpen}
                     pane1Style={{ display: 'unset' }}
                     resizerClassName='resizer'
@@ -129,7 +129,7 @@ export const ManualAnnotatorPage = () => {
                         />
                     </div>
                     <div className='annotated-images-panel'>
-                        <h2 style={{ margin: '0 35px 10px '}}>Images</h2>
+                        <h2 style={{ margin: '0 35px 10px ' }}>Images</h2>
                         <Divider style={{ width: '240px' }}/>
                         {sortedImages.map(image => (
                             <Button
