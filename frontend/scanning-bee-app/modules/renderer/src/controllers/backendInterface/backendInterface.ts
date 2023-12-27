@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import axios, { AxiosInstance } from 'axios';
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, shell } from 'electron';
 import Annotation, { AnnotationYaml } from '@frontend/models/annotation';
 import { AppToaster } from '@frontend/Toaster';
 
@@ -38,6 +38,10 @@ export class BackendInterface {
         const annotationsYaml: AnnotationYaml[] = annotations.map(annotation => Annotation.toYaml(annotation));
 
         ipcRenderer.send('saveAnnotations', { targetFolder, annotations: annotationsYaml });
+    };
+
+    public openFolderAtLocation = (folder: string) => {
+        shell.openPath(folder);
     };
 
     private async apiQuery<RequestDto>(endpoint: string, method: APIMethods, data?: RequestDto): Promise<RequestDto | null> {

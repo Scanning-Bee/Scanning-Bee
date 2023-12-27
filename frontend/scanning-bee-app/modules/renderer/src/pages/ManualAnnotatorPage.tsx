@@ -53,8 +53,8 @@ export const ManualAnnotatorPage = () => {
                 onClick={() => {
                     BackendInterface.getInstance().openFolderDialog();
                 }}
-                intent='primary'
-                icon='folder-open'
+                intent='success'
+                icon='folder-new'
                 style={{ padding: '5px', margin: '2px' }}
             />
             <p style={{ fontWeight: 'normal', fontSize: '16px' }} className='nomargin'>to start annotating or see your annotations.</p>
@@ -99,7 +99,7 @@ export const ManualAnnotatorPage = () => {
                         width: !leftPanelOpen && '0px',
                         transition: 'opacity 0.1s',
                     }}
-                    resizerStyle={{ backgroundColor: lightTheme.secondaryBackground }}
+                    resizerStyle={{ backgroundColor: lightTheme.secondaryBackground, height: '1px' }}
                     allowResize={leftPanelOpen}
                     pane1Style={{ display: 'unset' }}
                     resizerClassName='resizer'
@@ -113,7 +113,7 @@ export const ManualAnnotatorPage = () => {
                                 BackendInterface.getInstance().openFolderDialog();
                             }}
                             intent='primary'
-                            icon='folder-open'
+                            icon='folder-new'
                             style={{ margin: '5px' }}
                             className='inline-box-important'
                         />
@@ -145,7 +145,7 @@ export const ManualAnnotatorPage = () => {
                             <Button
                                 key={image}
                                 text={getFileName(image)}
-                                minimal
+                                minimal={image !== shownImageUrl}
                                 onClick={() => {
                                     setShownImageUrl(image);
                                     dispatch(setActiveAnnotation(undefined));

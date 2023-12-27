@@ -6,7 +6,7 @@ from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveUpda
 from rest_framework import status
 from .models import *
 from .serializers import *
-from .real_world_coordiantes import calculate_annotation_position
+from .real_world_coordiantes import convert_to_world_coordinates
 
 
 ##################### USER TYPE #####################
@@ -108,8 +108,28 @@ class CellContentList(ListCreateAPIView):
         queryset = CellContent.objects.all()
         filter_type = self.kwargs.get('filter_type')
         if filter_type == "image_name":
-            image_name = self.kwargs.get('image_name')
+            image_name = self.kwargs.get('arg')
             queryset = queryset.filter(image_name=image_name)
+        elif filter_type == "image_name_rect":
+            x_pos = self.kwargs.get('x_pos')
+            y_pos = self.kwargs.get('y_pos')
+            min_x, min_y = convert_to_world_coordinates((0,0), x_pos, y_pos)
+            max_x, max_y = convert_to_world_coordinates((1920,1080), x_pos, y_pos)
+
+            cells = Cell.objects.filter(
+                frame=1,
+                location_on_frame_x__gte=min_x,
+                location_on_frame_x__lte=max_x,
+                location_on_frame_y__gte=min_y,
+                location_on_frame_y__lte=max_y
+            )
+
+            if cells.exists():
+                queryset = queryset.filter(cell__in=cells)
+            
+            else:
+                queryset = queryset.none()
+
         return queryset
 
     def create(self, request, *args, **kwargs):
