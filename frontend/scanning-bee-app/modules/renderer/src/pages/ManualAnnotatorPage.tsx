@@ -170,9 +170,9 @@ export const ManualAnnotatorPage = () => {
                             onClick={() => {
                                 BackendInterface.getInstance().generateAnnotationsByAI(getFileName(shownImageUrl));
                             }}
-                            intent='primary'
+                            intent='success'
                             icon='send-to-graph'
-                            style={{ margin: '5px', backgroundColor: lightTheme.tertiaryAccent }}
+                            style={{ margin: '5px', backgroundColor: 'darkgreen' }}
                             className='inline-box-important'
                         />
                     </div>
