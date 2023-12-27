@@ -80,41 +80,15 @@ def test_lines():
     
     # plot_img = draw_parallel_grid(plot_img,first_detected_circles)
 
-    point_img,first_grid,second_grid = get_patches(point_img,first_detected_circles,cell_space = 0.03, error_margin=0.15)
-
-    plt.imshow(point_img)
-    plt.show()
+    point_img,first_grid,second_grid, first_tight, second_tight = get_patches(point_img,first_detected_circles,cell_space = 0.03, error_margin=0.15)
 
     second_detect_circles,patches = detect_second_stage(sample_image,first_grid,second_grid,first_detected_circles)
+    second_detect_circles = filter_circles(first_detected_circles,second_detect_circles)
     plot_img = draw_circles(plot_img,second_detect_circles,(0,128,255))
     all_detected_circles.extend(second_detect_circles)
 
-        # Calculate the number of rows and columns for the grid
-    num_rows = int(np.sqrt(len(patches)))
-    num_cols = (len(patches) + num_rows - 1) // num_rows
-
-    # Create a figure and axis
-    fig, axes = plt.subplots(num_rows, num_cols, figsize=(10, 10))
-
-    # Flatten the axes if needed
-    if num_rows > 1 and num_cols > 1:
-        axes = axes.flatten()
-
-    # Iterate through the patches and display them
-    for i, patch in enumerate(patches):
-        axes[i].imshow(patch)
-        axes[i].axis('off')  # Turn off axis labels
-
-    # Remove any remaining empty subplots
-    for j in range(len(patches), len(axes)):
-        fig.delaxes(axes[j])
-
-    # Adjust layout and display the plot
-    plt.tight_layout()
-    plt.show()
-
-
-    tiled_circles = tile_circles(sample_image,first_grid,second_grid,all_detected_circles)
+    tiled_circles = tile_circles(sample_image,first_tight,second_tight, all_detected_circles)
+    tiled_circles = filter_circles(all_detected_circles,tiled_circles)
     plot_img = draw_circles(plot_img,tiled_circles,color=(255,128,0))
 
 

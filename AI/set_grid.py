@@ -186,6 +186,9 @@ def get_patches(img, detected_circles, cell_space = 0.15, error_margin = 0.5):
     first_grid = []
     second_grid = []
 
+    first_tight = []
+    second_tight = []
+
     ## create and draw grids
     for row in horizontal_lines:
         for column in vertical_lines:
@@ -193,11 +196,13 @@ def get_patches(img, detected_circles, cell_space = 0.15, error_margin = 0.5):
             down = int(row[1] + error_margin * r)
             left = int(column[0] - error_margin * r)
             right = int(column[1] + error_margin * r)
-            cv2.line(img,(left,up),(right,up),(255,255,0),3)
-            cv2.line(img,(right,up),(right,down),(255,255,0),3)
-            cv2.line(img,(right,down),(left,down),(255,255,0),3)
-            cv2.line(img,(left,down),(left,up),(255,255,0),3)
+            # cv2.line(img,(left,up),(right,up),(255,255,0),3)
+            # cv2.line(img,(right,up),(right,down),(255,255,0),3)
+            # cv2.line(img,(right,down),(left,down),(255,255,0),3)
+            # cv2.line(img,(left,down),(left,up),(255,255,0),3)
             first_grid.append((left,right,up,down))
+            first_tight.append((int(column[0]),int(column[1]),int(row[0]),int(row[1])))
+            
 
     for row in slided_horizontal_lines:
         for column in slided_vertical_lines:
@@ -205,14 +210,15 @@ def get_patches(img, detected_circles, cell_space = 0.15, error_margin = 0.5):
             down = int(row[1] + error_margin * r)
             left = int(column[0] - error_margin * r)
             right = int(column[1] + error_margin * r)
-            cv2.line(img,(left,up),(right,up),(0,255,0),3)
-            cv2.line(img,(right,up),(right,down),(0,255,0),3)
-            cv2.line(img,(right,down),(left,down),(0,255,0),3)
-            cv2.line(img,(left,down),(left,up),(0,255,0),3)
+            # cv2.line(img,(left,up),(right,up),(0,255,0),3)
+            # cv2.line(img,(right,up),(right,down),(0,255,0),3)
+            # cv2.line(img,(right,down),(left,down),(0,255,0),3)
+            # cv2.line(img,(left,down),(left,up),(0,255,0),3)
             second_grid.append((left,right,up,down))
+            second_tight.append((int(column[0]),int(column[1]),int(row[0]),int(row[1])))
     
 
-    return img,first_grid,second_grid
+    return img,first_grid,second_grid, first_tight,second_tight
 
 
 def detect_second_stage(img,first_grid,second_grid,first_detected):
@@ -305,3 +311,26 @@ def tile_circles(img,first_grid,second_grid,first_detected):
 
     return newly_detected
 
+
+def filter_circles(first_detected,second_detected,default_radius = 70):
+
+    all_circles = first_detected
+
+    def check_circle(x, y, radius):
+        # check of proximity
+        for x_c, y_c, _ in all_circles:
+            distance = np.sqrt((x_c - x) ** 2 + (y_c - y) ** 2)
+            if distance < 1.5 * default_radius:
+                return False
+        return True
+    
+    
+    filtered_second = []
+    for x,y,r in second_detected:
+        if check_circle(x,y,r):
+            filtered_second.append([x,y,r])
+            all_circles = np.append(all_circles, [[x, y, r]], axis=0)
+
+    return filtered_second
+            
+    
