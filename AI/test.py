@@ -76,7 +76,6 @@ def test_lines(image_path, occlude = False):
     all_detected_circles = []
 
     first_detected_circles, _, _ = return_hough(sample_image)
-    # plot_img = draw_circles(plot_img,first_detected_circles,(255,255,0))
     all_detected_circles.extend(first_detected_circles)
 
     # plot_img = draw_parallel_grid(plot_img,first_detected_circles)
@@ -85,26 +84,38 @@ def test_lines(image_path, occlude = False):
 
     second_detect_circles,patches = detect_second_stage(sample_image,first_grid,second_grid,first_detected_circles)
     second_detect_circles = filter_circles(first_detected_circles,second_detect_circles)
-    # plot_img = draw_circles(plot_img,second_detect_circles,(0,128,255))
+    
     all_detected_circles.extend(second_detect_circles)
 
     tiled_circles = tile_circles(sample_image,first_tight,second_tight, all_detected_circles)
     tiled_circles = filter_circles(all_detected_circles,tiled_circles)
-    # plot_img = draw_circles(plot_img,tiled_circles,color=(255,128,0))
+    
 
     all_detected_circles.extend(tiled_circles)
 
-    if occlude:
-        model = YOLO('AI/bee_segment_model.pt')
-        bee_mask = create_bee_mask(model,sample_image)
-        all_detected_circles = filter_intersecting_circles(all_detected_circles,bee_mask)
+    # if occlude:
+    #     model = YOLO('AI/bee_segment_model.pt')
+    #     bee_mask = create_bee_mask(model,sample_image)
+    #     all_detected_circles = filter_intersecting_circles(all_detected_circles,bee_mask)
     
     # plot_img = draw_circles(plot_img,all_detected_circles)
+
+    # plot_img = draw_circles(plot_img,first_detected_circles,(255,255,0))
+    # plot_img = draw_circles(plot_img,second_detect_circles,(0,128,255))
+    # plot_img = draw_circles(plot_img,tiled_circles,color=(255,128,0))
+
     # plt.imshow(plot_img)
     # plt.show()
+
+    if first_detected_circles is not None:
+        all_detected_circles.extend(first_detected_circles)
+    if second_detect_circles is not None:
+        all_detected_circles.extend(second_detect_circles)
+    if tiled_circles is not None:
+        all_detected_circles.extend(tiled_circles)
 
     return all_detected_circles
 
 
 if __name__ == "__main__":
-    test_lines([])
+    test_lines("AI/test_images/image_1219.jpg",False)

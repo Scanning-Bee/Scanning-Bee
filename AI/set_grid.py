@@ -275,7 +275,7 @@ def draw_circles(img,detected_circles,color = (0,255,255)):
     
     if detect_circles is not None:
         for x,y,radius in detected_circles:
-            cv2.circle(img, (int(x),int(y)), int(radius), color, 3)
+            cv2.circle(img, (int(x),int(y)), int(radius), color, 7)
 
     return img
             
