@@ -73,51 +73,50 @@ def test_lines(image_path, occlude=False):
     plot_img = cv2.cvtColor(sample_image, cv2.COLOR_GRAY2RGB)
     point_img = plot_img.copy()
 
-    all_detected_circles = []
 
     first_detected_circles, _, _ = return_hough(sample_image)
-    all_detected_circles.extend(first_detected_circles)
+    all_detected_circles = first_detected_circles
 
     # plot_img = draw_parallel_grid(plot_img,first_detected_circles)
-    point_img, first_grid, second_grid, first_tight, second_tight = get_patches(point_img, first_detected_circles,
-                                                                                cell_space=0.03, error_margin=0.15)
+    try:
+        point_img, first_grid, second_grid, first_tight, second_tight = get_patches(point_img, first_detected_circles,
+                                                                                    cell_space=0.03, error_margin=0.15)
 
-    point_img, first_grid, second_grid, first_tight, second_tight = get_patches(point_img, first_detected_circles,
-                                                                                cell_space=0.03, error_margin=0.15)
+        second_detect_circles,patches = detect_second_stage(sample_image,first_grid,second_grid,first_detected_circles)
+        second_detect_circles = filter_circles(first_detected_circles,second_detect_circles)
+        
+        all_detected_circles = np.vstack([all_detected_circles,second_detect_circles])
 
-    second_detect_circles,patches = detect_second_stage(sample_image,first_grid,second_grid,first_detected_circles)
-    second_detect_circles = filter_circles(first_detected_circles,second_detect_circles)
-    
-    all_detected_circles.extend(second_detect_circles)
+        tiled_circles = tile_circles(sample_image,first_tight,second_tight, all_detected_circles)
+        tiled_circles = filter_circles(all_detected_circles,tiled_circles)
+        
+        all_detected_circles = np.vstack([all_detected_circles,tiled_circles])
 
-    tiled_circles = tile_circles(sample_image,first_tight,second_tight, all_detected_circles)
-    tiled_circles = filter_circles(all_detected_circles,tiled_circles)
-    
+        # all_detected_circles.extend(tiled_circles)
 
-    all_detected_circles.extend(tiled_circles)
+        # if occlude:
+        #     model = YOLO('AI/bee_segment_model.pt')
+        #     bee_mask = create_bee_mask(model,sample_image)
+        #     all_detected_circles = filter_intersecting_circles(all_detected_circles,bee_mask)
+        
+        # plot_img = draw_circles(plot_img,all_detected_circles)
 
-    # if occlude:
-    #     model = YOLO('AI/bee_segment_model.pt')
-    #     bee_mask = create_bee_mask(model,sample_image)
-    #     all_detected_circles = filter_intersecting_circles(all_detected_circles,bee_mask)
-    
-    # plot_img = draw_circles(plot_img,all_detected_circles)
+        # plot_img = draw_circles(plot_img,first_detected_circles,(255,255,0))
+        # plot_img = draw_circles(plot_img,second_detect_circles,(0,128,255))
+        # plot_img = draw_circles(plot_img,tiled_circles,color=(255,128,0))
 
-    # plot_img = draw_circles(plot_img,first_detected_circles,(255,255,0))
-    # plot_img = draw_circles(plot_img,second_detect_circles,(0,128,255))
-    # plot_img = draw_circles(plot_img,tiled_circles,color=(255,128,0))
+        # plt.imshow(plot_img)
+        # plt.show()
 
-    # plt.imshow(plot_img)
-    # plt.show()
+        # print(first_detected_circles)
+        # print(second_detect_circles)
+        # print(tiled_circles)
 
-    if first_detected_circles is not None:
-        all_detected_circles.extend(first_detected_circles)
-    if second_detect_circles is not None:
-        all_detected_circles.extend(second_detect_circles)
-    if tiled_circles is not None:
-        all_detected_circles.extend(tiled_circles)
-
-    return all_detected_circles
+        # all_detected_circles = np.concatenate([first_detected_circles,second_detect_circles,tiled_circles])
+        
+        return all_detected_circles
+    except:
+        return []
 
 
 if __name__ == "__main__":
