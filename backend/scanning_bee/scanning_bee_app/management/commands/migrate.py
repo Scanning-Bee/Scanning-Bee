@@ -1,6 +1,8 @@
 from django.core.management.commands.migrate import Command as MigrateCommand
 from django.core.management import call_command
 
+import os
+
 
 class Command(MigrateCommand):
     def handle(self, *args, **options):
@@ -8,10 +10,7 @@ class Command(MigrateCommand):
         super().handle(*args, **options)
 
         # Define your fixtures list
-        fixtures = [
-            'initial_content.json',
-            'initial_user_type.json',
-        ]
+        fixtures = os.listdir("./scanning_bee_app/fixtures")
 
         # Then, load each fixture
         for fixture in fixtures:
