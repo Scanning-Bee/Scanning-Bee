@@ -1,6 +1,7 @@
 import torch
 from torchvision import transforms, models
 
+
 class GrayscaleMobileNetV3:
     def __init__(self):
         # Load the pre-trained MobileNetV3 model

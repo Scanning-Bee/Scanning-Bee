@@ -10,6 +10,7 @@ FOUR_OVER_ROOT3 = 2.309401077
 TWO_OVER_ROOT3 = 1.154700538
 ROOT3 = 1.732050808
 
+
 def draw_hexagon(circle, image):
     global FOUR_OVER_ROOT3, TWO_OVER_ROOT3, ROOT3
     
@@ -50,6 +51,7 @@ def draw_hexagon(circle, image):
     cv2.polylines(sample_image,[pts],True,(0,255,255))
     return sample_image, False
 
+
 circle_org = (515, 291, 79) # x, y, r
 
 circle = (515, 291, 79)
@@ -61,7 +63,7 @@ height, width = sample_image.shape
 supposed_cells = []
 
 line_height = y + r
-while (line_height < height):
+while line_height < height:
     cv2.line(sample_image_rgb, (0, line_height),  (width - 1, line_height), (255, 0, 0), 1)
     line_height += int(r * 3 * TWO_OVER_ROOT3 + 15)
 
@@ -72,7 +74,7 @@ while (line_height > 0):
 
 # the top boundaries for the circles
 line_height = y - r 
-while (line_height > 0):
+while line_height > 0:
     cv2.line(sample_image_rgb, (0, line_height),  (width - 1, line_height), (0, 0, 255), 1)
     line_height -= int(r * 3 *TWO_OVER_ROOT3 + 15)
 
@@ -83,13 +85,13 @@ while (line_height < height):
 
 # the right boundaries for the circles
 vertical_line = x + r
-while (vertical_line > 0):
+while vertical_line > 0:
     cv2.line(sample_image_rgb, (vertical_line, 0),  (vertical_line, height - 1), (0, 255, 0), 1)
     vertical_line -= int(2 * r)
 
 # the left boundaries for the circles
 vertical_line = x - r
-while (vertical_line < width):
+while vertical_line < width:
     cv2.line(sample_image_rgb, (vertical_line, 0),  (vertical_line, height - 1), (0, 255, 0), 1)
     vertical_line += int(2 * r)
 
@@ -103,7 +105,7 @@ def detect_circle_on_clip(sample_image):
 
     peak = plot_img_hist(sample_image)
     dark_flag = False
-    if (peak <= 127):
+    if peak <= 127:
         dark_flag = True
         sample_image = ~sample_image
 
@@ -126,6 +128,7 @@ def detect_circle_on_clip(sample_image):
                                 ) 
     return circles[0]
     #circles = detect_hough(sample_image)
+
 
 sample_image = cv2.imread('AI/test_images/Screenshot from 2023-12-25 16-27-20.png')
 sample_image_org = sample_image.copy()
