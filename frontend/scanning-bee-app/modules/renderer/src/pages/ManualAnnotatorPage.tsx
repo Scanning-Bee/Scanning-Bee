@@ -3,8 +3,8 @@ import { BackendInterface } from '@frontend/controllers/backendInterface/backend
 import Annotation from '@frontend/models/annotation';
 import CellType from '@frontend/models/cellType';
 import {
-    setActiveAnnotation,
-    useActiveAnnotation,
+    setActiveAnnotations,
+    useActiveAnnotations,
     useAnnotations,
     useAnnotationsFolder,
     useImages,
@@ -60,7 +60,7 @@ export const ManualAnnotatorPage = () => {
     const [leftPanelOpen, setLeftPanelOpen] = useState<boolean>(true);
 
     const folder = useAnnotationsFolder();
-    const activeAnnotation = useActiveAnnotation();
+    const activeAnnotations = useActiveAnnotations();
     const annotations = useAnnotations();
     const images = useImages();
 
@@ -176,7 +176,7 @@ export const ManualAnnotatorPage = () => {
                                 minimal={image !== shownImageUrl}
                                 onClick={() => {
                                     setShownImageUrl(image);
-                                    dispatch(setActiveAnnotation(undefined));
+                                    dispatch(setActiveAnnotations([]));
                                 }}
                                 style={{ minWidth: 'fit-content', margin: '0 25px' }}
                                 intent={image === shownImageUrl ? 'primary' : 'none'}
@@ -193,7 +193,7 @@ export const ManualAnnotatorPage = () => {
                     shownImageUrl={images.find(image => image === shownImageUrl)}
                 />
                 <AnnotationEditorTools
-                    annotation={activeAnnotation}
+                    annotations={activeAnnotations}
                     newAnnotationProps={{
                         center: [480, 270],
                         radius: 86,
