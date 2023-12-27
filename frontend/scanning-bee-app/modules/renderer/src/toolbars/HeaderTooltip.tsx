@@ -1,5 +1,5 @@
 import { Button, Divider, Menu, MenuDivider, MenuItem, Popover } from '@blueprintjs/core';
-import { openFolderAtLocation, openFolderDialog } from '@frontend/controllers/backendInterface';
+import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
 import { resetAnnotations, useAnnotationsFolder } from '@frontend/slices/annotationSlice';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import React from 'react';
@@ -10,7 +10,7 @@ const TooltipButton = (props: { folder: string }) => <Button
     text={props.folder ? getFileName(props.folder) : 'Select Folder'}
     style={{ width: '100%', display: 'inline', textAlign: 'center' }}
     onClick={() => {
-        if (!props.folder) openFolderDialog();
+        if (!props.folder) BackendInterface.getInstance().openFolderDialog();
     }}
     className='header-button'
 />;
@@ -25,21 +25,21 @@ const TooltipMenu = (props: { folder: string }) => {
             <MenuItem
                 text='Select Another Folder'
                 onClick={() => {
-                    openFolderDialog();
+                    BackendInterface.getInstance().openFolderDialog();
                 }}
                 icon='folder-new'
             />
             <MenuItem
                 text='Open Folder Location'
                 onClick={() => {
-                    if (props.folder) openFolderAtLocation(props.folder);
+                    if (props.folder) BackendInterface.getInstance().openFolderAtLocation(props.folder);
                 }}
                 icon='folder-open'
             />
             <MenuItem
                 text='Open Annotations File'
                 onClick={() => {
-                    if (props.folder) openFolderAtLocation(`${props.folder}/annotations/annotations.yaml`);
+                    if (props.folder) BackendInterface.getInstance().openFolderAtLocation(`${props.folder}/annotations/annotations.yaml`);
                 }}
                 icon='document-open'
             />
