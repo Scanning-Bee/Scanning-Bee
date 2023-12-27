@@ -53,8 +53,8 @@ export const ManualAnnotatorPage = () => {
                 onClick={() => {
                     openFolderDialog();
                 }}
-                intent='primary'
-                icon='folder-open'
+                intent='success'
+                icon='folder-new'
                 style={{ padding: '5px', margin: '2px' }}
             />
             <p style={{ fontWeight: 'normal', fontSize: '16px' }} className='nomargin'>to start annotating or see your annotations.</p>
@@ -113,7 +113,7 @@ export const ManualAnnotatorPage = () => {
                                 openFolderDialog();
                             }}
                             intent='primary'
-                            icon='folder-open'
+                            icon='folder-new'
                             style={{ margin: '10px' }}
                             className='inline-box-important'
                         />
@@ -135,7 +135,7 @@ export const ManualAnnotatorPage = () => {
                             <Button
                                 key={image}
                                 text={getFileName(image)}
-                                minimal
+                                minimal={image !== shownImageUrl}
                                 onClick={() => {
                                     setShownImageUrl(image);
                                     dispatch(setActiveAnnotation(undefined));
