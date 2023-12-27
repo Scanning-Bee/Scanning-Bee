@@ -1,4 +1,4 @@
-from preprocess import *
+from .preprocess import *
 
 THRESHOLD = 200
 

@@ -1,5 +1,4 @@
-from detect import *
-from set_grid import *
+from .set_grid import *
 import glob
 from ultralytics import YOLO
 
@@ -60,14 +59,13 @@ def test_detection():
                     plt.imshow(original_img_rgb_dark)
                     plt.axis('off')
 
-                plt.suptitle(f"Results for def:{default},min:{min_r},max:{max_r}")                
+                plt.suptitle(f"Results for def:{default},min:{min_r},max:{max_r}")
                 plt.tight_layout()
                 plt.savefig(f'./results/grid_search/d{default}f{min_r}t{max_r}.png')
 
 
-def test_lines(image_path, occlude = False):
-    
-    sample_image = cv2.imread(image_path,cv2.IMREAD_GRAYSCALE)
+def test_lines(image_path, occlude=False):
+    sample_image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
     plot_img = cv2.cvtColor(sample_image, cv2.COLOR_GRAY2RGB)
     point_img = plot_img.copy()
