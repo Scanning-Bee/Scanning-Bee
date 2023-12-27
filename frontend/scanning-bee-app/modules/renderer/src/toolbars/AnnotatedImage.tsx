@@ -12,6 +12,7 @@ import { getFileName } from '@frontend/utils/fileNameUtils';
 import { isMac } from '@frontend/utils/platform';
 import { UUID } from 'crypto';
 import React from 'react';
+import Draggable from 'react-draggable';
 import { useDispatch } from 'react-redux';
 
 export const AnnotatedImage = (props: { shownImageUrl: string }) => {
@@ -64,7 +65,14 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
                         }
                     });
 
+                    // if the click is not within an annotation, check if there is an active annotation.
+                    // if there is, deselect it. if there isn't, create a new annotation
                     if (!annotationId) {
+                        if (activeAnnotationIds.length > 0) {
+                            dispatch(setActiveAnnotations([]));
+                            return;
+                        }
+
                         const newAnnotation = new Annotation({
                             center: [2 * x, 2 * y],
                             radius: 80,
@@ -87,21 +95,10 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
                 const isActive = activeAnnotationIds.includes(annotation.id);
 
                 return (
-                    <div
-                        key={annotation.id}
-                        className='flex-center noselect'
-                        style={{
-                            position: 'absolute',
-                            left: `${leftOffset + centerX - radius}px`,
-                            top: `${centerY - radius}px`,
-                            width: `${radius * 2}px`,
-                            height: `${radius * 2}px`,
-                            border: `3px solid ${CellTypeColours[annotation.cell_type]}`,
-                            borderRadius: '50%',
-                            color: CellTypeColours[annotation.cell_type],
-                            backgroundColor: isActive ? '#00FF0044' : 'transparent',
-                        }}
-                        onClick={(e) => {
+                    // @ts-ignore
+                    <Draggable
+                        allowAnyClick
+                        onMouseDown={(e) => {
                             e.stopPropagation();
 
                             if ((isMac() && e.metaKey) || (!isMac() && e.ctrlKey)) {
@@ -112,9 +109,34 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
                                 ));
                             }
                         }}
+                        onDrag={(e) => {
+                            e.stopPropagation();
+
+                            if ((isMac() && e.metaKey) || (!isMac() && e.ctrlKey)) {
+                                dispatch(setAnnotationAsActive({ id: annotation.id, active: true }));
+                            } else {
+                                dispatch(setActiveAnnotations([annotation.id]));
+                            }
+                        }}
                     >
-                        {annotation.cell_type}
-                    </div>
+                        <div
+                            key={annotation.id}
+                            className='flex-center noselect'
+                            style={{
+                                position: 'absolute',
+                                left: `${leftOffset + centerX - radius}px`,
+                                top: `${centerY - radius}px`,
+                                width: `${radius * 2}px`,
+                                height: `${radius * 2}px`,
+                                border: `3px solid ${CellTypeColours[annotation.cell_type]}`,
+                                borderRadius: '50%',
+                                color: CellTypeColours[annotation.cell_type],
+                                backgroundColor: isActive ? '#00FF0044' : 'transparent',
+                            }}
+                        >
+                            {annotation.cell_type}
+                        </div>
+                    </Draggable>
                 );
             })}
         </span>
