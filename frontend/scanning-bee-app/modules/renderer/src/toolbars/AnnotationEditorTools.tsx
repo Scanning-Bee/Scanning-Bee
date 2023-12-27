@@ -147,7 +147,7 @@ const CreateAnnotationButton = (props: { annotationProps: AnnotationProps }) => 
         <Button
             icon={<Icon icon='add' />}
             text='Create annotation'
-            intent='primary'
+            intent='success'
             minimal
             onClick={() => {
                 const newAnnotation = new Annotation(props.annotationProps);
