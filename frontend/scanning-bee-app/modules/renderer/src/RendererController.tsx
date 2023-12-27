@@ -6,6 +6,7 @@ import { render } from 'react-dom';
 import App from './App';
 import Annotation, { AnnotationYaml } from './models/annotation';
 import { generateAnnotationsFromYaml, openFolder } from './slices/annotationSlice';
+import { AppToaster } from './Toaster';
 
 export type PageType = 'home' | 'manual-annotator' | 'beehive' | 'settings';
 
@@ -22,6 +23,16 @@ export class RendererController {
 
         // { folder: folderPath, annotations, images: imageUrls }
         ipcRenderer.on('annotationsParsed', this.handleParsedAnnotations);
+        ipcRenderer.on('saveAnnotationsSuccess', (_event, _payload) => AppToaster.show({
+            message: 'Annotations saved successfully!',
+            intent: 'success',
+            timeout: 3000,
+        }));
+        ipcRenderer.on('saveAnnotationsError', (_event, _payload) => AppToaster.show({
+            message: 'Annotations could not be saved!',
+            intent: 'danger',
+            timeout: 3000,
+        }));
 
         this.initialize();
     }
