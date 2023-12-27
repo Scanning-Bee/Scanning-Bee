@@ -67,6 +67,9 @@ def test_detection():
 def test_lines(image_path, occlude=False):
     sample_image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
+    print("ZOOOORT")
+    print(sample_image.shape)
+
     plot_img = cv2.cvtColor(sample_image, cv2.COLOR_GRAY2RGB)
     point_img = plot_img.copy()
 

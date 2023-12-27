@@ -28,8 +28,7 @@ urlpatterns = [
 
     path('cellcontents/', views.CellContentList.as_view(), name='cellcontent-list'),
     path('cellcontents/<str:filter_type>/<str:arg>/', views.CellContentList.as_view(), name='cellcontent-detail'),
-    path('cellcontents/<str:filter_type>/<str:x_pos>/<str:y_pos>/', views.CellContentList.as_view(), name='cellcontent-detail'),
-    path('cellcontents/ai/<str:image_name>/', views.CellContentList.as_view(), name='cellcontent-detail'),
+    #path('cellcontents/ai/<str:image_name>/', views.CellContentsByAI.as_view(), name='cellcontent-detail'),
 
     path('images/', views.ImageList.as_view(), name='image-details')
 ]

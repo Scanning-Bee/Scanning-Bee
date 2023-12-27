@@ -115,14 +115,17 @@ class CellContentList(ListCreateAPIView):
     def get_queryset(self):
         queryset = CellContent.objects.all()
         filter_type = self.kwargs.get('filter_type')
+
         if filter_type == "image_name":
             image_name = self.kwargs.get('arg')
-            queryset = queryset.filter(image_name=image_name)
+            image = Image.objects.filter(image_name=image_name)
+            queryset = queryset.filter(image=image.pk)
+
         elif filter_type == "image_name_rect":
-            x_pos = int(self.kwargs.get('x_pos'))
-            y_pos = int(self.kwargs.get('y_pos'))
-            min_x, min_y = convert_to_world_coordinates((0, 0), x_pos, y_pos)
-            max_x, max_y = convert_to_world_coordinates((1920, 1080), x_pos, y_pos)
+            image_name = self.kwargs.get('arg')
+            image = Image.objects.get(image_name=image_name)
+            min_x, min_y = convert_to_world_coordinates((0, 0), image.x_pos, image.y_pos)
+            max_x, max_y = convert_to_world_coordinates((1920, 1080), image.x_pos, image.y_pos)
 
             cells = Cell.objects.filter(
                 frame=1,
@@ -137,6 +140,28 @@ class CellContentList(ListCreateAPIView):
 
             else:
                 queryset = queryset.none()
+        
+        elif filter_type == "ai":
+            image_name = self.kwargs.get('arg')
+            all_detected_circles = test_lines("scanning_bee_app/AnnotationFiles/" + image_name)
+            image = Image.objects.filter(image_name=image_name)
+            cell_contents = list()
+            for circle in all_detected_circles:
+                x = circle[0]
+                y = circle[1]
+                radius = circle[2]
+                cell_content = CellContent(cell=None,
+                                        frame=1,
+                                        timestamp=None,
+                                        content=9,
+                                        user=1,
+                                        center_x=x,
+                                        center_y=y,
+                                        image=image.pk,
+                                        radius=radius)
+                cell_contents.append(cell_content)
+
+            return Response(30)
 
         return queryset
 
@@ -172,30 +197,40 @@ class SingleCellContent(RetrieveUpdateDestroyAPIView):
     lookup_field = 'id'
 
 
-class CellContentsByAI(APIView):
+class CellContentsByAI(ListCreateAPIView):
     serializer_class = CellContentSerializer
 
-    def get(self, request):
+    def get_queryset(self):
+        print("ZOOOOOOORT")
+        queryset = CellContent.objects.all()
         image_name = self.kwargs.get('image_name')
-        all_detected_circles = test_lines(image_name)
         image = Image.objects.filter(image_name=image_name)
-        cell_contents = list()
-        for circle in all_detected_circles:
-            x = circle[0]
-            y = circle[1]
-            radius = circle[2]
-            cell_content = CellContent(cell=None,
-                                      frame=1,
-                                      timestamp=None,
-                                      content=9,
-                                      user=1,
-                                      center_x=x,
-                                      center_y=y,
-                                      image=image.pk,
-                                      radius=radius)
-            cell_contents.append(cell_content)
+        queryset = queryset.filter(image=image.pk)
+        return queryset
 
-        return Response(cell_contents)
+    # def get(self, request, image_name, format=None):
+    #     print(request.data)
+    #     print("ZOOOOOOORT")
+    
+    #     all_detected_circles = test_lines("backend/scanning_bee/scanning_bee_app/AnnotationFiles/" + image_name)
+    #     image = Image.objects.filter(image_name=image_name)
+    #     cell_contents = list()
+    #     for circle in all_detected_circles:
+    #         x = circle[0]
+    #         y = circle[1]
+    #         radius = circle[2]
+    #         cell_content = CellContent(cell=None,
+    #                                   frame=1,
+    #                                   timestamp=None,
+    #                                   content=9,
+    #                                   user=1,
+    #                                   center_x=x,
+    #                                   center_y=y,
+    #                                   image=image.pk,
+    #                                   radius=radius)
+    #         cell_contents.append(cell_content)
+
+    #     return Response(30)
 
 
 class ImageList(ListCreateAPIView):
