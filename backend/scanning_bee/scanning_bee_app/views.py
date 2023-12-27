@@ -118,7 +118,7 @@ class CellContentList(ListCreateAPIView):
 
         if filter_type == "image_name":
             image_name = self.kwargs.get('arg')
-            image = Image.objects.filter(image_name=image_name)
+            image = Image.objects.get(image_name=image_name)
             queryset = queryset.filter(image=image.pk)
 
         elif filter_type == "image_name_rect":
@@ -140,6 +140,8 @@ class CellContentList(ListCreateAPIView):
 
             else:
                 queryset = queryset.none()
+
+        return queryset
         
 
     def create(self, request, *args, **kwargs):

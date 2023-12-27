@@ -165,6 +165,16 @@ export const ManualAnnotatorPage = () => {
                             className='inline-box-important'
                         />
                         <SaveToDatabaseButton annotations={annotations} shownImageUrl={shownImageUrl} />
+                        <Button
+                            text='Generate annotations with AI'
+                            onClick={() => {
+                                BackendInterface.getInstance().generateAnnotationsByAI(getFileName(shownImageUrl));
+                            }}
+                            intent='primary'
+                            icon='send-to-graph'
+                            style={{ margin: '5px', backgroundColor: lightTheme.tertiaryAccent }}
+                            className='inline-box-important'
+                        />
                     </div>
                     <div className='annotated-images-panel'>
                         <h2 style={{ margin: '0 35px 10px ' }}>Images</h2>

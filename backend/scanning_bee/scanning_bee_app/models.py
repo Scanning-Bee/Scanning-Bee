@@ -69,7 +69,7 @@ class CellContent(models.Model):
         x_pos = my_image.x_pos
         y_pos = my_image.y_pos
 
-        calculated_x, calculated_y = convert_to_world_coordinates(self.center_x, self.center_y, x_pos, y_pos)
+        calculated_x, calculated_y = convert_to_world_coordinates((self.center_x, self.center_y), x_pos, y_pos)
 
         cell = self.find_or_create_cell(calculated_x, calculated_y, self.frame)
         self.cell = cell
