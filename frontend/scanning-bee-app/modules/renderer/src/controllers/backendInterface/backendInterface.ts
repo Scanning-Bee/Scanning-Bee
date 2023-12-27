@@ -2,6 +2,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { ipcRenderer } from 'electron';
 import Annotation, { AnnotationYaml } from '@frontend/models/annotation';
+import { AppToaster } from '@frontend/Toaster';
 
 import { BACKEND_ENDPOINTS, ENDPOINT_URL } from './endpoints';
 import { CellContentDto, CellDto, CellTypeDto, ContentDto, FrameDto, UserDto, UserTypeDto } from './payloadTypes';
@@ -109,6 +110,11 @@ export class BackendInterface {
     public saveAnnotationsToDatabase = async (annotations: Annotation[]) => {
         let success = true;
 
+        AppToaster.show({
+            message: 'Saving annotations to database...',
+            intent: 'primary',
+        });
+
         for (let i = 0; i < annotations.length; i += 1) {
             const annotation = annotations[i];
 
@@ -131,8 +137,9 @@ export class BackendInterface {
             }
         }
 
-        if (success) {
-            console.log('Successfully saved annotations to the database.');
-        }
+        AppToaster.show({
+            message: success ? 'Annotations saved successfully!' : 'Error while saving annotations!',
+            intent: success ? 'success' : 'danger',
+        });
     };
 }
