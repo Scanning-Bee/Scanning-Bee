@@ -111,8 +111,8 @@ class CellContentList(ListCreateAPIView):
             image_name = self.kwargs.get('arg')
             queryset = queryset.filter(image_name=image_name)
         elif filter_type == "image_name_rect":
-            x_pos = self.kwargs.get('x_pos')
-            y_pos = self.kwargs.get('y_pos')
+            x_pos = int(self.kwargs.get('x_pos'))
+            y_pos = int(self.kwargs.get('y_pos'))
             min_x, min_y = convert_to_world_coordinates((0,0), x_pos, y_pos)
             max_x, max_y = convert_to_world_coordinates((1920,1080), x_pos, y_pos)
 

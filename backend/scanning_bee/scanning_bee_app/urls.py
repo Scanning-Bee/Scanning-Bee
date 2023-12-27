@@ -16,6 +16,6 @@ urlpatterns = [
     path('cellcontents/', views.CellContentList.as_view(), name='cellcontent-list'),
     path('cellcontents/<int:id>/', views.SingleCellContent.as_view(), name='cellcontent-detail'),
     path('cellcontents/<str:filter_type>/<str:arg>', views.CellContentList.as_view(), name='cellcontent-detail'),
-    path('cellcontents/<str:filter_type>/<double:x_pos>/<double:y_pos>', views.CellContentList.as_view(), name='cellcontent-detail'),
+    path('cellcontents/<str:filter_type>/<str:x_pos>/<str:y_pos>', views.CellContentList.as_view(), name='cellcontent-detail'),
 ]
 

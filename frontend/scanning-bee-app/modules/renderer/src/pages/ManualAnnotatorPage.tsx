@@ -1,5 +1,5 @@
 import { Button, Divider, Icon } from '@blueprintjs/core';
-import { openFolderDialog, saveAnnotations } from '@frontend/controllers/backendInterface';
+import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
 import CellType from '@frontend/models/cellType';
 import {
     setActiveAnnotation,
@@ -51,10 +51,10 @@ export const ManualAnnotatorPage = () => {
                 minimal
                 large
                 onClick={() => {
-                    openFolderDialog();
+                    BackendInterface.getInstance().openFolderDialog();
                 }}
-                intent='primary'
-                icon='folder-open'
+                intent='success'
+                icon='folder-new'
                 style={{ padding: '5px', margin: '2px' }}
             />
             <p style={{ fontWeight: 'normal', fontSize: '16px' }} className='nomargin'>to start annotating or see your annotations.</p>
@@ -110,21 +110,31 @@ export const ManualAnnotatorPage = () => {
                         <Button
                             text='Open a folder'
                             onClick={() => {
-                                openFolderDialog();
+                                BackendInterface.getInstance().openFolderDialog();
                             }}
                             intent='primary'
-                            icon='folder-open'
-                            style={{ margin: '10px' }}
+                            icon='folder-new'
+                            style={{ margin: '5px' }}
                             className='inline-box-important'
                         />
                         <Button
-                            text='Save annotations'
+                            text='Save annotations locally'
                             onClick={() => {
-                                saveAnnotations(annotations, folder);
+                                BackendInterface.getInstance().saveAnnotations(annotations, folder);
                             }}
                             intent='primary'
                             icon='floppy-disk'
-                            style={{ margin: '10px' }}
+                            style={{ margin: '5px' }}
+                            className='inline-box-important'
+                        />
+                        <Button
+                            text='Save annotations to database'
+                            onClick={() => {
+                                BackendInterface.getInstance().saveAnnotationsToDatabase(annotations);
+                            }}
+                            intent='primary'
+                            icon='database'
+                            style={{ margin: '5px' }}
                             className='inline-box-important'
                         />
                     </div>
@@ -135,7 +145,7 @@ export const ManualAnnotatorPage = () => {
                             <Button
                                 key={image}
                                 text={getFileName(image)}
-                                minimal
+                                minimal={image !== shownImageUrl}
                                 onClick={() => {
                                     setShownImageUrl(image);
                                     dispatch(setActiveAnnotation(undefined));
