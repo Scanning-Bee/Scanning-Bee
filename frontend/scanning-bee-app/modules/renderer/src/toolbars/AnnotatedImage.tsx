@@ -12,7 +12,6 @@ import { getFileName } from '@frontend/utils/fileNameUtils';
 import { isMac } from '@frontend/utils/platform';
 import { UUID } from 'crypto';
 import React from 'react';
-import Draggable from 'react-draggable';
 import { useDispatch } from 'react-redux';
 
 export const AnnotatedImage = (props: { shownImageUrl: string }) => {
@@ -95,10 +94,21 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
                 const isActive = activeAnnotationIds.includes(annotation.id);
 
                 return (
-                    // @ts-ignore
-                    <Draggable
-                        allowAnyClick
-                        onMouseDown={(e) => {
+                    <div
+                        key={annotation.id}
+                        className='flex-center noselect'
+                        style={{
+                            position: 'absolute',
+                            left: `${leftOffset + centerX - radius}px`,
+                            top: `${centerY - radius}px`,
+                            width: `${radius * 2}px`,
+                            height: `${radius * 2}px`,
+                            border: `3px solid ${CellTypeColours[annotation.cell_type]}`,
+                            borderRadius: '50%',
+                            color: CellTypeColours[annotation.cell_type],
+                            backgroundColor: isActive ? '#00FF0044' : 'transparent',
+                        }}
+                        onClick={(e) => {
                             e.stopPropagation();
 
                             if ((isMac() && e.metaKey) || (!isMac() && e.ctrlKey)) {
@@ -109,34 +119,9 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
                                 ));
                             }
                         }}
-                        onDrag={(e) => {
-                            e.stopPropagation();
-
-                            if ((isMac() && e.metaKey) || (!isMac() && e.ctrlKey)) {
-                                dispatch(setAnnotationAsActive({ id: annotation.id, active: true }));
-                            } else {
-                                dispatch(setActiveAnnotations([annotation.id]));
-                            }
-                        }}
                     >
-                        <div
-                            key={annotation.id}
-                            className='flex-center noselect'
-                            style={{
-                                position: 'absolute',
-                                left: `${leftOffset + centerX - radius}px`,
-                                top: `${centerY - radius}px`,
-                                width: `${radius * 2}px`,
-                                height: `${radius * 2}px`,
-                                border: `3px solid ${CellTypeColours[annotation.cell_type]}`,
-                                borderRadius: '50%',
-                                color: CellTypeColours[annotation.cell_type],
-                                backgroundColor: isActive ? '#00FF0044' : 'transparent',
-                            }}
-                        >
-                            {annotation.cell_type}
-                        </div>
-                    </Draggable>
+                        {annotation.cell_type}
+                    </div>
                 );
             })}
         </span>
