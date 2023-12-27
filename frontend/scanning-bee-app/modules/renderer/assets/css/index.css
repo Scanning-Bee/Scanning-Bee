@@ -321,3 +321,9 @@ a {
   margin: 10px 0;
   cursor: row-resize;
 }
+
+.toaster{
+  z-index: 60;
+  /* margin-top: 80px; */
+  margin-top: 40px;
+}
