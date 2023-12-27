@@ -61,7 +61,7 @@ class CellContent(models.Model):
         return str(self.id) + " - " + self.content.name + " - " + str(self.cell)
 
     def save(self, *args, **kwargs):
-        calculated_x, calculated_y = convert_to_world_coordinates(self.center_x, self.center_y, self.x_pos, self.y_pos)
+        calculated_x, calculated_y = convert_to_world_coordinates((self.center_x, self.center_y), self.x_pos, self.y_pos)
 
         cell = self.find_or_create_cell(calculated_x, calculated_y, self.frame)
         self.cell = cell

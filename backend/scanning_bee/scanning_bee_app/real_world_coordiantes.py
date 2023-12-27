@@ -50,5 +50,5 @@ def convert_to_world_coordinates(point_2d, x_pos, y_pos, Z=1, camera_info_path="
     world_point[0] += x_pos
     world_point[1] += y_pos
 
-    return world_point
+    return world_point[0], world_point[1]
 
