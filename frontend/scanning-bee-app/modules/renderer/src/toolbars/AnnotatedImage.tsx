@@ -1,8 +1,15 @@
 import Annotation from '@frontend/models/annotation';
 import CellType from '@frontend/models/cellType';
-import { addAnnotation, setActiveAnnotation, useAnnotations } from '@frontend/slices/annotationSlice';
+import {
+    addAnnotation,
+    setActiveAnnotations,
+    setAnnotationAsActive,
+    useActiveAnnotationIds,
+    useAnnotations,
+} from '@frontend/slices/annotationSlice';
 import { CellTypeColours } from '@frontend/utils/colours';
 import { getFileName } from '@frontend/utils/fileNameUtils';
+import { isMac } from '@frontend/utils/platform';
 import { UUID } from 'crypto';
 import React from 'react';
 import { useDispatch } from 'react-redux';
@@ -13,6 +20,8 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
     const [leftOffset, setLeftOffset] = React.useState<number>(window.innerWidth / 2 - 480);
 
     const allAnnotations = useAnnotations();
+    const activeAnnotationIds = useActiveAnnotationIds();
+
     const dispatch = useDispatch();
 
     if (!shownImageUrl) {
@@ -66,7 +75,7 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
                         });
 
                         dispatch(addAnnotation(Annotation.toPlainObject(newAnnotation)));
-                        dispatch(setActiveAnnotation(newAnnotation.id));
+                        dispatch(setActiveAnnotations([newAnnotation.id]));
                     }
                 }}
             />
@@ -74,6 +83,8 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
                 const centerX = annotation.center[0] / 2;
                 const centerY = annotation.center[1] / 2;
                 const radius = annotation.radius / 2;
+
+                const isActive = activeAnnotationIds.includes(annotation.id);
 
                 return (
                     <div
@@ -88,10 +99,18 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
                             border: `3px solid ${CellTypeColours[annotation.cell_type]}`,
                             borderRadius: '50%',
                             color: CellTypeColours[annotation.cell_type],
+                            backgroundColor: isActive ? '#00FF0044' : 'transparent',
                         }}
                         onClick={(e) => {
                             e.stopPropagation();
-                            dispatch(setActiveAnnotation(annotation.id));
+
+                            if ((isMac() && e.metaKey) || (!isMac() && e.ctrlKey)) {
+                                dispatch(setAnnotationAsActive({ id: annotation.id, active: !isActive }));
+                            } else {
+                                dispatch(setActiveAnnotations(
+                                    isActive ? [] : [annotation.id],
+                                ));
+                            }
                         }}
                     >
                         {annotation.cell_type}
