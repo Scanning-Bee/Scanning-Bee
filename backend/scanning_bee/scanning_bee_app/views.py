@@ -3,10 +3,17 @@ from django.db import transaction
 from rest_framework.response import Response
 from rest_framework.decorators import api_view  # Import the api_view decorator
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.views import APIView
 from rest_framework import status
+
 from .models import *
 from .serializers import *
 from .real_world_coordiantes import convert_to_world_coordinates
+
+import sys
+sys.path.insert(0, '../../')
+
+from AI.test import test_lines
 
 
 ##################### USER TYPE #####################
@@ -65,7 +72,7 @@ class CellListByLocation(ListCreateAPIView):
                 # Convert parameters to float and validate
                 location_on_frame_x = float(location_on_frame_x)
                 location_on_frame_y = float(location_on_frame_y)
-                
+
                 # Calculate the range for x and y based on the threshold
                 x_min, x_max = location_on_frame_x - self.threshold, location_on_frame_x + self.threshold
                 y_min, y_max = location_on_frame_y - self.threshold, location_on_frame_y + self.threshold
@@ -77,7 +84,8 @@ class CellListByLocation(ListCreateAPIView):
                 )
             except ValueError:
                 # Handle cases where the conversion fails
-                raise ValidationError("Invalid parameters: Ensure 'location_on_frame_x' and 'location_on_frame_y' are valid numbers.")
+                raise ValidationError(
+                    "Invalid parameters: Ensure 'location_on_frame_x' and 'location_on_frame_y' are valid numbers.")
 
         return queryset
 
@@ -113,8 +121,8 @@ class CellContentList(ListCreateAPIView):
         elif filter_type == "image_name_rect":
             x_pos = int(self.kwargs.get('x_pos'))
             y_pos = int(self.kwargs.get('y_pos'))
-            min_x, min_y = convert_to_world_coordinates((0,0), x_pos, y_pos)
-            max_x, max_y = convert_to_world_coordinates((1920,1080), x_pos, y_pos)
+            min_x, min_y = convert_to_world_coordinates((0, 0), x_pos, y_pos)
+            max_x, max_y = convert_to_world_coordinates((1920, 1080), x_pos, y_pos)
 
             cells = Cell.objects.filter(
                 frame=1,
@@ -126,7 +134,7 @@ class CellContentList(ListCreateAPIView):
 
             if cells.exists():
                 queryset = queryset.filter(cell__in=cells)
-            
+
             else:
                 queryset = queryset.none()
 
@@ -163,3 +171,33 @@ class SingleCellContent(RetrieveUpdateDestroyAPIView):
     serializer_class = CellContentSerializer
     lookup_field = 'id'
 
+
+class CellContentsByAI(APIView):
+    serializer_class = CellContentSerializer
+
+    def get(self, request):
+        image_name = self.kwargs.get('image_name')
+        all_detected_circles = test_lines(image_name)
+        image = Image.objects.filter(image_name=image_name)
+        cell_contents = list()
+        for circle in all_detected_circles:
+            x = circle[0]
+            y = circle[1]
+            radius = circle[2]
+            cell_content = CellContent(cell=None,
+                                      frame=1,
+                                      timestamp=None,
+                                      content=9,
+                                      user=1,
+                                      center_x=x,
+                                      center_y=y,
+                                      image=image.pk,
+                                      radius=radius)
+            cell_contents.append(cell_content)
+
+        return Response(cell_contents)
+
+
+class ImageList(ListCreateAPIView):
+    queryset = Image.objects.all()
+    serializer_class = ImageSerializer

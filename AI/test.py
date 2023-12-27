@@ -1,5 +1,4 @@
-from detect import *
-from set_grid import *
+from .set_grid import *
 import glob
 from ultralytics import YOLO
 
@@ -60,14 +59,13 @@ def test_detection():
                     plt.imshow(original_img_rgb_dark)
                     plt.axis('off')
 
-                plt.suptitle(f"Results for def:{default},min:{min_r},max:{max_r}")                
+                plt.suptitle(f"Results for def:{default},min:{min_r},max:{max_r}")
                 plt.tight_layout()
                 plt.savefig(f'./results/grid_search/d{default}f{min_r}t{max_r}.png')
 
 
-def test_lines(image_path, occlude = False):
-    
-    sample_image = cv2.imread(image_path,cv2.IMREAD_GRAYSCALE)
+def test_lines(image_path, occlude=False):
+    sample_image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
     plot_img = cv2.cvtColor(sample_image, cv2.COLOR_GRAY2RGB)
     point_img = plot_img.copy()
@@ -82,24 +80,25 @@ def test_lines(image_path, occlude = False):
     point_img, first_grid, second_grid, first_tight, second_tight = get_patches(point_img, first_detected_circles,
                                                                                 cell_space=0.03, error_margin=0.15)
 
-    point_img,first_grid,second_grid, first_tight, second_tight = get_patches(point_img,first_detected_circles,cell_space = 0.03, error_margin=0.15)
+    point_img, first_grid, second_grid, first_tight, second_tight = get_patches(point_img, first_detected_circles,
+                                                                                cell_space=0.03, error_margin=0.15)
 
-    second_detect_circles,patches = detect_second_stage(sample_image,first_grid,second_grid,first_detected_circles)
-    second_detect_circles = filter_circles(first_detected_circles,second_detect_circles)
+    second_detect_circles, patches = detect_second_stage(sample_image, first_grid, second_grid, first_detected_circles)
+    second_detect_circles = filter_circles(first_detected_circles, second_detect_circles)
     # plot_img = draw_circles(plot_img,second_detect_circles,(0,128,255))
     all_detected_circles.extend(second_detect_circles)
 
-    tiled_circles = tile_circles(sample_image,first_tight,second_tight, all_detected_circles)
-    tiled_circles = filter_circles(all_detected_circles,tiled_circles)
+    tiled_circles = tile_circles(sample_image, first_tight, second_tight, all_detected_circles)
+    tiled_circles = filter_circles(all_detected_circles, tiled_circles)
     # plot_img = draw_circles(plot_img,tiled_circles,color=(255,128,0))
 
     all_detected_circles.extend(tiled_circles)
 
     if occlude:
         model = YOLO('AI/bee_segment_model.pt')
-        bee_mask = create_bee_mask(model,sample_image)
-        all_detected_circles = filter_intersecting_circles(all_detected_circles,bee_mask)
-    
+        bee_mask = create_bee_mask(model, sample_image)
+        all_detected_circles = filter_intersecting_circles(all_detected_circles, bee_mask)
+
     # plot_img = draw_circles(plot_img,all_detected_circles)
     # plt.imshow(plot_img)
     # plt.show()
