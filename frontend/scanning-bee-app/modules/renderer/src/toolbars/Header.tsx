@@ -6,6 +6,7 @@ import React from 'react';
 
 import { HeaderButtons } from './HeaderButtons';
 import { HeaderLeft } from './HeaderLeft';
+import { HeaderTooltip } from './HeaderTooltip';
 
 export default function Header(props: { page: PageType, setPage: (page: PageType) => void }) {
     const theme: Theme = lightTheme;
@@ -25,6 +26,7 @@ export default function Header(props: { page: PageType, setPage: (page: PageType
                 }}
             >
                 <HeaderLeft page={props.page} setPage={props.setPage} />
+                <HeaderTooltip page={props.page} setPage={props.setPage} />
                 <HeaderButtons page={props.page} setPage={props.setPage} />
             </div>
         </Overlay>

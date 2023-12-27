@@ -54,7 +54,7 @@ export const ManualAnnotatorPage = () => {
                     openFolderDialog();
                 }}
                 intent='success'
-                icon='folder-open'
+                icon='folder-new'
                 style={{ padding: '5px', margin: '2px' }}
             />
             <p style={{ fontWeight: 'normal', fontSize: '16px' }} className='nomargin'>to start annotating or see your annotations.</p>
@@ -113,7 +113,7 @@ export const ManualAnnotatorPage = () => {
                                 openFolderDialog();
                             }}
                             intent='primary'
-                            icon='folder-open'
+                            icon='folder-new'
                             style={{ margin: '10px' }}
                             className='inline-box-important'
                         />
