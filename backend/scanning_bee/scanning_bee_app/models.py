@@ -1,6 +1,6 @@
 from django.db import models
 #from django.contrib.gis.db import models as geo_models
-from .real_world_coordiantes import calculate_annotation_position
+from .real_world_coordiantes import convert_to_world_coordinates
 
 CELL_LOC_THRESHOLD = 0.01
 
