@@ -4,8 +4,8 @@ import glob
 from ultralytics import YOLO
 
 
-
-## This function belongs to Ege Keyvan, we try to improve this detection, so we use this as a baseline for testing our detections
+# This function belongs to Ege Keyvan, we try to improve this detection, so we use this as a baseline for testing our
+# detections
 def process_image(img: np.ndarray):
     gray = img
     # gray = cv2.cvtColor(cv2.bitwise_not(img), cv2.COLOR_BGR2GRAY)
@@ -38,11 +38,10 @@ def test_detection():
     # Set up the subplot grid
     plt.figure(figsize=(20, 10))
 
-    for default in range(65,105,10):
-        for min_r in range(30,65,10):
-            for max_r in range(100,130,10):
- 
-                
+    for default in range(65, 105, 10):
+        for min_r in range(30, 65, 10):
+            for max_r in range(100, 130, 10):
+
                 for i, file in enumerate(image_files, 1):
 
                     # Read the image
@@ -50,14 +49,14 @@ def test_detection():
                     org_img = img.copy()
 
                     # Detect circles using contour or blob detection
-                    detected_contours, detected_circles = detect_circles(img,default, max_r, min_r)
+                    detected_contours, detected_circles = detect_circles(img, default, max_r, min_r)
 
                     # Create subplot for original image contours
                     plt.subplot(4, 2, i)
                     original_img_rgb_dark = cv2.cvtColor(org_img, cv2.COLOR_GRAY2RGB)
                     if detected_contours is not None:
                         for x, y, radius in detected_circles:
-                            cv2.circle(original_img_rgb_dark, (x,y), int(radius), (255, 0, 255), 5)
+                            cv2.circle(original_img_rgb_dark, (x, y), int(radius), (255, 0, 255), 5)
                     plt.imshow(original_img_rgb_dark)
                     plt.axis('off')
 
@@ -80,6 +79,8 @@ def test_lines(image_path, occlude = False):
     all_detected_circles.extend(first_detected_circles)
 
     # plot_img = draw_parallel_grid(plot_img,first_detected_circles)
+    point_img, first_grid, second_grid, first_tight, second_tight = get_patches(point_img, first_detected_circles,
+                                                                                cell_space=0.03, error_margin=0.15)
 
     point_img,first_grid,second_grid, first_tight, second_tight = get_patches(point_img,first_detected_circles,cell_space = 0.03, error_margin=0.15)
 
