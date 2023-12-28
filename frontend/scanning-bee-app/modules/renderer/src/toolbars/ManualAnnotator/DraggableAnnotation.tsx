@@ -3,7 +3,7 @@ import { mutateAnnotation, setActiveAnnotations, setAnnotationAsActive } from '@
 import { CellTypeColours } from '@frontend/utils/colours';
 import { isMac } from '@frontend/utils/platform';
 import { UUID } from 'crypto';
-import React from 'react';
+import React, { useState } from 'react';
 import Draggable from 'react-draggable';
 import { useDispatch } from 'react-redux';
 
@@ -17,48 +17,60 @@ export const DraggableAnnotation = (props: {
 
     const dispatch = useDispatch();
 
+    const [isDragging, setIsDragging] = useState<boolean>(false);
+
     const radius = annotation.radius / 2;
     const centerX = annotation.center[0] / 2 - radius;
     const centerY = annotation.center[1] / 2 - radius;
 
     const isActive = activeAnnotationIds.includes(annotation.id);
 
+    const toggleActiveState = (e: any) => {
+        e.stopPropagation();
+
+        if ((isMac() && e.metaKey) || (!isMac() && e.ctrlKey)) {
+            dispatch(setAnnotationAsActive({ id: annotation.id, active: !isActive }));
+        } else {
+            dispatch(setActiveAnnotations(
+                isActive ? [] : [annotation.id],
+            ));
+        }
+    };
+
+    const debouncedAnnotationActivator = () => {
+        if (isDragging) return;
+
+        dispatch(setActiveAnnotations([annotation.id]));
+
+        setIsDragging(true);
+    };
+
+    const dragStopped = (e: any, pos: any) => {
+        e.stopPropagation();
+
+        const newX = (pos.x + radius) * 2;
+        const newY = (pos.y + radius) * 2;
+
+        const mutation = {
+            id: annotation.id,
+            mutations: { center: [newX, newY] },
+        };
+
+        dispatch(mutateAnnotation(mutation));
+
+        setIsDragging(false);
+    };
+
     return (
         <div
             key={key}
-            onMouseDown={(e) => {
-                e.stopPropagation();
-                console.log('mane');
-                if ((isMac() && e.metaKey) || (!isMac() && e.ctrlKey)) {
-                    dispatch(setAnnotationAsActive({ id: annotation.id, active: !isActive }));
-                } else {
-                    dispatch(setActiveAnnotations(
-                        isActive ? [] : [annotation.id],
-                    ));
-                }
-            }}
+            onMouseDown={toggleActiveState}
         >
             { /* @ts-ignore */ }
             <Draggable
                 position={{ x: centerX, y: centerY }}
-                onStart={() => {
-                    setTimeout(() => {
-                        dispatch(setActiveAnnotations([annotation.id]));
-                    }, 20);
-                }}
-                onStop={(e, pos) => {
-                    e.stopPropagation();
-
-                    const newX = (pos.x);
-                    const newY = (pos.y);
-
-                    const mutation = {
-                        id: annotation.id,
-                        mutations: { center: [newX * 2 + radius * 2, newY * 2 + radius * 2] },
-                    };
-
-                    dispatch(mutateAnnotation(mutation));
-                }}
+                onDrag={debouncedAnnotationActivator}
+                onStop={dragStopped}
             >
                 <div
                     key={annotation.id}
