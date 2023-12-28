@@ -3,16 +3,15 @@ import CellType from '@frontend/models/cellType';
 import {
     addAnnotation,
     setActiveAnnotations,
-    setAnnotationAsActive,
     useActiveAnnotationIds,
     useAnnotations,
 } from '@frontend/slices/annotationSlice';
-import { CellTypeColours } from '@frontend/utils/colours';
 import { getFileName } from '@frontend/utils/fileNameUtils';
-import { isMac } from '@frontend/utils/platform';
 import { UUID } from 'crypto';
 import React from 'react';
 import { useDispatch } from 'react-redux';
+
+import { DraggableAnnotation } from './DraggableAnnotation';
 
 export const AnnotatedImage = (props: { shownImageUrl: string }) => {
     const { shownImageUrl } = props;
@@ -37,7 +36,7 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
     };
 
     return (
-        <span>
+        <span style={{ height: '540px' }}>
             <img
                 src={shownImageUrl}
                 alt='Annotated image'
@@ -86,44 +85,14 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
                     }
                 }}
             />
-            {imageAnnotations.map((annotation) => {
-                const centerX = annotation.center[0] / 2;
-                const centerY = annotation.center[1] / 2;
-                const radius = annotation.radius / 2;
-
-                const isActive = activeAnnotationIds.includes(annotation.id);
-
-                return (
-                    <div
-                        key={annotation.id}
-                        className='flex-center noselect'
-                        style={{
-                            position: 'absolute',
-                            left: `${leftOffset + centerX - radius}px`,
-                            top: `${centerY - radius}px`,
-                            width: `${radius * 2}px`,
-                            height: `${radius * 2}px`,
-                            border: `3px solid ${CellTypeColours[annotation.cell_type]}`,
-                            borderRadius: '50%',
-                            color: CellTypeColours[annotation.cell_type],
-                            backgroundColor: isActive ? '#00FF0044' : 'transparent',
-                        }}
-                        onClick={(e) => {
-                            e.stopPropagation();
-
-                            if ((isMac() && e.metaKey) || (!isMac() && e.ctrlKey)) {
-                                dispatch(setAnnotationAsActive({ id: annotation.id, active: !isActive }));
-                            } else {
-                                dispatch(setActiveAnnotations(
-                                    isActive ? [] : [annotation.id],
-                                ));
-                            }
-                        }}
-                    >
-                        {annotation.cell_type}
-                    </div>
-                );
-            })}
+            {imageAnnotations.map(annotation => (
+                <DraggableAnnotation
+                    key={annotation.id}
+                    annotation={annotation}
+                    leftOffset={leftOffset}
+                    activeAnnotationIds={activeAnnotationIds}
+                />
+            ))}
         </span>
     );
 };

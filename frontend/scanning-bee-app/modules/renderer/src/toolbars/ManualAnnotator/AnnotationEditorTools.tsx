@@ -171,7 +171,7 @@ export const AnnotationEditorTools = (props: {
     const { annotations, newAnnotationProps } = props;
 
     return (
-        <div className='column-flex-center' style={{ width: '500px' }}>
+        <div className='column-flex-center' style={{ width: '300px', margin: '40px' }}>
             <JoystickLayout annotations={annotations} />
             <RadiusSlider annotations={annotations} />
             <CellTypePicker annotations={annotations} />
