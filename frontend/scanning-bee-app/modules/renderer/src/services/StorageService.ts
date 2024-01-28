@@ -62,8 +62,8 @@ class StorageService {
         let size = 0;
 
         for (const key in this.store.store) {
-            if (Object.prototype.hasOwnProperty.call(this.store.store, key)) {
-                size += this.store.store[key].length;
+            if (this.store.store[key]) {
+                size += JSON.stringify(this.store.store[key]).length;
             }
         }
 
