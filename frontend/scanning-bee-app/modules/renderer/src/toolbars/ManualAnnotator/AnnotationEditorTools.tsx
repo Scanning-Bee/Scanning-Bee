@@ -2,6 +2,7 @@ import { Button, Icon, IconName, Menu, MenuItem, Popover, Slider } from '@bluepr
 import Annotation, { AnnotationProps } from '@frontend/models/annotation';
 import CellType from '@frontend/models/cellType';
 import { addAnnotation, mutateAnnotation, removeAnnotation } from '@frontend/slices/annotationSlice';
+import { useTheme } from '@frontend/slices/themeSlice';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -30,15 +31,17 @@ const JoystickLayout = (props: {
         ],
     ];
 
+    const disabled = annotations.length === 0;
+
     return (
         <div>
             {joystickContent.map((row, rowIndex) => (
                 <div key={rowIndex} style={{ display: 'flex' }}>
                     {row.map((button, buttonIndex) => (
                         <Button
-                            disabled={annotations.length === 0}
+                            disabled={disabled}
                             key={buttonIndex}
-                            icon={<Icon icon={button.icon} />}
+                            icon={<Icon icon={button.icon} color={disabled ? 'grey' : 'black'} />}
                             onClick={() => {
                                 annotations.forEach((annotation) => {
                                     const mutation = {
@@ -91,22 +94,28 @@ const CellTypePicker = (props: {
 }) => {
     const { annotations } = props;
 
+    const theme = useTheme();
+
     const dispatch = useDispatch();
 
     const allAnnotationsAreSameCellType = annotations.length !== 0
         && annotations.every(annotation => annotation.cell_type === annotations[0].cell_type);
 
+    const disabled = annotations.length === 0;
+
     return (
         <Popover
             interactionKind='click'
             position='right-top'
-            disabled={annotations.length === 0}
+            disabled={disabled}
         >
             <Button
-                icon={<Icon icon='tag' />}
-                text={(annotations.length === 1 || allAnnotationsAreSameCellType) ? annotations[0].cell_type : 'Cell type'}
+                icon={<Icon icon='tag' color={theme.secondaryForeground + (disabled ? '80' : 'ff')} />}
+                text={<p style={{ color: theme.primaryForeground + (disabled ? '80' : 'ff'), margin: 0 }}>
+                    {(annotations.length === 1 || allAnnotationsAreSameCellType) ? annotations[0].cell_type : 'Cell type'}
+                </p>}
                 minimal
-                disabled={annotations.length === 0}
+                disabled={disabled}
                 rightIcon={<Icon icon='caret-right' />}
             />
             <Menu>
@@ -118,7 +127,7 @@ const CellTypePicker = (props: {
                             mutations: { cell_type: CellType[cellType] },
                         })))}
                         active={allAnnotationsAreSameCellType && annotations[0].cell_type === CellType[cellType]}
-                        disabled={annotations.length === 0}
+                        disabled={disabled}
                         text={cellType}
                     />
                 ))}

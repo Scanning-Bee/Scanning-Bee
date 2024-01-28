@@ -255,6 +255,13 @@ a {
   height: 100%;
 }
 
+.home {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: fit-content;
+}
+
 .annotated-images-panel{
   width: 250px;
   max-height: 60vh;

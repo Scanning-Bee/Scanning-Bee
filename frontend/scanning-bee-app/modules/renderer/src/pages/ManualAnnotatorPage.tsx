@@ -43,7 +43,13 @@ export const ManualAnnotatorPage = () => {
     }, [leftPanelOpen]);
 
     if (!folder || !shownImageUrl) {
-        return <div style={{ display: 'flex', alignItems: 'center' }}>
+        return <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: theme.primaryBackground,
+            color: theme.primaryForeground,
+            justifyContent: 'center',
+        }} className='page'>
             <Button
                 text='Open a folder'
                 minimal
@@ -60,7 +66,11 @@ export const ManualAnnotatorPage = () => {
     }
 
     return (
-        <div className='page'>
+        <div style={{
+            backgroundColor: theme.primaryBackground,
+            color: theme.primaryForeground,
+            display: 'flex',
+        }} className='page'>
             <div id="left-panel" className='panel'>
                 <Button
                     icon={<Icon icon={leftPanelOpen ? 'arrow-left' : 'arrow-right'} style={{ color: theme.primaryForeground }} />}

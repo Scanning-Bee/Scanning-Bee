@@ -22,7 +22,7 @@ export const ThemeSettings = () => {
     return (
         <div>
             <h2 className='settings-title'>Theme Settings</h2>
-            <Card>
+            <Card style={{ backgroundColor: theme.secondaryBackground }}>
                 <div className='settings-card'>
                     <p>
                         Theme
@@ -53,54 +53,62 @@ export const ThemeSettings = () => {
     );
 };
 
-export const AccessibilitySettings = () => (
-    <div>
-        <h2 className='settings-title'>Accessibility Settings</h2>
-        <Card>
-            <div className='settings-card'>
-                <p>
+export const AccessibilitySettings = () => {
+    const theme = useTheme();
+
+    return (
+        <div>
+            <h2 className='settings-title'>Accessibility Settings</h2>
+            <Card style={{ backgroundColor: theme.secondaryBackground }}>
+                <div className='settings-card'>
+                    <p>
                     Change Zoom
-                </p>
-                <div style={{ display: 'flex' }}>
-                    <ButtonGroup>
+                    </p>
+                    <div style={{ display: 'flex' }}>
+                        <ButtonGroup>
+                            <Button
+                                text='-'
+                                onClick={() => changeZoom(webFrame.getZoomLevel() - 1)}
+                            />
+                            <Button
+                                text='+'
+                                onClick={() => changeZoom(webFrame.getZoomLevel() + 1)}
+                            />
+                        </ButtonGroup>
                         <Button
-                            text='-'
-                            onClick={() => changeZoom(webFrame.getZoomLevel() - 1)}
+                            text='Reset'
+                            onClick={() => changeZoom(0)}
+                            style={{ marginLeft: '5px' }}
+                            intent='primary'
                         />
-                        <Button
-                            text='+'
-                            onClick={() => changeZoom(webFrame.getZoomLevel() + 1)}
-                        />
-                    </ButtonGroup>
+                    </div>
+                </div>
+            </Card>
+        </div>
+    );
+};
+
+export const AdvancedSettings = () => {
+    const theme = useTheme();
+
+    return (
+        <div>
+            <h2 className='settings-title'>Advanced Settings</h2>
+            <Card style={{ backgroundColor: theme.secondaryBackground }}>
+                <div className='settings-card'>
+                    <p>
+                    Current Storage Size: {StorageService.getStorageSize()} bytes
+                    </p>
                     <Button
-                        text='Reset'
-                        onClick={() => changeZoom(0)}
-                        style={{ marginLeft: '5px' }}
-                        intent='primary'
+                        text='Clear'
+                        intent='danger'
+                        onClick={() => {
+                            StorageService.clearStorage();
+                        }}
+                        style={{ alignSelf: 'center', height: 'fit-content' }}
                     />
                 </div>
-            </div>
-        </Card>
-    </div>
-);
-
-export const AdvancedSettings = () => (
-    <div>
-        <h2 className='settings-title'>Advanced Settings</h2>
-        <Card>
-            <div className='settings-card'>
-                <p>
-                    Current Storage Size: {StorageService.getStorageSize()} bytes
-                </p>
-                <Button
-                    text='Clear'
-                    intent='danger'
-                    onClick={() => {
-                        StorageService.clearStorage();
-                    }}
-                    style={{ alignSelf: 'center', height: 'fit-content' }}
-                />
-            </div>
-        </Card>
-    </div>
-);
+            </Card>
+        </div>
+    );
+};

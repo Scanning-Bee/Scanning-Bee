@@ -1,19 +1,31 @@
 import { Button, Divider, Menu, MenuDivider, MenuItem, Popover } from '@blueprintjs/core';
 import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
 import { resetAnnotations, useAnnotationsFolder } from '@frontend/slices/annotationSlice';
+import { useTheme } from '@frontend/slices/themeSlice';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
-const TooltipButton = (props: { folder: string }) => <Button
-    outlined
-    text={props.folder ? getFileName(props.folder) : 'Select Folder'}
-    style={{ width: '100%', display: 'inline', textAlign: 'center' }}
-    onClick={() => {
-        if (!props.folder) BackendInterface.getInstance().openFolderDialog();
-    }}
-    className='header-button'
-/>;
+const TooltipButton = (props: { folder: string }) => {
+    const theme = useTheme();
+
+    return (<Button
+        outlined
+        text={props.folder ? getFileName(props.folder) : 'Select Folder'}
+        style={{
+            width: '100%',
+            display: 'inline',
+            textAlign: 'center',
+            backgroundColor: theme.secondaryBackground,
+            color: theme.secondaryForeground,
+            borderColor: theme.tertiaryForeground,
+        }}
+        onClick={() => {
+            if (!props.folder) BackendInterface.getInstance().openFolderDialog();
+        }}
+        className='header-button'
+    />);
+};
 
 const TooltipMenu = (props: { folder: string }) => {
     const dispatch = useDispatch();
