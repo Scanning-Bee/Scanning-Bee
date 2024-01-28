@@ -3,6 +3,7 @@
 @import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
 
 @import "./fonts.css";
+@import "./bp3_overrides.css";
 
 :root {
   --buttonWidth:40px;
@@ -307,29 +308,3 @@ a {
   /* margin-top: 80px; */
   margin-top: 40px;
 }
-
-.bp3-button.bp3-intent-primary{
-  background-color: #313131;
-}
-
-.bp3-button.bp3-intent-primary:hover{
-  background-color: #313131;
-  box-shadow: inset 0 0 0 1px rgb(16 22 26 / 40%), inset 0 -1px 0 rgb(16 22 26 / 20%);
-}
-
-
-.bp3-button.bp3-minimal.bp3-intent-primary{
-  color: #313131;
-  background-color: none;
-}
-
-.bp3-button.bp3-minimal.bp3-intent-primary:hover{
-  color: #313131;
-  background-color: none;
-  box-shadow: inset 0 0 0 1px rgb(16 22 26 / 40%), inset 0 -1px 0 rgb(16 22 26 / 20%);
-}
-
-.bp3-portal{
-  z-index: 65;
-}
-
