@@ -1,7 +1,8 @@
 import { Overlay } from '@blueprintjs/core';
 import { PageType } from '@frontend/RendererController';
+import { useTheme } from '@frontend/slices/themeSlice';
 import { isMac } from '@frontend/utils/platform';
-import { lightTheme, Theme } from '@utils/colours';
+import { Theme } from '@utils/colours';
 import React from 'react';
 
 import { HeaderButtons } from './HeaderButtons';
@@ -9,7 +10,7 @@ import { HeaderLeft } from './HeaderLeft';
 import { HeaderTooltip } from './HeaderTooltip';
 
 export default function Header(props: { page: PageType, setPage: (page: PageType) => void }) {
-    const theme: Theme = lightTheme;
+    const theme: Theme = useTheme();
 
     return (
         <Overlay isOpen={true} hasBackdrop={false}>

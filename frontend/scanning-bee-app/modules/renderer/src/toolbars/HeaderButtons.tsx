@@ -1,11 +1,11 @@
 import { Button, Icon } from '@blueprintjs/core';
-import { lightTheme } from '@frontend/utils/colours';
+import { useTheme } from '@frontend/slices/themeSlice';
 import React from 'react';
 
 const HomeButton = (props: { setPage: any }) => {
     const { setPage } = props;
 
-    const theme = lightTheme;
+    const theme = useTheme();
 
     return (
         <Button
@@ -25,7 +25,7 @@ const HomeButton = (props: { setPage: any }) => {
 const ManualAnnotatorButton = (props: { setPage: any }) => {
     const { setPage } = props;
 
-    const theme = lightTheme;
+    const theme = useTheme();
 
     return (
         <Button
@@ -45,7 +45,7 @@ const ManualAnnotatorButton = (props: { setPage: any }) => {
 export const HeaderButtons = (props: { page: any, setPage: any }) => {
     const { setPage } = props;
 
-    const theme = lightTheme;
+    const theme = useTheme();
 
     return (
         <div

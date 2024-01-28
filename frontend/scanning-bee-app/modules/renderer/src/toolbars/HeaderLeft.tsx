@@ -1,10 +1,10 @@
 import HeaderLogo from '@assets/images/bee.png';
 import { Button, Divider } from '@blueprintjs/core';
-import { lightTheme } from '@frontend/utils/colours';
+import { useTheme } from '@frontend/slices/themeSlice';
 import React from 'react';
 
 export const HeaderLeft = (props: { page: any, setPage: any }) => {
-    const theme = lightTheme;
+    const theme = useTheme();
 
     return (<div className="header-container header-container-left">
         <Button

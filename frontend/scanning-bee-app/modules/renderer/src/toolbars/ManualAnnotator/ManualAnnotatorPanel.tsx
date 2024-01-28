@@ -2,7 +2,7 @@ import { Button, Divider, Menu, MenuItem, Popover } from '@blueprintjs/core';
 import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
 import Annotation from '@frontend/models/annotation';
 import { setActiveAnnotations } from '@frontend/slices/annotationSlice';
-import { lightTheme } from '@frontend/utils/colours';
+import { useTheme } from '@frontend/slices/themeSlice';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import React from 'react';
 import { useDispatch } from 'react-redux';
@@ -61,6 +61,8 @@ export const ManualAnnotatorPanel = (props:{
         folder,
     } = props;
 
+    const theme = useTheme();
+
     const dispatch = useDispatch();
 
     const annotatedImageNames = annotations.map(annotation => annotation.source_name);
@@ -80,12 +82,12 @@ export const ManualAnnotatorPanel = (props:{
             defaultSize={'250px'}
             maxSize={400}
             style={{
-                backgroundColor: lightTheme.secondaryBackground,
+                backgroundColor: theme.secondaryBackground,
                 opacity: leftPanelOpen ? 1 : 0,
                 width: !leftPanelOpen && '0px',
                 transition: 'opacity 0.1s',
             }}
-            resizerStyle={{ backgroundColor: lightTheme.secondaryBackground, height: '1px' }}
+            resizerStyle={{ backgroundColor: theme.secondaryBackground, height: '1px' }}
             allowResize={leftPanelOpen}
             pane1Style={{ display: 'unset', width: '245px' }}
             resizerClassName='resizer'
