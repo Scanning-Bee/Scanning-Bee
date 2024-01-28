@@ -265,6 +265,31 @@ a {
   padding-bottom: '20px',
 }
 
+.settings-page {
+  width: 70vw;
+  height: 70vh;
+}
+
+.settings-tab {
+  width: 100%;
+}
+
+.settings-title {
+  margin-bottom: 20px;
+}
+
+.settings-card {
+  display: flex;
+  margin: -10px;
+}
+
+.settings-card > p {
+  width: 100%;
+  align-self: center;
+  font-size: medium;
+  margin-bottom: 0;
+}
+
 .open-margin-left {
   /* position: relative !important; */
   right:var(--buttonOffset);

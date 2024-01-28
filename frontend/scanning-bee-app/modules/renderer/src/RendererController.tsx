@@ -8,8 +8,6 @@ import Annotation, { AnnotationYaml } from './models/annotation';
 import { generateAnnotationsFromYaml, openFolder } from './slices/annotationSlice';
 import { AppToaster } from './Toaster';
 
-export type PageType = 'home' | 'manual-annotator' | 'beehive' | 'settings';
-
 export class RendererController {
     page: PageType = 'home';
 

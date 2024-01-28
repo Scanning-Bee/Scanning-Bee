@@ -14,7 +14,7 @@ class StorageService {
      * @param storageId {string}
      * @returns {any}
      */
-    getStorage = (storageId: string) => this.store.get(storageId) || {};
+    getStorage = (storageId: string) => this.store.get(storageId);
 
     /**
      * returns the value of the given prop from the storage object for the given storageId.
@@ -46,6 +46,28 @@ class StorageService {
         data[prop] = value;
 
         this.store.set(storageId, data);
+    }
+
+    /**
+     * deletes all data in the storage.
+     */
+    clearStorage() {
+        this.store.clear();
+    }
+
+    /**
+     * returns the total size of the storage.
+     */
+    getStorageSize() {
+        let size = 0;
+
+        for (const key in this.store.store) {
+            if (Object.prototype.hasOwnProperty.call(this.store.store, key)) {
+                size += this.store.store[key].length;
+            }
+        }
+
+        return size;
     }
 }
 

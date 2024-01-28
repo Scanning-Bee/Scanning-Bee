@@ -3,12 +3,13 @@ import { Provider } from 'react-redux';
 
 import { HomePage } from './pages/HomePage';
 import { ManualAnnotatorPage } from './pages/ManualAnnotatorPage';
+import { SettingsPage } from './pages/SettingsPage';
 import store from './store';
 import Header from './toolbars/Header';
 
 require('@assets/css/index.css');
 
-const App = (props: { page: any, setPage: any }) => {
+const App = (props: { page: PageType, setPage: any }) => {
     const { page, setPage } = props;
 
     return (
@@ -25,6 +26,8 @@ const App = (props: { page: any, setPage: any }) => {
                             return <HomePage setPage={setPage} />;
                         case 'manual-annotator':
                             return <ManualAnnotatorPage />;
+                        case 'settings':
+                            return <SettingsPage />;
                         default:
                             return <div>Page not found</div>;
                         }

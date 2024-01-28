@@ -33,7 +33,10 @@ export const {
 
 export const selectTheme = (state: RootState) => state.theme.activeTheme;
 
-export const useTheme = () => useSelector(selectTheme);
+export const useTheme = () => {
+    const theme = useSelector(selectTheme);
+    return theme;
+};
 export const getTheme = () => StorageService.getStorage(THEME_STORAGE_ID);
 
 export default themeSlice.reducer;

@@ -31,6 +31,8 @@ export const HeaderLeft = (props: { page: any, setPage: any }) => {
                         switch (props.page) {
                         case 'manual-annotator':
                             return 'Manual Annotator';
+                        case 'settings':
+                            return 'Settings';
                         default:
                             return 'Page not found';
                         }
