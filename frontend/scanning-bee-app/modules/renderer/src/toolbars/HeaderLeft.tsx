@@ -1,20 +1,21 @@
-import HeaderLogo from '@assets/images/bee.png';
+import BeeBlack from '@assets/images/bee-black.png';
+import BeeWhite from '@assets/images/bee-white.png';
 import { Button, Divider } from '@blueprintjs/core';
-import { lightTheme } from '@frontend/utils/colours';
+import { useTheme } from '@frontend/slices/themeSlice';
 import React from 'react';
 
 export const HeaderLeft = (props: { page: any, setPage: any }) => {
-    const theme = lightTheme;
+    const theme = useTheme();
 
     return (<div className="header-container header-container-left">
         <Button
             minimal
             icon={<img
-                src={HeaderLogo}
+                src={theme.type === 'dark' ? BeeWhite : BeeBlack}
                 alt="Scanning Bee Logo"
                 className='header-logo'
             />}
-            text={<p style={{ fontSize: 'large', margin: 0 }}>Scanning Bee</p>}
+            text={<p style={{ fontSize: 'large', margin: 0, color: theme.primaryForeground }}>Scanning Bee</p>}
             onClick={(e) => {
                 e.preventDefault();
                 props.setPage('home');
@@ -24,13 +25,15 @@ export const HeaderLeft = (props: { page: any, setPage: any }) => {
             style={{ padding: '5px' }}
         />
         {props.page !== 'home' && <>
-            <Divider style={{ margin: '0px 5px 0px 2px', color: theme.primaryBorder, width: '1px', height: '50%' }} />
+            <Divider style={{ margin: '0px 5px 0px 2px', backgroundColor: theme.secondaryForeground, width: '1px', height: '50%' }} />
             <p style={{ margin: 0, color: theme.tertiaryForeground }}>
                 {
                     (() => {
                         switch (props.page) {
                         case 'manual-annotator':
                             return 'Manual Annotator';
+                        case 'settings':
+                            return 'Settings';
                         default:
                             return 'Page not found';
                         }

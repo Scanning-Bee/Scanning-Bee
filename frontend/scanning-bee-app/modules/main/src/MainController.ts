@@ -4,6 +4,7 @@ import path from 'path';
 import {
     app, BrowserWindow, dialog, ipcMain, Menu, MenuItemConstructorOptions, nativeImage, nativeTheme, screen, shell, Tray,
 } from 'electron';
+import Store from 'electron-store';
 import fs from 'fs-extra';
 
 import { AnnotationYaml, loadAnnotations, loadImages, saveAnnotations } from './annotationUtils';
@@ -66,6 +67,7 @@ class MainController {
         this.initMainMenu();
         this.initTray();
         this.initSplash();
+        this.initStore();
         this.initMainWindow();
     }
 
@@ -230,6 +232,10 @@ class MainController {
         this.splashWindow.loadURL(`file://${path.join(BUILD_ASSETS_PATH, 'scanning_bee_splash.png')}`);
     }
 
+    private initStore() {
+        Store.initRenderer();
+    }
+
     private initMainWindow() {
         this.mainWindow = new BrowserWindow({
             width: 1600, // width of the window
@@ -272,6 +278,23 @@ class MainController {
         };
 
         ipcMain.on('fullScreen', setFullScreen);
+
+        const themeChangeHandler = async () => {
+            const DEFAULT_THEME = {
+                themeType: 'light',
+                secondaryBackground: '#DCE0E5',
+            };
+
+            const theme = new Store<Record<string, any>>().get('theme') || DEFAULT_THEME;
+
+            if (this.mainWindow.setTitleBarOverlay) {
+                this.mainWindow.setTitleBarOverlay({
+                    color: theme.secondaryBackground,
+                    symbolColor:
+                        theme.themeType === 'light' ? '#000' : '#fff',
+                });
+            }
+        };
 
         const zoomChangeHandler = async () => {
             if (this.mainWindow) {
@@ -327,7 +350,9 @@ class MainController {
         });
 
         ipcMain.on('zoomChange', zoomChangeHandler);
+        ipcMain.on('themeChange', themeChangeHandler);
         zoomChangeHandler();
+        themeChangeHandler();
 
         this.mainWindow.once('closed', () => {
             // Dereference the window object, usually you would store windows

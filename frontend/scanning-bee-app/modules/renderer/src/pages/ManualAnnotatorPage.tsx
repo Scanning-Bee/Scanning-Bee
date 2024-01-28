@@ -7,14 +7,16 @@ import {
     useAnnotationsFolder,
     useImages,
 } from '@frontend/slices/annotationSlice';
+import { useTheme } from '@frontend/slices/themeSlice';
 import { AnnotatedImage } from '@frontend/toolbars/ManualAnnotator/AnnotatedImage';
 import { AnnotationEditorTools } from '@frontend/toolbars/ManualAnnotator/AnnotationEditorTools';
 import { ManualAnnotatorPanel } from '@frontend/toolbars/ManualAnnotator/ManualAnnotatorPanel';
-import { lightTheme } from '@frontend/utils/colours';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import React, { useEffect, useState } from 'react';
 
 export const ManualAnnotatorPage = () => {
+    const theme = useTheme();
+
     const [shownImageUrl, setShownImageUrl] = useState<string | undefined>(undefined);
     const [leftPanelOpen, setLeftPanelOpen] = useState<boolean>(true);
 
@@ -41,7 +43,13 @@ export const ManualAnnotatorPage = () => {
     }, [leftPanelOpen]);
 
     if (!folder || !shownImageUrl) {
-        return <div style={{ display: 'flex', alignItems: 'center' }}>
+        return <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: theme.primaryBackground,
+            color: theme.primaryForeground,
+            justifyContent: 'center',
+        }} className='page'>
             <Button
                 text='Open a folder'
                 minimal
@@ -58,10 +66,14 @@ export const ManualAnnotatorPage = () => {
     }
 
     return (
-        <div className='page'>
+        <div style={{
+            backgroundColor: theme.primaryBackground,
+            color: theme.primaryForeground,
+            display: 'flex',
+        }} className='page'>
             <div id="left-panel" className='panel'>
                 <Button
-                    icon={<Icon icon={leftPanelOpen ? 'arrow-left' : 'arrow-right'} style={{ color: lightTheme.primaryForeground }} />}
+                    icon={<Icon icon={leftPanelOpen ? 'arrow-left' : 'arrow-right'} style={{ color: theme.primaryForeground }} />}
                     className={`panel-button button-animation ${leftPanelOpen ? 'open-margin-left' : 'closed-margin-left'}`}
                     onClick={
                         (e) => {
@@ -71,7 +83,7 @@ export const ManualAnnotatorPage = () => {
                             setLeftPanelOpen(!leftPanelOpen);
                         }
                     }
-                    style={{ background: lightTheme.secondaryBackground }}
+                    style={{ background: theme.secondaryBackground }}
                 />
 
                 <ManualAnnotatorPanel

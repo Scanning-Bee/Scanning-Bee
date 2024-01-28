@@ -1,8 +1,8 @@
-import { Button, Divider, Menu, MenuItem, Popover } from '@blueprintjs/core';
+import { Button, Icon, Menu, MenuItem, Popover } from '@blueprintjs/core';
 import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
 import Annotation from '@frontend/models/annotation';
 import { setActiveAnnotations } from '@frontend/slices/annotationSlice';
-import { lightTheme } from '@frontend/utils/colours';
+import { useTheme } from '@frontend/slices/themeSlice';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import React from 'react';
 import { useDispatch } from 'react-redux';
@@ -61,6 +61,8 @@ export const ManualAnnotatorPanel = (props:{
         folder,
     } = props;
 
+    const theme = useTheme();
+
     const dispatch = useDispatch();
 
     const annotatedImageNames = annotations.map(annotation => annotation.source_name);
@@ -80,19 +82,17 @@ export const ManualAnnotatorPanel = (props:{
             defaultSize={'250px'}
             maxSize={400}
             style={{
-                backgroundColor: lightTheme.secondaryBackground,
+                backgroundColor: theme.secondaryBackground,
                 opacity: leftPanelOpen ? 1 : 0,
                 width: !leftPanelOpen && '0px',
                 transition: 'opacity 0.1s',
             }}
-            resizerStyle={{ backgroundColor: lightTheme.secondaryBackground, height: '1px' }}
+            resizerStyle={{ border: `1px solid ${theme.secondaryForeground}`, height: '1px' }}
             allowResize={leftPanelOpen}
             pane1Style={{ display: 'unset', width: '245px' }}
             resizerClassName='resizer'
         >
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'start' }}>
-                <h2>Annotations</h2>
-                <Divider style={{ width: '240px' }}/>
                 <Button
                     text='Open a folder'
                     onClick={() => {
@@ -127,11 +127,14 @@ export const ManualAnnotatorPanel = (props:{
             </div>
             <div className='annotated-images-panel'>
                 <h2 style={{ margin: '0 35px 10px ' }}>Images</h2>
-                <Divider style={{ width: '240px' }}/>
                 {sortedImages.map(image => (
                     <Button
                         key={image}
-                        text={getFileName(image)}
+                        text={
+                            <p
+                                style={{ margin: 0, color: image === shownImageUrl ? 'white' : theme.secondaryForeground }}
+                            >{getFileName(image)}</p>
+                        }
                         minimal={image !== shownImageUrl}
                         onClick={() => {
                             setShownImageUrl(image);
@@ -139,7 +142,10 @@ export const ManualAnnotatorPanel = (props:{
                         }}
                         style={{ minWidth: 'fit-content', margin: '0 25px' }}
                         intent={image === shownImageUrl ? 'primary' : 'none'}
-                        icon={annotatedImageNames.includes(getFileName(image)) ? 'annotation' : 'blank'}
+                        icon={<Icon
+                            icon={annotatedImageNames.includes(getFileName(image)) ? 'annotation' : 'blank'}
+                            color={image === shownImageUrl ? 'white' : theme.tertiaryForeground}
+                        />}
                         rightIcon={image === shownImageUrl ? 'eye-open' : 'blank'}
                     />
                 ))}

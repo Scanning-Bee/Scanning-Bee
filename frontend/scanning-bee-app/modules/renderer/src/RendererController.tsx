@@ -5,13 +5,12 @@ import { render } from 'react-dom';
 // Import main App component
 import App from './App';
 import Annotation, { AnnotationYaml } from './models/annotation';
+import { HistoryService } from './services/HistoryService';
 import { generateAnnotationsFromYaml, openFolder } from './slices/annotationSlice';
 import { AppToaster } from './Toaster';
 
-export type PageType = 'home' | 'manual-annotator' | 'beehive' | 'settings';
-
 export class RendererController {
-    page: PageType = 'home';
+    historyService: HistoryService = null;
 
     static getInstance(): RendererController {
         return (window as any).RendererController;
@@ -49,18 +48,31 @@ export class RendererController {
         }));
     }
 
-    public setPage(page: PageType) : void {
-        this.page = page;
+    public goBack() : void {
+        this.historyService.goBack();
 
         this.renderAgain();
+    }
+
+    public setPage(page: PageType) : void {
+        this.historyService.addPage(page);
+
+        this.renderAgain();
+    }
+
+    public getCurrentPage(): PageType {
+        const currentPage = this.historyService.getCurrentPage();
+
+        return currentPage;
     }
 
     renderAgain() {
         render(
             <StrictMode>
                 <App
-                    page = {this.page}
-                    setPage = {this.setPage}
+                    page={this.getCurrentPage()}
+                    setPage = {p => this.setPage(p)}
+                    goBack = {() => this.goBack()}
                 />
             </StrictMode>,
             document.getElementById('root'),
@@ -68,6 +80,10 @@ export class RendererController {
     }
 
     initialize(): void {
-        this.setPage(this.page);
+        const startPage = 'home';
+
+        this.historyService = new HistoryService(startPage);
+
+        this.setPage(startPage);
     }
 }
