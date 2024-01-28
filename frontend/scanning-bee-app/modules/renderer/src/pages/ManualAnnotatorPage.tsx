@@ -84,7 +84,7 @@ export const ManualAnnotatorPage = () => {
                 />
             </div>
 
-            <div className='column-flex-center' style={{ width: '100vw' }}>
+            <div className='column-flex-center' style={{ width: '100%', height: '100%' }}>
                 <AnnotatedImage
                     shownImageUrl={images.find(image => image === shownImageUrl)}
                 />
