@@ -9,8 +9,8 @@ import Header from './toolbars/Header';
 
 require('@assets/css/index.css');
 
-const App = (props: { page: PageType, setPage: any }) => {
-    const { page, setPage } = props;
+const App = (props: { page: PageType, setPage: any, goBack: any }) => {
+    const { page, setPage, goBack } = props;
 
     return (
         <Provider store={store}>
@@ -27,7 +27,7 @@ const App = (props: { page: PageType, setPage: any }) => {
                         case 'manual-annotator':
                             return <ManualAnnotatorPage />;
                         case 'settings':
-                            return <SettingsPage />;
+                            return <SettingsPage goBack={goBack} />;
                         default:
                             return <div>Page not found</div>;
                         }
