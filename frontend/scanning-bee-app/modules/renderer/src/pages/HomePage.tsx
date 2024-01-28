@@ -1,4 +1,5 @@
-import Bee from '@assets/images/bee-primary.png';
+import BeeBlack from '@assets/images/bee-black.png';
+import BeeWhite from '@assets/images/bee-white.png';
 import ScanningBeeLogoBig from '@assets/images/scanning_bee_logo_big.png';
 import { Card, Icon, Popover } from '@blueprintjs/core';
 import { useTheme } from '@frontend/slices/themeSlice';
@@ -49,7 +50,12 @@ export const HomePage = (props: { setPage: any }) => {
                             className='homepage-card disabled'
                             style={{ backgroundColor: theme.secondaryBackground, color: theme.primaryForeground }}
                         >
-                            <img src={Bee} alt={'Scanning Bee Logo'} className='disabled-image-icon' style={{ width: '50px' }} />
+                            <img
+                                src={theme.type === 'dark' ? BeeWhite : BeeBlack}
+                                alt={'Scanning Bee Logo'}
+                                className='disabled-image-icon'
+                                style={{ width: '50px' }}
+                            />
                             <h3 style={{ fontWeight: 'normal' }}>Beehive Information</h3>
                         </Card>
                         <div style={{ padding: '10px' }}>
