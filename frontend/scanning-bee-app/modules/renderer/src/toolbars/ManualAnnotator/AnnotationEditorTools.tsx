@@ -134,8 +134,9 @@ const SetBrushModeButton = (props: {
     brushCellType: CellType,
     setBrushCellType: (cellType: CellType) => void
 }) => {
-    const disabled = false;
+    const theme = useTheme();
 
+    const disabled = false;
     const brushModeOn = props.mode === 'brush';
 
     return (
@@ -147,7 +148,7 @@ const SetBrushModeButton = (props: {
             <Button
                 icon={<Icon icon='highlight' />}
                 minimal
-                intent={brushModeOn ? 'primary' : 'none'}
+                style={{ backgroundColor: brushModeOn ? theme.primaryAccent : 'transparent' }}
                 onClick={(e) => {
                     if (brushModeOn) {
                         e.stopPropagation();
