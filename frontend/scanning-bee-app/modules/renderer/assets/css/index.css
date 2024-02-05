@@ -124,7 +124,11 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  -webkit-app-region: drag;
+  -webkit-app-region: no-drag;
+}
+
+.header-button{
+  -webkit-app-region: no-drag !important;
 }
 
 .header-button:focus{

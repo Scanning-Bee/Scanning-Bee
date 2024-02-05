@@ -4,9 +4,7 @@ import StorageService from '@frontend/services/StorageService';
 import { RootState } from '@frontend/store';
 import { Theme, Themes } from '@frontend/utils/colours';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RENDERER_EVENTS } from '@scanning_bee/ipc-interfaces';
-
-const THEME_STORAGE_ID = 'theme';
+import { RENDERER_EVENTS, THEME_STORAGE_ID } from '@scanning_bee/ipc-interfaces';
 
 type ThemeState = {
     activeTheme: Theme;
