@@ -215,6 +215,11 @@ a {
   cursor: not-allowed;
 }
 
+.grid{
+  background-image: linear-gradient(rgba(0, 255, 0, .7) .1em, transparent .1em), linear-gradient(90deg, rgba(0, 255, 0, .7) .1em, transparent .1em);
+  background-size: 3em 3em;
+}
+
 .homepage-card{
   width: 250px;
   height: 150px;
@@ -343,4 +348,13 @@ a {
   z-index: 60;
   /* margin-top: 80px; */
   margin-top: 40px;
+}
+
+.manual-annotator-toolbar{
+  position:absolute;
+  top: 20px;
+  right: 20px;
+  padding: 5px;
+  border-radius: 5px;
+  margin: 5px;
 }
