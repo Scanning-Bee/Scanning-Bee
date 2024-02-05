@@ -1,8 +1,8 @@
 import { Button, ButtonGroup, Card, Menu, MenuItem, Popover } from '@blueprintjs/core';
 import StorageService from '@frontend/services/StorageService';
 import { setTheme, useTheme } from '@frontend/slices/themeSlice';
+import { resetZoom, setZoom } from '@frontend/slices/zoomSlice';
 import { Themes } from '@frontend/utils/colours';
-import { changeZoom } from '@frontend/utils/window';
 import { webFrame } from 'electron';
 import React from 'react';
 import { useDispatch } from 'react-redux';
@@ -56,6 +56,8 @@ export const ThemeSettings = () => {
 export const AccessibilitySettings = () => {
     const theme = useTheme();
 
+    const dispatch = useDispatch();
+
     return (
         <div>
             <h2 className='settings-title'>Accessibility Settings</h2>
@@ -68,16 +70,16 @@ export const AccessibilitySettings = () => {
                         <ButtonGroup>
                             <Button
                                 text='-'
-                                onClick={() => changeZoom(webFrame.getZoomLevel() - 1)}
+                                onClick={() => dispatch(setZoom(webFrame.getZoomLevel() - 1))}
                             />
                             <Button
                                 text='+'
-                                onClick={() => changeZoom(webFrame.getZoomLevel() + 1)}
+                                onClick={() => dispatch(setZoom(webFrame.getZoomLevel() + 1))}
                             />
                         </ButtonGroup>
                         <Button
                             text='Reset'
-                            onClick={() => changeZoom(0)}
+                            onClick={() => dispatch(resetZoom())}
                             style={{ marginLeft: '5px' }}
                             intent='primary'
                         />

@@ -6,7 +6,7 @@ import {
 } from 'electron';
 import Store from 'electron-store';
 import fs from 'fs-extra';
-import { AnnotationYaml, MAIN_EVENTS, RENDERER_EVENTS, RENDERER_QUERIES } from '@scanning_bee/ipc-interfaces';
+import { AnnotationYaml, MAIN_EVENTS, RENDERER_EVENTS, RENDERER_QUERIES, THEME_STORAGE_ID } from '@scanning_bee/ipc-interfaces';
 
 import { loadAnnotations, loadImages, saveAnnotations } from './annotationUtils';
 import { isRunningDevMode } from './utils';
@@ -286,13 +286,13 @@ class MainController {
                 secondaryBackground: '#DCE0E5',
             };
 
-            const theme = new Store<Record<string, any>>().get('theme') || DEFAULT_THEME;
+            const theme = new Store<Record<string, any>>().get(THEME_STORAGE_ID) || DEFAULT_THEME;
 
             if (this.mainWindow.setTitleBarOverlay) {
                 this.mainWindow.setTitleBarOverlay({
                     color: theme.secondaryBackground,
                     symbolColor:
-                        theme.themeType === 'light' ? '#000' : '#fff',
+                        theme.type === 'light' ? '#000' : '#fff',
                 });
             }
         };
@@ -309,8 +309,6 @@ class MainController {
                     // change title bar height
                     this.mainWindow.setTitleBarOverlay({
                         height: Math.floor((46 * zoomFactor) / scaleFactor),
-                        color: '#F4AC18',
-                        symbolColor: '#ffffff',
                     });
                 }
             }
