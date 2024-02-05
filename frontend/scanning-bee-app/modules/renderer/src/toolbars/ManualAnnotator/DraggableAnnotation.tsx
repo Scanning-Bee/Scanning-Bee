@@ -15,9 +15,9 @@ export const DraggableAnnotation = (props: {
     leftOffset: number,
     activeAnnotationIds: UUID[],
     mode: string,
-    fircaCellType: CellType,
+    brushCellType: CellType,
 }) => {
-    const { key, annotation, topOffset, leftOffset, activeAnnotationIds, mode, fircaCellType } = props;
+    const { key, annotation, topOffset, leftOffset, activeAnnotationIds, mode, brushCellType } = props;
 
     const dispatch = useDispatch();
 
@@ -34,10 +34,10 @@ export const DraggableAnnotation = (props: {
     const handleOnClick = (e: any) => {
         e.stopPropagation();
 
-        if (mode === 'firca') {
+        if (mode === 'brush') {
             dispatch(mutateAnnotation({
                 id: annotation.id,
-                mutations: { cell_type: fircaCellType },
+                mutations: { cell_type: brushCellType },
             }));
 
             return;

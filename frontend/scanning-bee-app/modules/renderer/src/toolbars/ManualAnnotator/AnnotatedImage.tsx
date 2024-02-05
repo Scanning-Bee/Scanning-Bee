@@ -13,8 +13,8 @@ import { useDispatch } from 'react-redux';
 
 import { DraggableAnnotation } from './DraggableAnnotation';
 
-export const AnnotatedImage = (props: { shownImageUrl: string, mode: string, fircaCellType: CellType }) => {
-    const { shownImageUrl, mode, fircaCellType } = props;
+export const AnnotatedImage = (props: { shownImageUrl: string, mode: string, brushCellType: CellType }) => {
+    const { shownImageUrl, mode, brushCellType } = props;
 
     const [topOffset, setTopOffset] = useState<number>(window.innerHeight / 2 - 270);
     const [leftOffset, setLeftOffset] = useState<number>(window.innerWidth / 2 - 480);
@@ -96,7 +96,7 @@ export const AnnotatedImage = (props: { shownImageUrl: string, mode: string, fir
                     leftOffset={leftOffset}
                     activeAnnotationIds={activeAnnotationIds}
                     mode={mode}
-                    fircaCellType={fircaCellType}
+                    brushCellType={brushCellType}
                 />
             ))}
         </span>

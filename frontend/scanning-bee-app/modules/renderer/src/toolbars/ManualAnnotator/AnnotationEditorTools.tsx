@@ -128,15 +128,15 @@ const GridButton = (props: { onClick: () => void }) => (
     />
 );
 
-const SetFircaModeButton = (props: {
+const SetBrushModeButton = (props: {
     mode: string,
-    setFircaMode: (set?: boolean) => void,
-    fircaCellType: CellType,
-    setFircaCellType: (cellType: CellType) => void
+    setBrushMode: (set?: boolean) => void,
+    brushCellType: CellType,
+    setBrushCellType: (cellType: CellType) => void
 }) => {
     const disabled = false;
 
-    const fircaModeOn = props.mode === 'firca';
+    const brushModeOn = props.mode === 'brush';
 
     return (
         <Popover
@@ -147,27 +147,27 @@ const SetFircaModeButton = (props: {
             <Button
                 icon={<Icon icon='highlight' />}
                 minimal
-                intent={fircaModeOn ? 'primary' : 'none'}
+                intent={brushModeOn ? 'primary' : 'none'}
                 onClick={(e) => {
-                    if (fircaModeOn) {
+                    if (brushModeOn) {
                         e.stopPropagation();
-                        props.setFircaMode(false);
+                        props.setBrushMode(false);
                     }
                 }}
             />
             <Menu>
                 {Object.keys(CellType).map((cellType, index) => {
-                    const active = fircaModeOn && props.fircaCellType === CellType[cellType];
+                    const active = brushModeOn && props.brushCellType === CellType[cellType];
 
                     return (
                         <MenuItem
                             key={index}
                             onClick={() => {
                                 if (active) {
-                                    props.setFircaMode(false);
+                                    props.setBrushMode(false);
                                 } else {
-                                    props.setFircaMode(true);
-                                    props.setFircaCellType(CellType[cellType]);
+                                    props.setBrushMode(true);
+                                    props.setBrushCellType(CellType[cellType]);
                                 }
                             }}
                             active={active}
@@ -187,11 +187,11 @@ export const AnnotationEditorTools = (props: {
     newAnnotationProps: AnnotationProps,
     toggleGrid: () => void,
     mode: string,
-    setFircaMode: () => void,
-    fircaCellType: CellType,
-    setFircaCellType: (cellType: CellType) => void,
+    setBrushMode: () => void,
+    brushCellType: CellType,
+    setBrushCellType: (cellType: CellType) => void,
 }) => {
-    const { annotations, newAnnotationProps, toggleGrid, mode, setFircaMode, setFircaCellType, fircaCellType } = props;
+    const { annotations, newAnnotationProps, toggleGrid, mode, setBrushMode, setBrushCellType, brushCellType } = props;
 
     const theme = useTheme();
 
@@ -209,11 +209,11 @@ export const AnnotationEditorTools = (props: {
             <RadiusSlider annotations={annotations} />
             <CellTypePicker annotations={annotations} />
             <GridButton onClick={toggleGrid} />
-            <SetFircaModeButton
+            <SetBrushModeButton
                 mode={mode}
-                setFircaMode={setFircaMode}
-                setFircaCellType={setFircaCellType}
-                fircaCellType={fircaCellType}
+                setBrushMode={setBrushMode}
+                setBrushCellType={setBrushCellType}
+                brushCellType={brushCellType}
             />
         </div>
     );

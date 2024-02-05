@@ -14,7 +14,7 @@ import { ManualAnnotatorPanel } from '@frontend/toolbars/ManualAnnotator/ManualA
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import React, { useEffect, useState } from 'react';
 
-type AnnotationMode = 'default' | 'firca';
+type AnnotationMode = 'default' | 'brush';
 
 export const ManualAnnotatorPage = () => {
     const theme = useTheme();
@@ -23,7 +23,7 @@ export const ManualAnnotatorPage = () => {
     const [leftPanelOpen, setLeftPanelOpen] = useState<boolean>(true);
     const [gridOpen, setGridOpen] = useState<boolean>(true);
     const [mode, setMode] = useState<AnnotationMode>('default');
-    const [fircaCellType, setFircaCellType] = useState<CellType>(CellType.NOT_CLASSIFIED);
+    const [brushCellType, setBrushCellType] = useState<CellType>(CellType.NOT_CLASSIFIED);
 
     const folder = useAnnotationsFolder();
     const activeAnnotations = useActiveAnnotations();
@@ -104,7 +104,7 @@ export const ManualAnnotatorPage = () => {
                 <AnnotatedImage
                     shownImageUrl={images.find(image => image === shownImageUrl)}
                     mode={mode}
-                    fircaCellType={fircaCellType}
+                    brushCellType={brushCellType}
                 />
                 <AnnotationEditorTools
                     annotations={activeAnnotations}
@@ -120,13 +120,13 @@ export const ManualAnnotatorPage = () => {
                         setGridOpen(!gridOpen);
                     }}
                     mode={mode}
-                    setFircaMode={(set: boolean = false) => setMode(
+                    setBrushMode={(set: boolean = false) => setMode(
                         mode === 'default' || set
-                            ? 'firca'
+                            ? 'brush'
                             : 'default',
                     )}
-                    fircaCellType={fircaCellType}
-                    setFircaCellType={setFircaCellType}
+                    brushCellType={brushCellType}
+                    setBrushCellType={setBrushCellType}
                 />
             </div>
         </div>
