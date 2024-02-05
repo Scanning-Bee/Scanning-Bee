@@ -4,6 +4,7 @@ import StorageService from '@frontend/services/StorageService';
 import { RootState } from '@frontend/store';
 import { Theme, Themes } from '@frontend/utils/colours';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RENDERER_EVENTS } from '@scanning_bee/ipc-interfaces';
 
 const THEME_STORAGE_ID = 'theme';
 
@@ -22,7 +23,7 @@ const themeSlice = createSlice({
         setTheme(state, action: PayloadAction<Theme>) {
             state.activeTheme = action.payload;
             StorageService.saveStorage(THEME_STORAGE_ID, action.payload);
-            ipcRenderer.send('themeChange');
+            ipcRenderer.send(RENDERER_EVENTS.THEME_CHANGE);
         },
     },
 });

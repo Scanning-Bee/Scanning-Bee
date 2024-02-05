@@ -1,10 +1,11 @@
+import { AnnotationYaml, MAIN_EVENTS } from '@scanning_bee/ipc-interfaces';
 import { ipcRenderer } from 'electron';
 import React, { StrictMode } from 'react';
 import { render } from 'react-dom';
 
 // Import main App component
 import App from './App';
-import Annotation, { AnnotationYaml } from './models/annotation';
+import Annotation from './models/annotation';
 import { HistoryService } from './services/HistoryService';
 import { generateAnnotationsFromYaml, openFolder } from './slices/annotationSlice';
 import { AppToaster } from './Toaster';
@@ -21,17 +22,21 @@ export class RendererController {
         this.handleParsedAnnotations = this.handleParsedAnnotations.bind(this);
 
         // { folder: folderPath, annotations, images: imageUrls }
-        ipcRenderer.on('annotationsParsed', this.handleParsedAnnotations);
-        ipcRenderer.on('saveAnnotationsSuccess', (_event, _payload) => AppToaster.show({
+        ipcRenderer.on(MAIN_EVENTS.ANNOTATIONS_PARSED, this.handleParsedAnnotations);
+        ipcRenderer.on(MAIN_EVENTS.SAVE_ANNOTATIONS_SUCCESS, (_event, _payload) => AppToaster.show({
             message: 'Annotations saved successfully!',
             intent: 'success',
             timeout: 3000,
         }));
-        ipcRenderer.on('saveAnnotationsError', (_event, _payload) => AppToaster.show({
-            message: 'Annotations could not be saved!',
-            intent: 'danger',
-            timeout: 3000,
-        }));
+        ipcRenderer.on(MAIN_EVENTS.SAVE_ANNOTATIONS_ERROR, (_event, _payload) => {
+            console.log('Annotations could not be saved!', _payload);
+
+            AppToaster.show({
+                message: 'Annotations could not be saved!',
+                intent: 'danger',
+                timeout: 3000,
+            });
+        });
 
         this.initialize();
     }

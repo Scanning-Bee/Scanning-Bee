@@ -1,17 +1,6 @@
 import fs from 'fs';
 import yaml from 'js-yaml';
-
-export type AnnotationYaml = {
-    annotated_image: string;
-    annotation: string;
-    center_x: number;
-    center_y: number;
-    orig_image: string;
-    radius: number;
-    sec: number;
-    x_pos: number;
-    y_pos: number;
-};
+import { AnnotationYaml } from '@scanning_bee/ipc-interfaces';
 
 export const loadAnnotations = (filePath: string) => {
     try {
