@@ -77,7 +77,7 @@ export const AnnotatedImage = (props: { shownImageUrl: string, mode: string, bru
                         const newAnnotation = new Annotation({
                             center: [2 * x, 2 * y],
                             radius: 80,
-                            cell_type: CellType.NOT_CLASSIFIED,
+                            cell_type: mode === 'brush' ? brushCellType : CellType.NOT_CLASSIFIED,
                             poses: [0, 0],
                             source_name: getFileName(shownImageUrl),
                             timestamp: 0,
