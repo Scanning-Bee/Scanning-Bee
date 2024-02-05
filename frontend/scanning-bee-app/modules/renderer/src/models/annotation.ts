@@ -1,18 +1,7 @@
 import { UUID } from 'crypto';
+import { AnnotationYaml } from '@scanning_bee/ipc-interfaces';
 
 import CellType from './cellType';
-
-export type AnnotationYaml = {
-    annotated_image: string;
-    annotation: CellType;
-    center_x: number;
-    center_y: number;
-    orig_image: string;
-    radius: number;
-    sec: number;
-    x_pos: number;
-    y_pos: number;
-};
 
 export interface AnnotationProps {
     radius: number,
@@ -98,7 +87,7 @@ export default class Annotation {
         return new Annotation({
             radius: yaml.radius,
             center,
-            cell_type: yaml.annotation,
+            cell_type: yaml.annotation as CellType,
             source_name: yaml.orig_image,
             timestamp: yaml.sec,
             poses,

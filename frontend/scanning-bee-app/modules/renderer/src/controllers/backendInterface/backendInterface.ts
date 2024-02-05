@@ -1,10 +1,11 @@
 /* eslint-disable no-underscore-dangle */
 import axios, { AxiosInstance } from 'axios';
 import { ipcRenderer, shell } from 'electron';
-import Annotation, { AnnotationYaml } from '@frontend/models/annotation';
+import Annotation from '@frontend/models/annotation';
 import CellType from '@frontend/models/cellType';
 import { addAnnotation } from '@frontend/slices/annotationSlice';
 import { AppToaster } from '@frontend/Toaster';
+import { AnnotationYaml, RENDERER_QUERIES } from '@scanning_bee/ipc-interfaces';
 
 import { BACKEND_ENDPOINTS, ENDPOINT_URL } from './endpoints';
 import {
@@ -35,13 +36,13 @@ export class BackendInterface {
 
     // Function to request opening the dialog
     public openFolderDialog = () => {
-        ipcRenderer.send('selectFolder');
+        ipcRenderer.send(RENDERER_QUERIES.SELECT_FOLDER);
     };
 
     public saveAnnotations = (annotations: Annotation[], targetFolder: string) => {
         const annotationsYaml: AnnotationYaml[] = annotations.map(annotation => Annotation.toYaml(annotation));
 
-        ipcRenderer.send('saveAnnotations', { targetFolder, annotations: annotationsYaml });
+        ipcRenderer.send(RENDERER_QUERIES.SAVE_ANNOTATIONS, { targetFolder, annotations: annotationsYaml });
     };
 
     public openFolderAtLocation = (folder: string) => {

@@ -6,8 +6,9 @@ import {
 } from 'electron';
 import Store from 'electron-store';
 import fs from 'fs-extra';
+import { AnnotationYaml, MAIN_EVENTS, RENDERER_EVENTS, RENDERER_QUERIES } from '@scanning_bee/ipc-interfaces';
 
-import { AnnotationYaml, loadAnnotations, loadImages, saveAnnotations } from './annotationUtils';
+import { loadAnnotations, loadImages, saveAnnotations } from './annotationUtils';
 import { isRunningDevMode } from './utils';
 
 // Determine the mode (dev or production)
@@ -277,7 +278,7 @@ class MainController {
             }
         };
 
-        ipcMain.on('fullScreen', setFullScreen);
+        ipcMain.on(RENDERER_EVENTS.FULL_SCREEN, setFullScreen);
 
         const themeChangeHandler = async () => {
             const DEFAULT_THEME = {
@@ -315,7 +316,7 @@ class MainController {
             }
         };
 
-        ipcMain.on('selectFolder', (_event) => {
+        ipcMain.on(RENDERER_QUERIES.SELECT_FOLDER, (_event) => {
             dialog.showOpenDialog({
                 properties: ['openDirectory'],
             }).then((result) => {
@@ -332,25 +333,28 @@ class MainController {
 
                     const imageUrls = loadImages(folderPath);
 
-                    this.send('annotationsParsed', { folder: folderPath, annotations, images: imageUrls });
+                    this.send(MAIN_EVENTS.ANNOTATIONS_PARSED, { folder: folderPath, annotations, images: imageUrls });
                 }
             }).catch((err) => {
                 console.log(err);
             });
         });
 
-        ipcMain.on('saveAnnotations', (_event, { targetFolder, annotations }: { targetFolder: string, annotations: AnnotationYaml[] }) => {
-            try {
-                saveAnnotations(annotations, targetFolder);
+        ipcMain.on(
+            RENDERER_QUERIES.SAVE_ANNOTATIONS,
+            (_event, { targetFolder, annotations }: { targetFolder: string, annotations: AnnotationYaml[] }) => {
+                try {
+                    saveAnnotations(annotations, targetFolder);
 
-                this.send('saveAnnotationsSuccess', { targetFolder });
-            } catch (e) {
-                this.send('saveAnnotationsError', { targetFolder });
-            }
-        });
+                    this.send(MAIN_EVENTS.SAVE_ANNOTATIONS_SUCCESS, { targetFolder });
+                } catch (e) {
+                    this.send(MAIN_EVENTS.SAVE_ANNOTATIONS_ERROR, { targetFolder, error: e });
+                }
+            },
+        );
 
-        ipcMain.on('zoomChange', zoomChangeHandler);
-        ipcMain.on('themeChange', themeChangeHandler);
+        ipcMain.on(RENDERER_EVENTS.ZOOM_CHANGE, zoomChangeHandler);
+        ipcMain.on(RENDERER_EVENTS.THEME_CHANGE, themeChangeHandler);
         zoomChangeHandler();
         themeChangeHandler();
 
