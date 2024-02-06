@@ -1,4 +1,5 @@
 import Annotation from '@frontend/models/annotation';
+import CellType from '@frontend/models/cellType';
 import { mutateAnnotation, setActiveAnnotations, setAnnotationAsActive } from '@frontend/slices/annotationSlice';
 import { CellTypeColours } from '@frontend/utils/colours';
 import { isMac } from '@frontend/utils/platform';
@@ -10,14 +11,19 @@ import { useDispatch } from 'react-redux';
 export const DraggableAnnotation = (props: {
     key: any,
     annotation: Annotation,
+    topOffset: number,
     leftOffset: number,
     activeAnnotationIds: UUID[],
+    mode: string,
+    brushCellType: CellType,
 }) => {
-    const { key, annotation, leftOffset, activeAnnotationIds } = props;
+    const { key, annotation, topOffset, leftOffset, activeAnnotationIds, mode, brushCellType } = props;
 
     const dispatch = useDispatch();
 
     const [isDragging, setIsDragging] = useState<boolean>(false);
+
+    const headerHeight = 48;
 
     const radius = annotation.radius / 2;
     const centerX = annotation.center[0] / 2 - radius;
@@ -25,8 +31,17 @@ export const DraggableAnnotation = (props: {
 
     const isActive = activeAnnotationIds.includes(annotation.id);
 
-    const toggleActiveState = (e: any) => {
+    const handleOnClick = (e: any) => {
         e.stopPropagation();
+
+        if (mode === 'brush') {
+            dispatch(mutateAnnotation({
+                id: annotation.id,
+                mutations: { cell_type: brushCellType },
+            }));
+
+            return;
+        }
 
         if ((isMac() && e.metaKey) || (!isMac() && e.ctrlKey)) {
             dispatch(setAnnotationAsActive({ id: annotation.id, active: !isActive }));
@@ -64,7 +79,7 @@ export const DraggableAnnotation = (props: {
     return (
         <div
             key={key}
-            onMouseDown={toggleActiveState}
+            onMouseDown={handleOnClick}
         >
             { /* @ts-ignore */ }
             <Draggable
@@ -78,7 +93,7 @@ export const DraggableAnnotation = (props: {
                     style={{
                         position: 'absolute',
                         left: `${leftOffset}px`,
-                        top: 0,
+                        top: `${topOffset - headerHeight / 2}px`,
                         width: `${radius * 2}px`,
                         height: `${radius * 2}px`,
                         border: `3px solid ${CellTypeColours[annotation.cell_type]}`,

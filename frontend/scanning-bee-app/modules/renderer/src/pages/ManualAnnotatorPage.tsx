@@ -14,11 +14,16 @@ import { ManualAnnotatorPanel } from '@frontend/toolbars/ManualAnnotator/ManualA
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import React, { useEffect, useState } from 'react';
 
+type AnnotationMode = 'default' | 'brush';
+
 export const ManualAnnotatorPage = () => {
     const theme = useTheme();
 
     const [shownImageUrl, setShownImageUrl] = useState<string | undefined>(undefined);
     const [leftPanelOpen, setLeftPanelOpen] = useState<boolean>(true);
+    const [gridOpen, setGridOpen] = useState<boolean>(true);
+    const [mode, setMode] = useState<AnnotationMode>('default');
+    const [brushCellType, setBrushCellType] = useState<CellType>(CellType.NOT_CLASSIFIED);
 
     const folder = useAnnotationsFolder();
     const activeAnnotations = useActiveAnnotations();
@@ -67,10 +72,9 @@ export const ManualAnnotatorPage = () => {
 
     return (
         <div style={{
-            backgroundColor: theme.primaryBackground,
             color: theme.primaryForeground,
             display: 'flex',
-        }} className='page'>
+        }} className={`page ${gridOpen && 'grid'}`}>
             <div id="left-panel" className='panel'>
                 <Button
                     icon={<Icon icon={leftPanelOpen ? 'arrow-left' : 'arrow-right'} style={{ color: theme.primaryForeground }} />}
@@ -99,6 +103,8 @@ export const ManualAnnotatorPage = () => {
             <div className='column-flex-center' style={{ width: '100%', height: '100%' }}>
                 <AnnotatedImage
                     shownImageUrl={images.find(image => image === shownImageUrl)}
+                    mode={mode}
+                    brushCellType={brushCellType}
                 />
                 <AnnotationEditorTools
                     annotations={activeAnnotations}
@@ -110,6 +116,17 @@ export const ManualAnnotatorPage = () => {
                         source_name: getFileName(shownImageUrl),
                         timestamp: 0,
                     }}
+                    toggleGrid={() => {
+                        setGridOpen(!gridOpen);
+                    }}
+                    mode={mode}
+                    setBrushMode={(set: boolean = false) => setMode(
+                        mode === 'default' || set
+                            ? 'brush'
+                            : 'default',
+                    )}
+                    brushCellType={brushCellType}
+                    setBrushCellType={setBrushCellType}
                 />
             </div>
         </div>

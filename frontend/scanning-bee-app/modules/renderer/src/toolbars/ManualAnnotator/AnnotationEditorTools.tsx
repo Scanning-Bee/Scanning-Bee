@@ -1,70 +1,10 @@
-import { Button, Icon, IconName, Menu, MenuItem, Popover, Slider } from '@blueprintjs/core';
+import { Button, Divider, Icon, Menu, MenuItem, Popover, Slider } from '@blueprintjs/core';
 import Annotation, { AnnotationProps } from '@frontend/models/annotation';
 import CellType from '@frontend/models/cellType';
 import { addAnnotation, mutateAnnotation, removeAnnotation } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import React from 'react';
 import { useDispatch } from 'react-redux';
-
-const JoystickLayout = (props: {
-    annotations: Annotation[],
-}) => {
-    const { annotations } = props;
-
-    const dispatch = useDispatch();
-
-    const joystickContent: { icon: IconName, direction: number[] }[][] = [
-        [
-            { icon: 'arrow-top-left', direction: [-1, -1] },
-            { icon: 'arrow-up', direction: [0, -1] },
-            { icon: 'arrow-top-right', direction: [1, -1] },
-        ],
-        [
-            { icon: 'arrow-left', direction: [-1, 0] },
-            { icon: 'circle', direction: [0, 0] },
-            { icon: 'arrow-right', direction: [1, 0] },
-        ],
-        [
-            { icon: 'arrow-bottom-left', direction: [-1, 1] },
-            { icon: 'arrow-down', direction: [0, 1] },
-            { icon: 'arrow-bottom-right', direction: [1, 1] },
-        ],
-    ];
-
-    const disabled = annotations.length === 0;
-
-    return (
-        <div>
-            {joystickContent.map((row, rowIndex) => (
-                <div key={rowIndex} style={{ display: 'flex' }}>
-                    {row.map((button, buttonIndex) => (
-                        <Button
-                            disabled={disabled}
-                            key={buttonIndex}
-                            icon={<Icon icon={button.icon} color={disabled ? 'grey' : 'black'} />}
-                            onClick={() => {
-                                annotations.forEach((annotation) => {
-                                    const mutation = {
-                                        id: annotation.id,
-                                        mutations: {
-                                            center: [
-                                                annotation.center[0] + button.direction[0],
-                                                annotation.center[1] + button.direction[1],
-                                            ],
-                                        },
-
-                                    };
-
-                                    dispatch(mutateAnnotation(mutation));
-                                });
-                            }}
-                        />
-                    ))}
-                </div>
-            ))}
-        </div>
-    );
-};
 
 const RadiusSlider = (props: {
     annotations: Annotation[],
@@ -73,19 +13,34 @@ const RadiusSlider = (props: {
 
     const dispatch = useDispatch();
 
+    const disabled = annotations.length !== 1;
+
     return (
-        <Slider
-            disabled={annotations.length !== 1}
-            min={0}
-            max={100}
-            stepSize={1}
-            labelStepSize={10}
-            onChange={value => dispatch(mutateAnnotation({
-                id: annotations[0].id,
-                mutations: { radius: value },
-            }))}
-            value={annotations[0]?.radius || 86}
-        />
+        <Popover
+            interactionKind='click'
+            position='left'
+            disabled={disabled}
+        >
+            <Button
+                icon={<Icon icon='circle' />}
+                minimal
+                disabled={disabled}
+            />
+            <div style={{ padding: '10px', width: '200px' }}>
+                <Slider
+                    disabled={disabled}
+                    min={0}
+                    max={100}
+                    stepSize={1}
+                    labelStepSize={10}
+                    onChange={value => dispatch(mutateAnnotation({
+                        id: annotations[0].id,
+                        mutations: { radius: value },
+                    }))}
+                    value={annotations[0]?.radius || 86}
+                />
+            </div>
+        </Popover>
     );
 };
 
@@ -93,8 +48,6 @@ const CellTypePicker = (props: {
     annotations: Annotation[],
 }) => {
     const { annotations } = props;
-
-    const theme = useTheme();
 
     const dispatch = useDispatch();
 
@@ -106,17 +59,13 @@ const CellTypePicker = (props: {
     return (
         <Popover
             interactionKind='click'
-            position='right-top'
+            position='left'
             disabled={disabled}
         >
             <Button
-                icon={<Icon icon='tag' color={theme.secondaryForeground + (disabled ? '80' : 'ff')} />}
-                text={<p style={{ color: theme.primaryForeground + (disabled ? '80' : 'ff'), margin: 0 }}>
-                    {(annotations.length === 1 || allAnnotationsAreSameCellType) ? annotations[0].cell_type : 'Cell type'}
-                </p>}
+                icon={<Icon icon='tag' />}
                 minimal
                 disabled={disabled}
-                rightIcon={<Icon icon='caret-right' />}
             />
             <Menu>
                 {Object.keys(CellType).map((cellType, index) => (
@@ -146,7 +95,6 @@ const DeleteAnnotationButton = (props: {
     return (
         <Button
             icon={<Icon icon='trash' />}
-            text={`Delete ${annotations.length} annotation${annotations.length === 1 ? '' : 's'}`}
             intent='danger'
             minimal
             onClick={() => annotations.forEach(annotation => dispatch(removeAnnotation(annotation.id)))}
@@ -161,7 +109,6 @@ const CreateAnnotationButton = (props: { annotationProps: AnnotationProps }) => 
     return (
         <Button
             icon={<Icon icon='add' />}
-            text='Create annotation'
             intent='success'
             minimal
             onClick={() => {
@@ -173,21 +120,102 @@ const CreateAnnotationButton = (props: { annotationProps: AnnotationProps }) => 
     );
 };
 
+const GridButton = (props: { onClick: () => void }) => (
+    <Button
+        icon={<Icon icon='grid' />}
+        minimal
+        onClick={props.onClick}
+    />
+);
+
+const SetBrushModeButton = (props: {
+    mode: string,
+    setBrushMode: (set?: boolean) => void,
+    brushCellType: CellType,
+    setBrushCellType: (cellType: CellType) => void
+}) => {
+    const theme = useTheme();
+
+    const disabled = false;
+    const brushModeOn = props.mode === 'brush';
+
+    return (
+        <Popover
+            interactionKind='click'
+            position='left'
+            disabled={disabled}
+        >
+            <Button
+                icon={<Icon icon='highlight' />}
+                minimal
+                style={{ backgroundColor: brushModeOn ? theme.primaryAccent : 'transparent' }}
+                onClick={(e) => {
+                    if (brushModeOn) {
+                        e.stopPropagation();
+                        props.setBrushMode(false);
+                    }
+                }}
+            />
+            <Menu>
+                {Object.keys(CellType).map((cellType, index) => {
+                    const active = brushModeOn && props.brushCellType === CellType[cellType];
+
+                    return (
+                        <MenuItem
+                            key={index}
+                            onClick={() => {
+                                if (active) {
+                                    props.setBrushMode(false);
+                                } else {
+                                    props.setBrushMode(true);
+                                    props.setBrushCellType(CellType[cellType]);
+                                }
+                            }}
+                            active={active}
+                            icon={active ? 'tick' : 'blank'}
+                            disabled={disabled}
+                            text={cellType}
+                        />
+                    );
+                })}
+            </Menu>
+        </Popover>
+    );
+};
+
 export const AnnotationEditorTools = (props: {
     annotations: Annotation[],
     newAnnotationProps: AnnotationProps,
+    toggleGrid: () => void,
+    mode: string,
+    setBrushMode: () => void,
+    brushCellType: CellType,
+    setBrushCellType: (cellType: CellType) => void,
 }) => {
-    const { annotations, newAnnotationProps } = props;
+    const { annotations, newAnnotationProps, toggleGrid, mode, setBrushMode, setBrushCellType, brushCellType } = props;
+
+    const theme = useTheme();
 
     return (
-        <div className='column-flex-center' style={{ width: '300px', margin: '40px' }}>
-            <JoystickLayout annotations={annotations} />
+        <div
+            className='column-flex-center manual-annotator-toolbar'
+            style={{
+                backgroundColor: theme.secondaryBackground,
+                color: theme.secondaryForeground,
+            }}
+        >
+            <CreateAnnotationButton annotationProps={newAnnotationProps} />
+            <Divider style={{ width: '100%' }} />
+            <DeleteAnnotationButton annotations={annotations} />
             <RadiusSlider annotations={annotations} />
             <CellTypePicker annotations={annotations} />
-            <div>
-                <DeleteAnnotationButton annotations={annotations} />
-                <CreateAnnotationButton annotationProps={newAnnotationProps} />
-            </div>
+            <GridButton onClick={toggleGrid} />
+            <SetBrushModeButton
+                mode={mode}
+                setBrushMode={setBrushMode}
+                setBrushCellType={setBrushCellType}
+                brushCellType={brushCellType}
+            />
         </div>
     );
 };
