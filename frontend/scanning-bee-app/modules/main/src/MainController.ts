@@ -4,9 +4,11 @@ import path from 'path';
 import {
     app, BrowserWindow, dialog, ipcMain, Menu, MenuItemConstructorOptions, nativeImage, nativeTheme, screen, shell, Tray,
 } from 'electron';
+import Store from 'electron-store';
 import fs from 'fs-extra';
+import { AnnotationYaml, MAIN_EVENTS, RENDERER_EVENTS, RENDERER_QUERIES, THEME_STORAGE_ID } from '@scanning_bee/ipc-interfaces';
 
-import { AnnotationYaml, loadAnnotations, loadImages, saveAnnotations } from './annotationUtils';
+import { loadAnnotations, loadImages, saveAnnotations } from './annotationUtils';
 import { isRunningDevMode } from './utils';
 
 // Determine the mode (dev or production)
@@ -66,6 +68,7 @@ class MainController {
         this.initMainMenu();
         this.initTray();
         this.initSplash();
+        this.initStore();
         this.initMainWindow();
     }
 
@@ -230,6 +233,10 @@ class MainController {
         this.splashWindow.loadURL(`file://${path.join(BUILD_ASSETS_PATH, 'scanning_bee_splash.png')}`);
     }
 
+    private initStore() {
+        Store.initRenderer();
+    }
+
     private initMainWindow() {
         this.mainWindow = new BrowserWindow({
             width: 1600, // width of the window
@@ -271,7 +278,24 @@ class MainController {
             }
         };
 
-        ipcMain.on('fullScreen', setFullScreen);
+        ipcMain.on(RENDERER_EVENTS.FULL_SCREEN, setFullScreen);
+
+        const themeChangeHandler = async () => {
+            const DEFAULT_THEME = {
+                themeType: 'light',
+                secondaryBackground: '#DCE0E5',
+            };
+
+            const theme = new Store<Record<string, any>>().get(THEME_STORAGE_ID) || DEFAULT_THEME;
+
+            if (this.mainWindow.setTitleBarOverlay) {
+                this.mainWindow.setTitleBarOverlay({
+                    color: theme.secondaryBackground,
+                    symbolColor:
+                        theme.type === 'light' ? '#000' : '#fff',
+                });
+            }
+        };
 
         const zoomChangeHandler = async () => {
             if (this.mainWindow) {
@@ -285,14 +309,12 @@ class MainController {
                     // change title bar height
                     this.mainWindow.setTitleBarOverlay({
                         height: Math.floor((46 * zoomFactor) / scaleFactor),
-                        color: '#F4AC18',
-                        symbolColor: '#ffffff',
                     });
                 }
             }
         };
 
-        ipcMain.on('selectFolder', (_event) => {
+        ipcMain.on(RENDERER_QUERIES.SELECT_FOLDER, (_event) => {
             dialog.showOpenDialog({
                 properties: ['openDirectory'],
             }).then((result) => {
@@ -309,25 +331,30 @@ class MainController {
 
                     const imageUrls = loadImages(folderPath);
 
-                    this.send('annotationsParsed', { folder: folderPath, annotations, images: imageUrls });
+                    this.send(MAIN_EVENTS.ANNOTATIONS_PARSED, { folder: folderPath, annotations, images: imageUrls });
                 }
             }).catch((err) => {
                 console.log(err);
             });
         });
 
-        ipcMain.on('saveAnnotations', (_event, { targetFolder, annotations }: { targetFolder: string, annotations: AnnotationYaml[] }) => {
-            try {
-                saveAnnotations(annotations, targetFolder);
+        ipcMain.on(
+            RENDERER_QUERIES.SAVE_ANNOTATIONS,
+            (_event, { targetFolder, annotations }: { targetFolder: string, annotations: AnnotationYaml[] }) => {
+                try {
+                    saveAnnotations(annotations, targetFolder);
 
-                this.send('saveAnnotationsSuccess', { targetFolder });
-            } catch (e) {
-                this.send('saveAnnotationsError', { targetFolder });
-            }
-        });
+                    this.send(MAIN_EVENTS.SAVE_ANNOTATIONS_SUCCESS, { targetFolder });
+                } catch (e) {
+                    this.send(MAIN_EVENTS.SAVE_ANNOTATIONS_ERROR, { targetFolder, error: e });
+                }
+            },
+        );
 
-        ipcMain.on('zoomChange', zoomChangeHandler);
+        ipcMain.on(RENDERER_EVENTS.ZOOM_CHANGE, zoomChangeHandler);
+        ipcMain.on(RENDERER_EVENTS.THEME_CHANGE, themeChangeHandler);
         zoomChangeHandler();
+        themeChangeHandler();
 
         this.mainWindow.once('closed', () => {
             // Dereference the window object, usually you would store windows

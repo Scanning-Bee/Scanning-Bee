@@ -2,51 +2,8 @@
 @import "~@blueprintjs/core/lib/css/blueprint.css";
 @import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
 
-@font-face {
-  font-family: "Saira-Regular";   /*Can be any text*/
-  src: local("Saira-Regular"),
-  url("../fonts/Saira/static/Saira-Regular.ttf") format("truetype");
-}
-@font-face {
-  font-family: "Saira";   /*Can be any text*/
-  src: local("Saira-Black"),
-  url("../fonts/Saira/static/Saira-Black.ttf") format("truetype");
-}
-@font-face {
-  font-family: "Saira-Bold";   /*Can be any text*/
-  src: local("Saira-Bold"),
-  url("../fonts/Saira/static/Saira-Bold.ttf") format("truetype");
-}
-@font-face {
-  font-family: "Saira-Black";   /*Can be any text*/
-  src: local("Saira-ExtraBold"),
-  url("../fonts/Saira/static/Saira-ExtraBold.ttf") format("truetype");
-}
-@font-face {
-  font-family: "Saira";   /*Can be any text*/
-  src: local("Saira-ExtraLight"),
-  url("../fonts/Saira/static/Saira-ExtraLight.ttf") format("truetype");
-}
-@font-face {
-  font-family: "Saira";   /*Can be any text*/
-  src: local("Saira-Light"),
-  url("../fonts/Saira/static/Saira-Light.ttf") format("truetype");
-}
-@font-face {
-  font-family: "Saira";   /*Can be any text*/
-  src: local("Saira-Medium"),
-  url("../fonts/Saira/static/Saira-Medium.ttf") format("truetype");
-}
-@font-face {
-  font-family: "Saira";   /*Can be any text*/
-  src: local("Saira-SemiBold"),
-  url("../fonts/Saira/static/Saira-SemiBold.ttf") format("truetype");
-}
-@font-face {
-  font-family: "Saira";   /*Can be any text*/
-  src: local("Saira-Thin"),
-  url("../fonts/Saira/static/Saira-Thin.ttf") format("truetype");
-}
+@import "./fonts.css";
+@import "./bp3_overrides.css";
 
 :root {
   --buttonWidth:40px;
@@ -167,7 +124,11 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  -webkit-app-region: drag;
+  -webkit-app-region: no-drag;
+}
+
+.header-button{
+  -webkit-app-region: no-drag !important;
 }
 
 .header-button:focus{
@@ -254,6 +215,11 @@ a {
   cursor: not-allowed;
 }
 
+.grid{
+  background-image: linear-gradient(rgba(0, 255, 0, .7) .1em, transparent .1em), linear-gradient(90deg, rgba(0, 255, 0, .7) .1em, transparent .1em);
+  background-size: 3em 3em;
+}
+
 .homepage-card{
   width: 250px;
   height: 150px;
@@ -294,6 +260,15 @@ a {
 .page{
   top: 0;
   position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.home {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: fit-content;
 }
 
 .annotated-images-panel{
@@ -304,6 +279,31 @@ a {
   align-items: self-start;
   overflow: scroll;
   padding-bottom: '20px',
+}
+
+.settings-page {
+  width: 70vw;
+  height: 70vh;
+}
+
+.settings-tab {
+  width: 100%;
+}
+
+.settings-title {
+  margin-bottom: 20px;
+}
+
+.settings-card {
+  display: flex;
+  margin: -10px;
+}
+
+.settings-card > p {
+  width: 100%;
+  align-self: center;
+  font-size: medium;
+  margin-bottom: 0;
 }
 
 .open-margin-left {
@@ -350,28 +350,11 @@ a {
   margin-top: 40px;
 }
 
-.bp3-button.bp3-intent-primary{
-  background-color: #313131;
+.manual-annotator-toolbar{
+  position:absolute;
+  top: 20px;
+  right: 20px;
+  padding: 5px;
+  border-radius: 5px;
+  margin: 5px;
 }
-
-.bp3-button.bp3-intent-primary:hover{
-  background-color: #313131;
-  box-shadow: inset 0 0 0 1px rgb(16 22 26 / 40%), inset 0 -1px 0 rgb(16 22 26 / 20%);
-}
-
-
-.bp3-button.bp3-minimal.bp3-intent-primary{
-  color: #313131;
-  background-color: none;
-}
-
-.bp3-button.bp3-minimal.bp3-intent-primary:hover{
-  color: #313131;
-  background-color: none;
-  box-shadow: inset 0 0 0 1px rgb(16 22 26 / 40%), inset 0 -1px 0 rgb(16 22 26 / 20%);
-}
-
-.bp3-portal{
-  z-index: 65;
-}
-

@@ -17,14 +17,14 @@ class User(models.Model):
     user_type = models.ForeignKey(UserType, on_delete=models.PROTECT, null=True)
 
     def __str__(self):
-        return str(self.id) + " - " + self.user_type.description
+        return str(self.pk) + " - " + self.user_type.description
 
 
 class Frame(models.Model):
     description = models.CharField(max_length=100, null=True)
 
     def __str__(self):
-        return str(self.id) + " - " + self.description
+        return str(self.pk) + " - " + self.description
 
 
 class Cell(models.Model):
@@ -33,7 +33,7 @@ class Cell(models.Model):
     frame = models.ForeignKey(Frame, on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.id) + " - (" + str(self.location_on_frame_x) + ", " + str(self.location_on_frame_y) + ")"
+        return str(self.pk) + " - (" + str(self.location_on_frame_x) + ", " + str(self.location_on_frame_y) + ")"
 
 
 class Content(models.Model):
@@ -44,6 +44,12 @@ class Content(models.Model):
         return self.name
 
 
+class Image(models.Model):
+    image_name = models.CharField(max_length=100)
+    x_pos = models.FloatField()
+    y_pos = models.FloatField()
+
+
 class CellContent(models.Model):
     cell = models.ForeignKey(Cell, on_delete=models.PROTECT, null=True)
     frame = models.ForeignKey(Frame, on_delete=models.PROTECT, default=1)
@@ -52,16 +58,18 @@ class CellContent(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     center_x = models.IntegerField()
     center_y = models.IntegerField()
-    x_pos = models.FloatField()
-    y_pos = models.FloatField()
+    image = models.ForeignKey(Image, on_delete=models.CASCADE)
     radius = models.IntegerField()
-    image_name = models.CharField(max_length=100)
 
     def __str__(self):
-        return str(self.id) + " - " + self.content.name + " - " + str(self.cell)
+        return str(self.pk) + " - " + self.content.name + " - " + str(self.cell)
 
     def save(self, *args, **kwargs):
-        calculated_x, calculated_y = convert_to_world_coordinates((self.center_x, self.center_y), self.x_pos, self.y_pos)
+        my_image = Image.objects.get(pk = self.image.pk)
+        x_pos = my_image.x_pos
+        y_pos = my_image.y_pos
+
+        calculated_x, calculated_y = convert_to_world_coordinates((self.center_x, self.center_y), x_pos, y_pos)
 
         cell = self.find_or_create_cell(calculated_x, calculated_y, self.frame)
         self.cell = cell
@@ -88,3 +96,4 @@ class CellContent(models.Model):
             )
             new_cell.save()
             return new_cell
+

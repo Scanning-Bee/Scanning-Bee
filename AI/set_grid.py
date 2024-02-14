@@ -1,5 +1,5 @@
-from detect import *
-from preprocess import *
+from .detect import *
+from .preprocess import *
 
 FOUR_OVER_ROOT3 = 2.309401077
 TWO_OVER_ROOT3 = 1.154700538

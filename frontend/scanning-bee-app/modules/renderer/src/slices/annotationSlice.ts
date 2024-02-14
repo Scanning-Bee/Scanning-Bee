@@ -1,8 +1,9 @@
 import { UUID } from 'crypto';
 import { useSelector } from 'react-redux';
-import Annotation, { AnnotationMutation, AnnotationPropsWithID, AnnotationYaml } from '@frontend/models/annotation';
+import Annotation, { AnnotationMutation, AnnotationPropsWithID } from '@frontend/models/annotation';
 import { RootState } from '@frontend/store';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AnnotationYaml } from '@scanning_bee/ipc-interfaces';
 
 type AnnotationsState = {
     // contains the plain object versions of the annotations. contains AnnotationProps and the id

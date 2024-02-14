@@ -1,48 +1,45 @@
 import CellType from '@frontend/models/cellType';
 
-export type CellDto = {
-    id: number;
-    location_on_frame_x: number;
-    location_on_frame_y: number;
-    frame: number;
+export type UserTypeDto = {
+    type: string;
 };
 
-export type CellContentDto = {
-    id: number;
-    frame: number;
-    timestamp: string;
-    content: number;
-    user: number;
-    center_x: number;
-    center_y: number;
-    x_pos: number;
-    y_pos: number;
-    radius: number;
-    image_name: string;
-    cell?: number;
+export type UserDto = {
+    name: string;
+    user_type: UserTypeDto;
+};
+
+export type FrameDto = {
+    description: string;
+};
+
+export type CellDto = {
+    location_on_frame_x: number;
+    location_on_frame_y: number;
+    frame: FrameDto;
 };
 
 export type ContentDto = {
-    id: number;
     name: string;
     content_description: string;
 };
 
-export type FrameDto = {
-    id: number;
-    name: string;
-    frame_description: string;
+export type ImageDto = {
+    image_name: string;
+    x_pos: number;
+    y_pos: number;
 };
 
-export type UserDto = {
-    id: number;
-    name: string;
-    user_type: number;
-};
-
-export type UserTypeDto = {
-    id: number;
-    type: string;
+export type CellContentDto = {
+    frame: FrameDto | number;
+    timestamp: string;
+    content: ContentDto | number;
+    user: UserDto | number;
+    center_x: number;
+    center_y: number;
+    image: string | number;
+    radius: number;
+    cell?: CellDto;
 };
 
 export const CellTypeDto = {

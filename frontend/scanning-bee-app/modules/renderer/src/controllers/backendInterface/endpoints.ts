@@ -71,4 +71,17 @@ export const BACKEND_ENDPOINTS = {
             CREATE: `${ENDPOINT_URL}/usertypes/`,
         },
     },
+    IMAGE: {
+        GET: {
+            LIST: `${ENDPOINT_URL}/images/`,
+        },
+        POST: {
+            CREATE: `${ENDPOINT_URL}/images/`,
+        },
+    },
+    AI: {
+        GET: {
+            BY_IMAGE_NAME: (imageName: string) => `${ENDPOINT_URL}/cellcontentsbyai/${imageName}/`,
+        },
+    },
 };
