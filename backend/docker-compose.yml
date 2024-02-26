@@ -1,0 +1,26 @@
+version: "3"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: scanning_bee/Dockerfile.app
+    container_name: scanning_bee_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/scanning_bee
+    depends_on:
+      - db
+
+  db:
+    build:
+      context: .
+      dockerfile: Database/Dockerfile.db
+    container_name: scanning_bee_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  db:
