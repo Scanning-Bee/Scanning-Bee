@@ -8,9 +8,11 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - .:/scanning_bee
+      - ./scanning_bee:/scanning_bee
     depends_on:
       - db
+    environment:
+      - DEBUG=1
 
   db:
     build:
@@ -19,8 +21,11 @@ services:
     container_name: scanning_bee_db
     ports:
       - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=pass
+      - MYSQL_DATABASE=scanning_bee_db
     volumes:
-      - db:/var/lib/mysql
+      - db_data:/var/lib/mysql
 
 volumes:
-  db:
+  db_data:

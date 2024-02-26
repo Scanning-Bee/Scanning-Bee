@@ -4,11 +4,9 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 WORKDIR /scanning_bee
-COPY /scanning_bee/ /scanning_bee/
+COPY scanning_bee/ ./
 
-COPY /requirements2.txt .
-# COPY /scanning_bee/manage.py .
-
+COPY requirements2.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements2.txt
 
