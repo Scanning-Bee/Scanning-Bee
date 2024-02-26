@@ -11,6 +11,7 @@ class Command(MigrateCommand):
 
         # Define your fixtures list
         fixtures = os.listdir("./scanning_bee_app/fixtures")
+        fixtures.sort()
 
         # Then, load each fixture
         for fixture in fixtures:

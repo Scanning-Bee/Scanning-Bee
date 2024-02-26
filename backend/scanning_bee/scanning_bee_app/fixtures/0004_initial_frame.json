@@ -1,0 +1,16 @@
+[
+    {
+      "model": "scanning_bee_app.frame",
+      "pk": 1,
+      "fields": {
+        "description": "Front side of the hive"
+      }
+    },
+    {
+      "model": "scanning_bee_app.frame",
+      "pk": 2,
+      "fields": {
+        "description": "Back side of the hive"
+      }
+    }
+]

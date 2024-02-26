@@ -3,12 +3,13 @@ services:
   app:
     build:
       context: .
-      dockerfile: scanning_bee/Dockerfile.app
+      dockerfile: Dockerfile.app
     container_name: scanning_bee_app
     ports:
       - "8000:8000"
     volumes:
-      - ./scanning_bee:/scanning_bee
+      - ./backend:/scanning_bee/backend
+      - ./AI:/scanning_bee/AI
     depends_on:
       - db
     environment:
@@ -17,7 +18,7 @@ services:
   db:
     build:
       context: .
-      dockerfile: Database/Dockerfile.db
+      dockerfile: Dockerfile.db
     container_name: scanning_bee_db
     ports:
       - "3306:3306"
