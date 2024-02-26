@@ -1,6 +1,0 @@
-version: "3.9"
-services:
-  scanning_bee_container:
-    build: .
-    ports:
-      - "3306:3306"

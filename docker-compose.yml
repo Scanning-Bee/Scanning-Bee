@@ -1,0 +1,36 @@
+version: "3"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    container_name: scanning_bee_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/scanning_bee/backend
+      - ./AI:/scanning_bee/AI
+    depends_on:
+      - db
+    environment:
+      - DEBUG=1
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+    container_name: scanning_bee_db
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=pass
+      - MYSQL_DATABASE=scanning_bee_db
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
