@@ -46,8 +46,10 @@ class Content(models.Model):
 
 class Image(models.Model):
     image_name = models.CharField(max_length=100)
+    image_path = models.CharField(max_length=300)
     x_pos = models.FloatField()
     y_pos = models.FloatField()
+    timestamp = models.DateTimeField(auto_now_add=True, blank=True)
 
 
 class CellContent(models.Model):

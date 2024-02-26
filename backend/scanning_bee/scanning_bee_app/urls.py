@@ -1,5 +1,9 @@
-from django.urls import path
+from django.urls import path, register_converter
 from . import views
+from .converters import FloatConverter, DateTimeConverter
+
+register_converter(FloatConverter, 'float')
+register_converter(DateTimeConverter, 'datetime')
 
 urlpatterns = [
     path('usertypes/', views.UserTypeList.as_view(), name='usertype-list'),
@@ -28,7 +32,8 @@ urlpatterns = [
 
     path('cellcontents/', views.CellContentList.as_view(), name='cellcontent-list'),
     path('cellcontents/<str:filter_type>/<str:arg>/', views.CellContentList.as_view(), name='cellcontent-detail'),
-    path('cellcontentsbyai/<str:image_name>/', views.CellContentsByAI.as_view(), name='cellcontent-detail'),
+    path('cellcontentsbyai/<float:image_x_pos>/<float:image_y_pos>/', views.CellContentsByAI.as_view(), name='cellcontent-detail'),
+    path('cellcontentsbyai/<float:image_x_pos>/<float:image_y_pos>/<datetime:timestamp>/', views.CellContentsByAI.as_view(), name='cellcontent-detail'),
 
     path('images/', views.ImageList.as_view(), name='image-details')
 ]

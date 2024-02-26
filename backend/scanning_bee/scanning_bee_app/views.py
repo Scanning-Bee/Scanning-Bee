@@ -11,6 +11,7 @@ from .serializers import *
 from .real_world_coordiantes import convert_to_world_coordinates
 
 import sys
+
 sys.path.insert(0, '../../')
 
 from AI.test import test_lines
@@ -142,7 +143,6 @@ class CellContentList(ListCreateAPIView):
                 queryset = queryset.none()
 
         return queryset
-        
 
     def create(self, request, *args, **kwargs):
         if isinstance(request.data, list):  # Check if request is a list for bulk creation
@@ -179,29 +179,38 @@ class SingleCellContent(RetrieveUpdateDestroyAPIView):
 class CellContentsByAI(ListCreateAPIView):
     serializer_class = CellContentSerializer
 
+    def get(self, request,  image_x_pos, image_y_pos, timestamp=None, format=None):
+        queryset = Image.objects.filter(x_pos=image_x_pos, y_pos=image_y_pos)
+        print('queryset', queryset)
+        if timestamp is not None:
+            queryset = queryset.objects.filter(timestamp=timestamp)
+            print('timestampli queryset', queryset)
 
-    def get(self, request, image_name, format=None):
-        all_detected_circles = test_lines("scanning_bee_app/AnnotationFiles/" + image_name)
-        image = Image.objects.get(image_name=image_name)
-        frame = Frame.objects.get(pk=1)
-        user = User.objects.get(pk=1)
-        content = Content.objects.get(pk=9)
-
+        image_list = list(queryset)
+        print('image_list', image_list)
         cell_contents = list()
-        for circle in all_detected_circles:
-            x = circle[0]
-            y = circle[1]
-            radius = circle[2]
-            cell_content = CellContent(cell=None,
-                                    frame=frame,
-                                    timestamp=None,
-                                    content=content,
-                                    user=user,
-                                    center_x=x,
-                                    center_y=y,
-                                    image=image,
-                                    radius=radius)
-            cell_contents.append(cell_content)
+
+        for image in image_list:
+            all_detected_circles = test_lines("scanning_bee_app/AnnotationFiles/" + image.image_name)
+
+            frame = Frame.objects.get(pk=1)
+            user = User.objects.get(pk=1)
+            content = Content.objects.get(pk=9)
+
+            for circle in all_detected_circles:
+                x = circle[0]
+                y = circle[1]
+                radius = circle[2]
+                cell_content = CellContent(cell=None,
+                                           frame=frame,
+                                           timestamp=None,
+                                           content=content,
+                                           user=user,
+                                           center_x=x,
+                                           center_y=y,
+                                           image=image,
+                                           radius=radius)
+                cell_contents.append(cell_content)
 
         serializer = CellContentSerializer(cell_contents, many=True)
         return Response(serializer.data)
