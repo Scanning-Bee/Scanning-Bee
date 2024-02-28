@@ -175,6 +175,8 @@ class SingleCellContent(RetrieveUpdateDestroyAPIView):
     serializer_class = CellContentSerializer
     lookup_field = 'id'
 
+# TODO: AI değil de dümdüz image'ı xpos ve ypos ile çekme view'i oluşturulacak
+# TODO: Ege'nin bu yaml metadatası ve image dosyalarını AnnotationFiles'tan otomatik olarak okuyup database'e kaydetme opsiyonu eklenecek
 
 class CellContentsByAI(ListCreateAPIView):
     serializer_class = CellContentSerializer
