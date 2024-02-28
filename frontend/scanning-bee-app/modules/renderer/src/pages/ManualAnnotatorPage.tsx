@@ -14,16 +14,12 @@ import { ManualAnnotatorPanel } from '@frontend/toolbars/ManualAnnotator/ManualA
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import React, { useEffect, useState } from 'react';
 
-type AnnotationMode = 'default' | 'brush';
-
 export const ManualAnnotatorPage = () => {
     const theme = useTheme();
 
     const [shownImageUrl, setShownImageUrl] = useState<string | undefined>(undefined);
     const [leftPanelOpen, setLeftPanelOpen] = useState<boolean>(true);
     const [gridOpen, setGridOpen] = useState<boolean>(true);
-    const [mode, setMode] = useState<AnnotationMode>('default');
-    const [brushCellType, setBrushCellType] = useState<CellType>(CellType.NOT_CLASSIFIED);
 
     const folder = useAnnotationsFolder();
     const activeAnnotations = useActiveAnnotations();
@@ -103,8 +99,6 @@ export const ManualAnnotatorPage = () => {
             <div className='column-flex-center' style={{ width: '100%', height: '100%' }}>
                 <AnnotatedImage
                     shownImageUrl={images.find(image => image === shownImageUrl)}
-                    mode={mode}
-                    brushCellType={brushCellType}
                 />
                 <AnnotationEditorTools
                     annotations={activeAnnotations}
@@ -119,14 +113,6 @@ export const ManualAnnotatorPage = () => {
                     toggleGrid={() => {
                         setGridOpen(!gridOpen);
                     }}
-                    mode={mode}
-                    setBrushMode={(set: boolean = false) => setMode(
-                        mode === 'default' || set
-                            ? 'brush'
-                            : 'default',
-                    )}
-                    brushCellType={brushCellType}
-                    setBrushCellType={setBrushCellType}
                 />
             </div>
         </div>

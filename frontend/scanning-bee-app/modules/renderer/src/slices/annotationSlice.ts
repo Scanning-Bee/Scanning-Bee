@@ -1,9 +1,20 @@
 import { UUID } from 'crypto';
 import { useSelector } from 'react-redux';
 import Annotation, { AnnotationMutation, AnnotationPropsWithID } from '@frontend/models/annotation';
+import CellType from '@frontend/models/cellType';
 import { RootState } from '@frontend/store';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AnnotationYaml } from '@scanning_bee/ipc-interfaces';
+
+export enum ManualAnnotatorMode {
+    Default = 'default',
+    Brush = 'brush',
+    Add = 'add',
+    Delete = 'delete',
+}
+export type ManualAnnotatorModeParams = {
+    cellType?: CellType;
+};
 
 type AnnotationsState = {
     // contains the plain object versions of the annotations. contains AnnotationProps and the id
@@ -11,6 +22,9 @@ type AnnotationsState = {
     images: string[];
     activeAnnotationIds: UUID[];
     annotationsFolder: string | null;
+
+    mode: ManualAnnotatorMode;
+    modeParams: ManualAnnotatorModeParams;
 };
 
 const initialState: AnnotationsState = {
@@ -18,6 +32,8 @@ const initialState: AnnotationsState = {
     images: [], // file://blahblahblah
     activeAnnotationIds: [],
     annotationsFolder: null,
+    mode: ManualAnnotatorMode.Default,
+    modeParams: {},
 };
 
 const annotationSlice = createSlice({
@@ -71,6 +87,12 @@ const annotationSlice = createSlice({
 
             state.annotationObjects = annotations.map(Annotation.toPlainObject);
         },
+        setManualAnnotatorMode(state, action: PayloadAction<ManualAnnotatorMode>) {
+            state.mode = action.payload;
+        },
+        setModeParams(state, action: PayloadAction<ManualAnnotatorModeParams>) {
+            state.modeParams = action.payload;
+        },
     },
 });
 
@@ -83,12 +105,16 @@ export const {
     setAnnotationAsActive,
     setActiveAnnotations,
     mutateAnnotation,
+    setManualAnnotatorMode,
+    setModeParams,
 } = annotationSlice.actions;
 
 export const selectAnnotations = (state: RootState) => state.annotation.annotationObjects.map(Annotation.fromPlainObject);
 export const selectActiveAnnotationIds = (state: RootState) => state.annotation.activeAnnotationIds;
 export const selectAnnotationsFolder = (state: RootState) => state.annotation.annotationsFolder;
 export const selectImages = (state: RootState) => state.annotation.images;
+export const selectMode = (state: RootState) => state.annotation.mode;
+export const selectModeParams = (state: RootState) => state.annotation.modeParams;
 
 export const useAnnotations = () => {
     const annotations = useSelector(selectAnnotations);
@@ -114,6 +140,18 @@ export const useAnnotationsFolder = () => {
 export const useImages = () => {
     const images = useSelector(selectImages);
     return images;
+};
+
+export const useManualAnnotatorMode = () => {
+    const mode = useSelector(selectMode);
+    return mode;
+};
+
+export const useManualAnnotatorModeWithParams = () => {
+    const mode = useSelector(selectMode);
+    const modeParams = useSelector(selectModeParams);
+
+    return { mode, modeParams };
 };
 
 export const generateAnnotationsFromYaml = (yaml: AnnotationYaml[]): Annotation[] => yaml.map((annotationYaml) => {

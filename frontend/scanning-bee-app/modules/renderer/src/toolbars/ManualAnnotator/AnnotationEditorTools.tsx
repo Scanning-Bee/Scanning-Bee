@@ -1,8 +1,19 @@
-import { Button, Divider, Icon, Menu, MenuItem, Popover, Slider } from '@blueprintjs/core';
+import {
+    Button, Divider, Icon, Menu, MenuItem, Popover, Slider,
+} from '@blueprintjs/core';
 import Annotation, { AnnotationProps } from '@frontend/models/annotation';
 import CellType from '@frontend/models/cellType';
-import { addAnnotation, mutateAnnotation, removeAnnotation } from '@frontend/slices/annotationSlice';
+import {
+    addAnnotation,
+    ManualAnnotatorMode,
+    mutateAnnotation,
+    removeAnnotation,
+    setManualAnnotatorMode,
+    setModeParams,
+    useManualAnnotatorModeWithParams,
+} from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
+import { getIconForMode } from '@frontend/utils/annotationUtils';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -15,6 +26,8 @@ const RadiusSlider = (props: {
 
     const disabled = annotations.length !== 1;
 
+    const theme = useTheme();
+
     return (
         <Popover
             interactionKind='click'
@@ -22,7 +35,7 @@ const RadiusSlider = (props: {
             disabled={disabled}
         >
             <Button
-                icon={<Icon icon='circle' />}
+                icon={<Icon icon='circle' color={theme.secondaryForeground} />}
                 minimal
                 disabled={disabled}
             />
@@ -56,6 +69,8 @@ const CellTypePicker = (props: {
 
     const disabled = annotations.length === 0;
 
+    const theme = useTheme();
+
     return (
         <Popover
             interactionKind='click'
@@ -63,7 +78,7 @@ const CellTypePicker = (props: {
             disabled={disabled}
         >
             <Button
-                icon={<Icon icon='tag' />}
+                icon={<Icon icon='tag' color={theme.secondaryForeground} />}
                 minimal
                 disabled={disabled}
             />
@@ -122,77 +137,98 @@ const CreateAnnotationButton = (props: { annotationProps: AnnotationProps }) => 
 
 const GridButton = (props: { onClick: () => void }) => (
     <Button
-        icon={<Icon icon='grid' />}
+        icon={<Icon icon='grid' color={useTheme().secondaryForeground} />}
         minimal
         onClick={props.onClick}
     />
 );
 
-const SetBrushModeButton = (props: {
-    mode: string,
-    setBrushMode: (set?: boolean) => void,
-    brushCellType: CellType,
-    setBrushCellType: (cellType: CellType) => void
-}) => {
-    const theme = useTheme();
+const ModeMenu = () => {
+    const dispatch = useDispatch();
 
-    const disabled = false;
-    const brushModeOn = props.mode === 'brush';
+    const { mode, modeParams } = useManualAnnotatorModeWithParams();
+
+    return (
+        <Menu>
+            <MenuItem
+                icon={getIconForMode(ManualAnnotatorMode.Default)}
+                text='Default'
+                active={mode === ManualAnnotatorMode.Default}
+                onClick={() => dispatch(setManualAnnotatorMode(ManualAnnotatorMode.Default))}
+            />
+
+            <MenuItem
+                icon={getIconForMode(ManualAnnotatorMode.Brush)}
+                text='Brush'
+                active={mode === ManualAnnotatorMode.Brush}
+            >
+                {Object.keys(CellType).map((cellType, index) => (
+                    <MenuItem
+                        key={index}
+                        onClick={() => {
+                            dispatch(setManualAnnotatorMode(ManualAnnotatorMode.Brush));
+                            dispatch(setModeParams({ cellType: CellType[cellType] }));
+                        }}
+                        icon={modeParams.cellType === cellType
+                            ? 'small-tick'
+                            : 'blank'}
+                        text={cellType}
+                    />
+                ))}
+            </MenuItem>
+
+            <MenuItem
+                icon={getIconForMode(ManualAnnotatorMode.Add)}
+                text='Add'
+                active={mode === ManualAnnotatorMode.Add}
+                onClick={() => dispatch(setManualAnnotatorMode(ManualAnnotatorMode.Add))}
+            />
+
+            <MenuItem
+                icon={getIconForMode(ManualAnnotatorMode.Delete)}
+                text='Delete'
+                active={mode === ManualAnnotatorMode.Delete}
+                onClick={() => dispatch(setManualAnnotatorMode(ManualAnnotatorMode.Delete))}
+            />
+        </Menu>
+    );
+};
+
+const SetModeButton = () => {
+    const theme = useTheme();
 
     return (
         <Popover
             interactionKind='click'
             position='left'
-            disabled={disabled}
         >
             <Button
-                icon={<Icon icon='highlight' />}
+                icon={<Icon icon='style' color={theme.secondaryForeground} />}
                 minimal
-                style={{ backgroundColor: brushModeOn ? theme.primaryAccent : 'transparent' }}
-                onClick={(e) => {
-                    if (brushModeOn) {
-                        e.stopPropagation();
-                        props.setBrushMode(false);
-                    }
-                }}
             />
-            <Menu>
-                {Object.keys(CellType).map((cellType, index) => {
-                    const active = brushModeOn && props.brushCellType === CellType[cellType];
-
-                    return (
-                        <MenuItem
-                            key={index}
-                            onClick={() => {
-                                if (active) {
-                                    props.setBrushMode(false);
-                                } else {
-                                    props.setBrushMode(true);
-                                    props.setBrushCellType(CellType[cellType]);
-                                }
-                            }}
-                            active={active}
-                            icon={active ? 'tick' : 'blank'}
-                            disabled={disabled}
-                            text={cellType}
-                        />
-                    );
-                })}
-            </Menu>
+            <ModeMenu />
         </Popover>
     );
 };
+
+const EditorButtonPopover = (props: { children: any }) => <Popover
+    usePortal
+    canEscapeKeyClose
+    interactionKind='hover-target'
+    hoverOpenDelay={0}
+    hoverCloseDelay={0}
+    disabled={false}
+    position='left'
+>
+    {props.children}
+</Popover>;
 
 export const AnnotationEditorTools = (props: {
     annotations: Annotation[],
     newAnnotationProps: AnnotationProps,
     toggleGrid: () => void,
-    mode: string,
-    setBrushMode: () => void,
-    brushCellType: CellType,
-    setBrushCellType: (cellType: CellType) => void,
 }) => {
-    const { annotations, newAnnotationProps, toggleGrid, mode, setBrushMode, setBrushCellType, brushCellType } = props;
+    const { annotations, newAnnotationProps, toggleGrid } = props;
 
     const theme = useTheme();
 
@@ -204,18 +240,39 @@ export const AnnotationEditorTools = (props: {
                 color: theme.secondaryForeground,
             }}
         >
-            <CreateAnnotationButton annotationProps={newAnnotationProps} />
-            <Divider style={{ width: '100%' }} />
-            <DeleteAnnotationButton annotations={annotations} />
-            <RadiusSlider annotations={annotations} />
-            <CellTypePicker annotations={annotations} />
-            <GridButton onClick={toggleGrid} />
-            <SetBrushModeButton
-                mode={mode}
-                setBrushMode={setBrushMode}
-                setBrushCellType={setBrushCellType}
-                brushCellType={brushCellType}
-            />
+            <EditorButtonPopover>
+                <CreateAnnotationButton annotationProps={newAnnotationProps} />
+                <span style={{ padding: '20px' }}>Create Annotation</span>
+            </EditorButtonPopover>
+
+            <EditorButtonPopover>
+                <DeleteAnnotationButton annotations={annotations} />
+                <span style={{ padding: '20px' }}>Delete</span>
+            </EditorButtonPopover>
+
+            <Divider style={{ width: '100%', backgroundColor: theme.secondaryForeground }} />
+
+            <EditorButtonPopover>
+                <RadiusSlider annotations={annotations} />
+                <span style={{ padding: '20px' }}>Set Radius</span>
+            </EditorButtonPopover>
+
+            <EditorButtonPopover>
+                <CellTypePicker annotations={annotations} />
+                <span style={{ padding: '20px' }}>Set Cell Type</span>
+            </EditorButtonPopover>
+
+            <EditorButtonPopover>
+                <GridButton onClick={toggleGrid} />
+                <span style={{ padding: '20px' }}>Toggle Grid</span>
+            </EditorButtonPopover>
+
+            <Divider style={{ width: '100%', backgroundColor: theme.secondaryForeground }} />
+
+            <EditorButtonPopover>
+                <SetModeButton />
+                <span style={{ padding: '20px' }}>Mode</span>
+            </EditorButtonPopover>
         </div>
     );
 };
