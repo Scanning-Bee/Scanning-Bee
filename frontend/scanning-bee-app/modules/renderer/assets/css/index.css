@@ -358,3 +358,21 @@ a {
   border-radius: 5px;
   margin: 5px;
 }
+
+.custom-tooltip {
+  width: fit-content;
+  height: fit-content;
+  background-color: #fff;
+  border: 1px solid #999;
+  margin: 0;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.label {
+  margin: 0;
+  padding: 0;
+  color: #333;
+}

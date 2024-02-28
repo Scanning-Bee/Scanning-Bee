@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { HomePage } from './pages/HomePage';
 import { ManualAnnotatorPage } from './pages/ManualAnnotatorPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { StatisticsPage } from './pages/StatisticsPage';
 import store from './store';
 import Header from './toolbars/Header';
 
@@ -28,6 +29,8 @@ const App = (props: { page: PageType, setPage: any, goBack: any }) => {
                             return <ManualAnnotatorPage />;
                         case 'settings':
                             return <SettingsPage goBack={goBack} />;
+                        case 'statistics':
+                            return <StatisticsPage />;
                         default:
                             return <div>Page not found</div>;
                         }
