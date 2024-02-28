@@ -211,13 +211,13 @@ const SetModeButton = () => {
     );
 };
 
-const EditorButtonPopover = (props: { children: any }) => <Popover
+const EditorButtonPopover = (props: { children: any, disabled?: boolean }) => <Popover
     usePortal
     canEscapeKeyClose
     interactionKind='hover-target'
     hoverOpenDelay={0}
     hoverCloseDelay={0}
-    disabled={false}
+    disabled={props.disabled}
     position='left'
 >
     {props.children}
@@ -242,36 +242,36 @@ export const AnnotationEditorTools = (props: {
         >
             <EditorButtonPopover>
                 <CreateAnnotationButton annotationProps={newAnnotationProps} />
-                <span style={{ padding: '20px' }}>Create Annotation</span>
+                <div style={{ padding: '10px' }}>Create Annotation</div>
             </EditorButtonPopover>
 
-            <EditorButtonPopover>
+            <EditorButtonPopover disabled={annotations.length === 0}>
                 <DeleteAnnotationButton annotations={annotations} />
-                <span style={{ padding: '20px' }}>Delete</span>
+                <div style={{ padding: '10px' }}>Delete</div>
             </EditorButtonPopover>
 
             <Divider style={{ width: '100%', backgroundColor: theme.secondaryForeground }} />
 
-            <EditorButtonPopover>
+            <EditorButtonPopover disabled={annotations.length === 0}>
                 <RadiusSlider annotations={annotations} />
-                <span style={{ padding: '20px' }}>Set Radius</span>
+                <div style={{ padding: '10px' }}>Set Radius</div>
             </EditorButtonPopover>
 
-            <EditorButtonPopover>
+            <EditorButtonPopover disabled={annotations.length === 0}>
                 <CellTypePicker annotations={annotations} />
-                <span style={{ padding: '20px' }}>Set Cell Type</span>
+                <div style={{ padding: '10px' }}>Set Cell Type</div>
             </EditorButtonPopover>
 
             <EditorButtonPopover>
                 <GridButton onClick={toggleGrid} />
-                <span style={{ padding: '20px' }}>Toggle Grid</span>
+                <div style={{ padding: '10px' }}>Toggle Grid</div>
             </EditorButtonPopover>
 
             <Divider style={{ width: '100%', backgroundColor: theme.secondaryForeground }} />
 
             <EditorButtonPopover>
                 <SetModeButton />
-                <span style={{ padding: '20px' }}>Mode</span>
+                <div style={{ padding: '20px' }}>Mode</div>
             </EditorButtonPopover>
         </div>
     );
