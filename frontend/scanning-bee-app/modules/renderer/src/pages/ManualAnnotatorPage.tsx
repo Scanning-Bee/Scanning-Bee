@@ -1,5 +1,4 @@
 import { Button, Icon } from '@blueprintjs/core';
-import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
 import CellType from '@frontend/models/cellType';
 import {
     useActiveAnnotations,
@@ -13,6 +12,8 @@ import { AnnotationEditorTools } from '@frontend/toolbars/ManualAnnotator/Annota
 import { ManualAnnotatorPanel } from '@frontend/toolbars/ManualAnnotator/ManualAnnotatorPanel';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import React, { useEffect, useState } from 'react';
+
+import { PickFolderPage } from './PickFolderPage';
 
 export const ManualAnnotatorPage = () => {
     const theme = useTheme();
@@ -44,26 +45,7 @@ export const ManualAnnotatorPage = () => {
     }, [leftPanelOpen]);
 
     if (!folder || !shownImageUrl) {
-        return <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: theme.primaryBackground,
-            color: theme.primaryForeground,
-            justifyContent: 'center',
-        }} className='page'>
-            <Button
-                text='Open a folder'
-                minimal
-                large
-                onClick={() => {
-                    BackendInterface.getInstance().openFolderDialog();
-                }}
-                intent='success'
-                icon='folder-new'
-                style={{ padding: '5px', margin: '2px' }}
-            />
-            <p style={{ fontWeight: 'normal', fontSize: '16px' }} className='nomargin'>to start annotating or see your annotations.</p>
-        </div>;
+        return <PickFolderPage />;
     }
 
     return (
