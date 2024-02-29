@@ -1,5 +1,4 @@
 import { Button, Icon } from '@blueprintjs/core';
-import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
 import CellType from '@frontend/models/cellType';
 import {
     useActiveAnnotations,
@@ -14,7 +13,7 @@ import { ManualAnnotatorPanel } from '@frontend/toolbars/ManualAnnotator/ManualA
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import React, { useEffect, useState } from 'react';
 
-type AnnotationMode = 'default' | 'brush';
+import { PickFolderPage } from './PickFolderPage';
 
 export const ManualAnnotatorPage = () => {
     const theme = useTheme();
@@ -22,8 +21,6 @@ export const ManualAnnotatorPage = () => {
     const [shownImageUrl, setShownImageUrl] = useState<string | undefined>(undefined);
     const [leftPanelOpen, setLeftPanelOpen] = useState<boolean>(true);
     const [gridOpen, setGridOpen] = useState<boolean>(true);
-    const [mode, setMode] = useState<AnnotationMode>('default');
-    const [brushCellType, setBrushCellType] = useState<CellType>(CellType.NOT_CLASSIFIED);
 
     const folder = useAnnotationsFolder();
     const activeAnnotations = useActiveAnnotations();
@@ -48,26 +45,7 @@ export const ManualAnnotatorPage = () => {
     }, [leftPanelOpen]);
 
     if (!folder || !shownImageUrl) {
-        return <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: theme.primaryBackground,
-            color: theme.primaryForeground,
-            justifyContent: 'center',
-        }} className='page'>
-            <Button
-                text='Open a folder'
-                minimal
-                large
-                onClick={() => {
-                    BackendInterface.getInstance().openFolderDialog();
-                }}
-                intent='success'
-                icon='folder-new'
-                style={{ padding: '5px', margin: '2px' }}
-            />
-            <p style={{ fontWeight: 'normal', fontSize: '16px' }} className='nomargin'>to start annotating or see your annotations.</p>
-        </div>;
+        return <PickFolderPage />;
     }
 
     return (
@@ -103,8 +81,6 @@ export const ManualAnnotatorPage = () => {
             <div className='column-flex-center' style={{ width: '100%', height: '100%' }}>
                 <AnnotatedImage
                     shownImageUrl={images.find(image => image === shownImageUrl)}
-                    mode={mode}
-                    brushCellType={brushCellType}
                 />
                 <AnnotationEditorTools
                     annotations={activeAnnotations}
@@ -119,14 +95,6 @@ export const ManualAnnotatorPage = () => {
                     toggleGrid={() => {
                         setGridOpen(!gridOpen);
                     }}
-                    mode={mode}
-                    setBrushMode={(set: boolean = false) => setMode(
-                        mode === 'default' || set
-                            ? 'brush'
-                            : 'default',
-                    )}
-                    brushCellType={brushCellType}
-                    setBrushCellType={setBrushCellType}
                 />
             </div>
         </div>

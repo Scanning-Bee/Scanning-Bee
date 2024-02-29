@@ -1,6 +1,13 @@
 import Annotation from '@frontend/models/annotation';
-import CellType from '@frontend/models/cellType';
-import { mutateAnnotation, setActiveAnnotations, setAnnotationAsActive } from '@frontend/slices/annotationSlice';
+import {
+    ManualAnnotatorMode,
+    ManualAnnotatorModeParams,
+    mutateAnnotation,
+    removeAnnotation,
+    setActiveAnnotations,
+    setAnnotationAsActive,
+    useManualAnnotatorModeWithParams,
+} from '@frontend/slices/annotationSlice';
 import { CellTypeColours } from '@frontend/utils/colours';
 import { isMac } from '@frontend/utils/platform';
 import { UUID } from 'crypto';
@@ -8,20 +15,55 @@ import React, { useState } from 'react';
 import Draggable from 'react-draggable';
 import { useDispatch } from 'react-redux';
 
+const clickHandler = (
+    e: any,
+    annotation: Annotation,
+    isActive: boolean,
+    dispatch: any,
+    mode: ManualAnnotatorMode,
+    modeParams: ManualAnnotatorModeParams,
+) => {
+    // e.stopPropagation();
+
+    switch (mode) {
+    case ManualAnnotatorMode.Default:
+        if ((isMac() && e.metaKey) || (!isMac() && e.ctrlKey)) {
+            dispatch(setAnnotationAsActive({ id: annotation.id, active: !isActive }));
+        } else {
+            dispatch(setActiveAnnotations(
+                isActive ? [] : [annotation.id],
+            ));
+        }
+        break;
+    case ManualAnnotatorMode.Brush:
+        dispatch(mutateAnnotation({
+            id: annotation.id,
+            mutations: { cell_type: modeParams.cellType },
+        }));
+        break;
+    case ManualAnnotatorMode.Delete:
+        dispatch(setActiveAnnotations([]));
+        dispatch(removeAnnotation(annotation.id));
+        break;
+    default:
+        break;
+    }
+};
+
 export const DraggableAnnotation = (props: {
     key: any,
     annotation: Annotation,
     topOffset: number,
     leftOffset: number,
     activeAnnotationIds: UUID[],
-    mode: string,
-    brushCellType: CellType,
 }) => {
-    const { key, annotation, topOffset, leftOffset, activeAnnotationIds, mode, brushCellType } = props;
+    const { key, annotation, topOffset, leftOffset, activeAnnotationIds } = props;
 
     const dispatch = useDispatch();
 
     const [isDragging, setIsDragging] = useState<boolean>(false);
+
+    const { mode, modeParams } = useManualAnnotatorModeWithParams();
 
     const headerHeight = 48;
 
@@ -30,27 +72,6 @@ export const DraggableAnnotation = (props: {
     const centerY = annotation.center[1] / 2 - radius;
 
     const isActive = activeAnnotationIds.includes(annotation.id);
-
-    const handleOnClick = (e: any) => {
-        e.stopPropagation();
-
-        if (mode === 'brush') {
-            dispatch(mutateAnnotation({
-                id: annotation.id,
-                mutations: { cell_type: brushCellType },
-            }));
-
-            return;
-        }
-
-        if ((isMac() && e.metaKey) || (!isMac() && e.ctrlKey)) {
-            dispatch(setAnnotationAsActive({ id: annotation.id, active: !isActive }));
-        } else {
-            dispatch(setActiveAnnotations(
-                isActive ? [] : [annotation.id],
-            ));
-        }
-    };
 
     const debouncedAnnotationActivator = () => {
         if (isDragging) return;
@@ -79,7 +100,14 @@ export const DraggableAnnotation = (props: {
     return (
         <div
             key={key}
-            onMouseDown={handleOnClick}
+            onMouseDown={e => clickHandler(
+                e,
+                annotation,
+                isActive,
+                dispatch,
+                mode,
+                modeParams,
+            )}
         >
             { /* @ts-ignore */ }
             <Draggable

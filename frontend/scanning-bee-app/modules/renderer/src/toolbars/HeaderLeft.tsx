@@ -34,6 +34,8 @@ export const HeaderLeft = (props: { page: any, setPage: any }) => {
                             return 'Manual Annotator';
                         case 'settings':
                             return 'Settings';
+                        case 'statistics':
+                            return 'Statistics';
                         default:
                             return 'Page not found';
                         }

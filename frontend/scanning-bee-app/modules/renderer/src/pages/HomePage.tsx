@@ -5,7 +5,7 @@ import { Card, Icon, Popover } from '@blueprintjs/core';
 import { useTheme } from '@frontend/slices/themeSlice';
 import React from 'react';
 
-export const HomePage = (props: { setPage: any }) => {
+export const HomePage = (props: { setPage: (arg: PageType) => void }) => {
     const { setPage } = props;
 
     const theme = useTheme();
@@ -36,6 +36,16 @@ export const HomePage = (props: { setPage: any }) => {
                     >
                         <Icon icon='annotation' iconSize={50} />
                         <h3 style={{ fontWeight: 'normal' }}>Manual Annotator</h3>
+                    </Card>
+                    <Card
+                        onClick={() => setPage('statistics')}
+                        interactive
+                        elevation={2}
+                        className='homepage-card'
+                        style={{ backgroundColor: theme.secondaryBackground, color: theme.primaryForeground }}
+                    >
+                        <Icon icon='timeline-bar-chart' iconSize={50} />
+                        <h3 style={{ fontWeight: 'normal' }}>Statistics</h3>
                     </Card>
                     <Popover
                         interactionKind='hover-target'
