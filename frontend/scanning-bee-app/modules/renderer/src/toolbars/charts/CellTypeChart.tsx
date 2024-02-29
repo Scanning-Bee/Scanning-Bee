@@ -2,11 +2,22 @@ import { useAnnotations } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { CellTypeColours } from '@frontend/utils/colours';
 import React from 'react';
-import {
-    Bar, BarChart, CartesianGrid, Cell, Tooltip, XAxis, YAxis,
-} from 'recharts';
+import { Cell, Pie, PieChart, Tooltip } from 'recharts';
 
 import { TooltipContent } from './TooltipContent';
+
+const RADIAN = Math.PI / 180;
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+        <text x={x} y={y} fill="black" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+            {`${(percent * 100).toFixed(0)}%`}
+        </text>
+    );
+};
 
 export const CellTypeChart = () => {
     const theme = useTheme();
@@ -32,41 +43,37 @@ export const CellTypeChart = () => {
             color: theme.primaryForeground,
             display: 'flex',
         }}>
-            <BarChart
+            <PieChart
                 width={500}
                 height={400}
-                data={sortedData}
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                 style={{ fontSize: 'smaller', color: theme.secondaryForeground }}
-                layout='vertical'
             >
-                <XAxis type='number'/>
-                <YAxis
-                    dataKey='cellType'
-                    fontSize='smaller'
-                    interval={0}
-                    type='category'
-                    scale='point'
-                    padding={{ top: 20, bottom: 20 }}
-                />
-                <CartesianGrid strokeDasharray='3 3' />
                 <Tooltip
                     contentStyle={{ color: 'black' }}
-                    content={({ active, payload, label }) => <TooltipContent
-                        active={active}
-                        payload={payload[0]?.value}
-                        label={label}
-                    />}
+                    content={({ active, payload, label }) => {
+                        console.log(payload, label); return <TooltipContent
+                            active={active}
+                            payload={payload[0]?.value}
+                            label={payload[0]?.payload.cellType}
+                        />;
+                    }}
                 />
-                <Bar
-                    dataKey='count'
-                    fill='#8884d8'
+                <Pie
+                    data={sortedData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine
+                    label={renderCustomizedLabel}
+                    outerRadius={150}
+                    fill="#8884d8"
+                    dataKey="count"
                 >
                     {sortedData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={CellTypeColours[entry.cellType]} />
                     ))}
-                </Bar>
-            </BarChart>
+                </Pie>
+            </PieChart>
         </div>
     );
 };
