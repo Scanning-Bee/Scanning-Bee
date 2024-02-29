@@ -2,7 +2,7 @@
     "name": "scanning_bee",
     "description": "Desktop Application for Scanning Bee",
     "author": "Scanning Bee",
-    "version": "0.0.0-local",
+    "version": "0.1.0-local",
     "main": "./modules/main/dist/src/index.js",
     "private": true,
     "engines": {
@@ -14,6 +14,7 @@
         "clean": "rimraf modules/*/dist dist build/code build/output",
         "stag": "webpack serve --config webpack.dev.config.js",
         "dev": "cross-env SCANNING_BEE_DEV_MODE=true yarn run build; yarn run stag",
+        "bundle": "webpack --config webpack.build.config.js",
         "package": "zx build/package.mjs",
         "lint": "eslint \"modules/*/src/**/*.{tsx,ts,jsx,js}\" --cache",
         "format": "eslint \"modules/*/src/**/*.{tsx,ts,jsx,js}\" --cache --fix",
