@@ -24,6 +24,8 @@ export const CellTypeChart = () => {
 
     const data = Object.entries(cellTypeCount).map(([cellType, count]) => ({ cellType, count }));
 
+    const sortedData = data.sort((a, b) => b.count - a.count);
+
     return (
         <div style={{
             backgroundColor: theme.primaryBackground,
@@ -33,12 +35,20 @@ export const CellTypeChart = () => {
             <BarChart
                 width={500}
                 height={400}
-                data={data}
+                data={sortedData}
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                 style={{ fontSize: 'smaller', color: theme.secondaryForeground }}
+                layout='vertical'
             >
-                <XAxis dataKey='cellType' fontSize='smaller' interval={0} />
-                <YAxis />
+                <XAxis type='number'/>
+                <YAxis
+                    dataKey='cellType'
+                    fontSize='smaller'
+                    interval={0}
+                    type='category'
+                    scale='point'
+                    padding={{ top: 20, bottom: 20 }}
+                />
                 <CartesianGrid strokeDasharray='3 3' />
                 <Tooltip
                     contentStyle={{ color: 'black' }}
@@ -52,7 +62,7 @@ export const CellTypeChart = () => {
                     dataKey='count'
                     fill='#8884d8'
                 >
-                    {data.map((entry, index) => (
+                    {sortedData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={CellTypeColours[entry.cellType]} />
                     ))}
                 </Bar>

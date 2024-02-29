@@ -40,7 +40,14 @@ export const AnnotationsByImageChart = () => {
                 layout='vertical'
             >
                 <XAxis type='number'/>
-                <YAxis dataKey='image' fontSize='smaller' interval={0} type='category' scale='point'/>
+                <YAxis
+                    dataKey='image'
+                    fontSize='smaller'
+                    interval={0}
+                    type='category'
+                    scale='point'
+                    padding={{ top: 20, bottom: 20 }}
+                />
                 <CartesianGrid strokeDasharray='3 3' />
                 <Tooltip
                     contentStyle={{ color: 'black' }}
