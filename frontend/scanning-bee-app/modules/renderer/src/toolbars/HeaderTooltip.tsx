@@ -78,7 +78,7 @@ export const HeaderTooltip = (props: { page: any, setPage: any }) => {
     const folder = useAnnotationsFolder();
 
     return (<div className="header-container flex-center header-container-left" style={{ width: '35%', marginLeft: '10px' }}>
-        {props.page === 'manual-annotator'
+        {(props.page === 'manual-annotator' || props.page === 'statistics')
         && <Popover
             interactionKind='click'
             position='bottom'
