@@ -2,14 +2,17 @@ from django.urls.converters import StringConverter
 from datetime import datetime
 
 
-class DateTimeConverter(StringConverter):
-    regex = '\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}'
+class DateTimeConverter:
+    # The regex for matching the URL path segment
+    regex = r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{6}Z'
 
     def to_python(self, value):
-        return datetime.strptime(value, '%Y-%m-%d_%H-%M-%S')
+        # Convert the matched string to a Python datetime object
+        return datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%fZ')
 
     def to_url(self, value):
-        return value.strftime('%Y-%m-%d_%H-%M-%S')
+        # Convert a Python datetime object to a string format for the URL
+        return value.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
 
 class FloatConverter(StringConverter):

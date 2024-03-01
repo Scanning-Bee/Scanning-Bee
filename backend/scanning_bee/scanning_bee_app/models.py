@@ -54,7 +54,7 @@ class Image(models.Model):
 class CellContent(models.Model):
     cell = models.ForeignKey(Cell, on_delete=models.PROTECT, null=True)
     frame = models.ForeignKey(Frame, on_delete=models.PROTECT, default=1)
-    timestamp = models.DateTimeField(auto_now_add=True, blank=True)
+    timestamp = models.DateTimeField(blank=True)
     content = models.ForeignKey(Content, on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     center_x = models.IntegerField()
@@ -66,9 +66,10 @@ class CellContent(models.Model):
         return str(self.pk) + " - " + self.content.name + " - " + str(self.cell)
 
     def save(self, *args, **kwargs):
-        my_image = Image.objects.get(pk = self.image.pk)
+        my_image = Image.objects.get(pk=self.image.pk)
         x_pos = my_image.x_pos
         y_pos = my_image.y_pos
+        self.timestamp = my_image.timestamp
 
         calculated_x, calculated_y = convert_to_world_coordinates((self.center_x, self.center_y), x_pos, y_pos)
 

@@ -19,11 +19,17 @@ from AI.test import test_lines
 
 ##################### USER TYPE #####################
 class UserTypeList(ListCreateAPIView):
-    queryset = UserType.objects.all()
     serializer_class = UserTypeSerializer
 
+    def get_queryset(self, *args, **kwargs):
+        queryset = UserType.objects.all()
+        pk = self.kwargs.get('id')
+        if pk:
+            queryset = queryset.filter(id=pk)
+        return queryset
 
-class SingleUserType(RetrieveUpdateDestroyAPIView):
+
+class UserTypeDetail(RetrieveUpdateDestroyAPIView):
     queryset = UserType.objects.all()
     serializer_class = UserTypeSerializer
     lookup_field = 'id'
@@ -31,11 +37,17 @@ class SingleUserType(RetrieveUpdateDestroyAPIView):
 
 ##################### USER #####################
 class UserList(ListCreateAPIView):
-    queryset = User.objects.all()
     serializer_class = UserSerializer
 
+    def get_queryset(self, *args, **kwargs):
+        queryset = User.objects.all()
+        pk = self.kwargs.get('id')
+        if pk:
+            queryset = queryset.filter(id=pk)
+        return queryset
 
-class SingleUser(RetrieveUpdateDestroyAPIView):
+
+class UserDetail(RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'id'
@@ -43,11 +55,17 @@ class SingleUser(RetrieveUpdateDestroyAPIView):
 
 ##################### FRAME #####################
 class FrameList(ListCreateAPIView):
-    queryset = Frame.objects.all()
     serializer_class = FrameSerializer
 
+    def get_queryset(self, *args, **kwargs):
+        queryset = Frame.objects.all()
+        pk = self.kwargs.get('id')
+        if pk:
+            queryset = queryset.filter(id=pk)
+        return queryset
 
-class SingleFrame(RetrieveUpdateDestroyAPIView):
+
+class FrameDetail(RetrieveUpdateDestroyAPIView):
     queryset = Frame.objects.all()
     serializer_class = FrameSerializer
     lookup_field = 'id'
@@ -55,43 +73,46 @@ class SingleFrame(RetrieveUpdateDestroyAPIView):
 
 ##################### CELL #####################
 class CellList(ListCreateAPIView):
-    queryset = Cell.objects.all()
     serializer_class = CellSerializer
 
-
-class CellListByLocation(ListCreateAPIView):
-    serializer_class = CellSerializer
-    threshold = CELL_LOC_THRESHOLD
-
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         queryset = Cell.objects.all()
-        location_on_frame_x = self.request.query_params.get('location_on_frame_x', None)
-        location_on_frame_y = self.request.query_params.get('location_on_frame_y', None)
+        pk = self.kwargs.get('id')
 
-        if location_on_frame_x is not None and location_on_frame_y is not None:
-            try:
-                # Convert parameters to float and validate
-                location_on_frame_x = float(location_on_frame_x)
-                location_on_frame_y = float(location_on_frame_y)
+        if pk:
+            queryset = queryset.filter(id=pk)
 
-                # Calculate the range for x and y based on the threshold
-                x_min, x_max = location_on_frame_x - self.threshold, location_on_frame_x + self.threshold
-                y_min, y_max = location_on_frame_y - self.threshold, location_on_frame_y + self.threshold
+        filter_type = self.kwargs.get('filter_type')
 
-                # Filter the queryset within the range for both x and y
-                queryset = queryset.filter(
-                    location_on_frame_x__gte=x_min, location_on_frame_x__lte=x_max,
-                    location_on_frame_y__gte=y_min, location_on_frame_y__lte=y_max
-                )
-            except ValueError:
-                # Handle cases where the conversion fails
-                raise ValidationError(
-                    "Invalid parameters: Ensure 'location_on_frame_x' and 'location_on_frame_y' are valid numbers.")
+        if filter_type == 'location':
+            threshold = CELL_LOC_THRESHOLD
+            location_on_frame_x = self.kwargs.get('location_on_frame_x', None)
+            location_on_frame_y = self.kwargs.get('location_on_frame_y', None)
+
+            if location_on_frame_x is not None and location_on_frame_y is not None:
+                try:
+                    # Convert parameters to float and validate
+                    location_on_frame_x = float(location_on_frame_x)
+                    location_on_frame_y = float(location_on_frame_y)
+
+                    # Calculate the range for x and y based on the threshold
+                    x_min, x_max = location_on_frame_x - threshold, location_on_frame_x + threshold
+                    y_min, y_max = location_on_frame_y - threshold, location_on_frame_y + threshold
+
+                    # Filter the queryset within the range for both x and y
+                    queryset = queryset.filter(
+                        location_on_frame_x__gte=x_min, location_on_frame_x__lte=x_max,
+                        location_on_frame_y__gte=y_min, location_on_frame_y__lte=y_max
+                    )
+                except ValueError:
+                    # Handle cases where the conversion fails
+                    raise ValidationError(
+                        "Invalid parameters: Ensure 'location_on_frame_x' and 'location_on_frame_y' are valid numbers.")
 
         return queryset
 
 
-class SingleCell(RetrieveUpdateDestroyAPIView):
+class CellDetail(RetrieveUpdateDestroyAPIView):
     queryset = Cell.objects.all()
     serializer_class = CellSerializer
     lookup_field = 'id'
@@ -99,11 +120,17 @@ class SingleCell(RetrieveUpdateDestroyAPIView):
 
 ##################### CONTENT #####################
 class ContentList(ListCreateAPIView):
-    queryset = Content.objects.all()
     serializer_class = ContentSerializer
 
+    def get_queryset(self, *args, **kwargs):
+        queryset = Content.objects.all()
+        pk = self.kwargs.get('id')
+        if pk:
+            queryset = queryset.filter(id=pk)
+        return queryset
 
-class SingleContent(RetrieveUpdateDestroyAPIView):
+
+class ContentDetail(RetrieveUpdateDestroyAPIView):
     queryset = Content.objects.all()
     serializer_class = ContentSerializer
     lookup_field = 'id'
@@ -113,14 +140,18 @@ class SingleContent(RetrieveUpdateDestroyAPIView):
 class CellContentList(ListCreateAPIView):
     serializer_class = CellContentSerializer
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         queryset = CellContent.objects.all()
-        filter_type = self.kwargs.get('filter_type')
+        pk = self.kwargs.get('id')
 
+        if pk:
+            queryset = queryset.filter(id=pk)
+
+        filter_type = self.kwargs.get('filter_type')
         if filter_type == "image_name":
             image_name = self.kwargs.get('arg')
-            image = Image.objects.get(image_name=image_name)
-            queryset = queryset.filter(image=image.pk)
+            image_list = Image.objects.filter(image_name=image_name)
+            queryset = queryset.filter(image__in=image_list)
 
         elif filter_type == "image_name_rect":
             image_name = self.kwargs.get('arg')
@@ -141,6 +172,18 @@ class CellContentList(ListCreateAPIView):
 
             else:
                 queryset = queryset.none()
+
+        elif filter_type == "location":
+            x_pos = self.kwargs.get('x_pos')
+            y_pos = self.kwargs.get('y_pos')
+            timestamp = self.kwargs.get('timestamp')
+            image_queryset = Image.objects.filter(x_pos=x_pos, y_pos=y_pos)
+
+            if timestamp is not None:
+                image_queryset = image_queryset.filter(timestamp=timestamp)
+
+            image_list = list(image_queryset)
+            queryset = queryset.filter(image__in=image_list)
 
         return queryset
 
@@ -170,19 +213,18 @@ class CellContentList(ListCreateAPIView):
             return super().create(request, *args, **kwargs)
 
 
-class SingleCellContent(RetrieveUpdateDestroyAPIView):
-    queryset = CellContent.objects.all()
-    serializer_class = CellContentSerializer
-    lookup_field = 'id'
+class CellContentDetail(RetrieveUpdateDestroyAPIView):
+        queryset = CellContent.objects.all()
+        serializer_class = CellContentSerializer
+        lookup_field = 'id'
 
-# TODO: AI değil de dümdüz image'ı xpos ve ypos ile çekme view'i oluşturulacak
 # TODO: Ege'nin bu yaml metadatası ve image dosyalarını AnnotationFiles'tan otomatik olarak okuyup database'e kaydetme opsiyonu eklenecek
 
 class CellContentsByAI(ListCreateAPIView):
     serializer_class = CellContentSerializer
 
-    def get(self, request,  image_x_pos, image_y_pos, timestamp=None, format=None):
-        queryset = Image.objects.filter(x_pos=image_x_pos, y_pos=image_y_pos)
+    def get(self, request,  x_pos, y_pos, timestamp=None, format=None):
+        queryset = Image.objects.filter(x_pos=x_pos, y_pos=y_pos)
         print('queryset', queryset)
         if timestamp is not None:
             queryset = queryset.objects.filter(timestamp=timestamp)
@@ -217,7 +259,46 @@ class CellContentsByAI(ListCreateAPIView):
         serializer = CellContentSerializer(cell_contents, many=True)
         return Response(serializer.data)
 
-
+######################## IMAGE ##################################
 class ImageList(ListCreateAPIView):
+    serializer_class = ImageSerializer
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = Image.objects.all()
+        pk = self.kwargs.get('id')
+
+        if pk:
+            queryset = queryset.filter(id=pk)
+        filter_type = self.kwargs.get('filter_type')
+
+        if filter_type == 'location':
+            x_pos = self.kwargs.get('x_pos')
+            y_pos = self.kwargs.get('y_pos')
+            timestamp = self.kwargs.get('timestamp')
+            queryset = queryset.filter(x_pos=x_pos, y_pos=y_pos)
+
+            if timestamp is not None:
+                queryset = queryset.filter(timestamp=timestamp)
+
+        elif filter_type == 'name':
+            name = self.kwargs.get('name')
+            queryset = queryset.filter(name=name)
+
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def perform_create(self, serializer):
+        # Customize the save operation here if needed
+        serializer.save()
+
+
+class ImageDetail(RetrieveUpdateDestroyAPIView):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
+    lookup_field = 'id'
