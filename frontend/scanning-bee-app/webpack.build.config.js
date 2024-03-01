@@ -6,6 +6,8 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 const APP_NAME = process.env.APP_NAME || 'Scanning Bee';
 
+const SCANNING_BEE_VERSION = process.env.SCANNING_BEE_VERSION || 'dev';
+
 const commonConfig = {
     mode: 'production',
     module: {
@@ -38,7 +40,7 @@ module.exports = [
     {
         ...commonConfig,
         entry: {
-            'index': path.resolve(__dirname, 'packages/main/dist/src/index.js'),
+            'index': path.resolve(__dirname, 'modules/main/dist/src/index.js'),
         },
         target: 'electron-main',
         optimization: {
@@ -58,7 +60,7 @@ module.exports = [
         plugins: [
             new webpack.EnvironmentPlugin({
                 FLUENTFFMPEG_COV: false,
-                SCANNING_BEE_VERSION: process.env.SCANNING_BEE_VERSION,
+                SCANNING_BEE_VERSION: SCANNING_BEE_VERSION,
                 APP_NAME,
             })
         ],
@@ -69,21 +71,23 @@ module.exports = [
     {
         ...commonConfig,
         entry: {
-            'index': path.resolve(__dirname, 'packages/renderer/dist/src/index.js'),
+            'index': path.resolve(__dirname, 'modules/renderer/dist/src/index.js'),
         },
         resolve: {
             alias: {
-                '@frontend': path.resolve(__dirname, 'packages/renderer/dist/src/'),
-                '@utils': path.resolve(__dirname, 'packages/renderer/dist/src/utils/'),
-                '@assets': path.resolve(__dirname, 'packages/renderer/assets/'),
+                '@frontend': path.resolve(__dirname, 'modules/renderer/dist/src/'),
+                '@utils': path.resolve(__dirname, 'modules/renderer/dist/src/utils/'),
+                '@assets': path.resolve(__dirname, 'modules/renderer/assets/'),
             },
         },
         target: 'electron-renderer',
-        externals: externalsObject,
+        externals: {
+            'electron': 'commonjs electron',
+        },
         plugins: [
             new webpack.EnvironmentPlugin({
                 APP_NAME,
-                SCANNING_BEE_VERSION: process.env.SCANNING_BEE_VERSION,
+                SCANNING_BEE_VERSION: SCANNING_BEE_VERSION,
             }),
             new WebpackObfuscator({
                 compact: true,

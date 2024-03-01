@@ -3,6 +3,7 @@
 const packageJson = require(path.join(process.cwd(), 'package.json'));
 
 let version = process.env.SCANNING_BEE_VERSION;
+console.log('version:', version);
 if (version && version.length >= 1 && version[0] === 'v') {
     version = version.slice(1);
 }
