@@ -1,8 +1,10 @@
 from django.forms import ValidationError
 from django.db import transaction
+from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view  # Import the api_view decorator
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from rest_framework import status
 
@@ -10,7 +12,14 @@ from .models import *
 from .serializers import *
 from .real_world_coordiantes import convert_to_world_coordinates
 
+from datetime import datetime, timezone
+
 import sys
+import os
+import yaml
+import logging
+
+logger = logging.getLogger(__name__)
 
 sys.path.insert(0, '../../')
 
@@ -298,15 +307,80 @@ class ImageList(ListCreateAPIView):
         serializer.save()
 
 
-# class ImageScrape(ListCreateASPIView):
-#     # 
-
-
 class ImageDetail(RetrieveUpdateDestroyAPIView):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
     lookup_field = 'id'
 
+
+class ImageScraper(ListCreateAPIView):
+    serializer_class = ImageSerializer
+
+    def post(self, request, *args, **kwargs):
+        # Use 'path' from request data as an absolute path
+        relative_path = request.data.get('path')
+        if not relative_path:
+            return Response({"error": "Path parameter is missing."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # if not os.path.isabs(relative_path):
+        #     return Response({"error": "The provided path is not an absolute path."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        print(f"Current Working Directory: {os.getcwd()}")
+        print(f"Looking for metadata.yaml at: {relative_path}")
+
+        # Verify if the file exists before attempting to open it
+        if not os.path.exists(relative_path):
+            return Response({"error": f"Metadata file not found at the provided path: {relative_path}"}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            metadata_path = os.path.join(relative_path, 'metadata.yaml')
+
+            with open(metadata_path, 'r') as file:
+                metadata = yaml.safe_load(file)
+            
+            bag_name = metadata.get('images', {}).get('bag_name', None)
+            if not bag_name:
+                return Response({"error": "Bag name is missing in metadata."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            bag, created = Bag.objects.get_or_create(name=bag_name)
+            
+            image_data_list = metadata.get('images', {}).get('image_data', [])
+            created_images = []
+
+            for i, item in enumerate(image_data_list):
+                if i < len(image_data_list) - 1:
+                    image_name = image_data_list[i + 1]['prev_image']
+                else:
+                    image_name = "final_image.jpg"  # Adjust as necessary
+                
+                timestamp = datetime.fromtimestamp(item['sec'], tz=timezone.utc)
+                image_instance_data = {
+                    'image_name': image_name,
+                    'x_pos': item.get('x_pos'),
+                    'y_pos': item.get('y_pos'),
+                    'timestamp': timestamp,
+                    'bag': bag.id
+                }
+                
+                serializer = self.get_serializer(data=image_instance_data)
+                if serializer.is_valid():
+                    serializer.save()
+                    created_images.append(serializer.data)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            return Response({"created_images": created_images}, status=status.HTTP_201_CREATED)
+        
+        except FileNotFoundError:
+            logger.error(f"Metadata file not found at: {metadata_path}")
+            return JsonResponse({"error": f"Metadata file not found at the provided path: {metadata_path}"}, status=404)
+        except PermissionError:
+            logger.error(f"Permission denied for file at: {metadata_path}")
+            return JsonResponse({"error": "Permission denied for accessing the file."}, status=403)
+        except Exception as e:
+            logger.error(f"Unexpected error accessing file at {metadata_path}: {e}")
+            return JsonResponse({"error": str(e)}, status=500)
+        
 
 ######################## BAG ##################################
 class BagList(ListCreateAPIView):
@@ -320,7 +394,7 @@ class BagList(ListCreateAPIView):
             queryset = queryset.filter(id=pk)
 
         return queryset
-    
+
 
 class BagDetail(RetrieveUpdateDestroyAPIView):
     queryset = Bag.objects.all()
