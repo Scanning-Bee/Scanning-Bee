@@ -42,3 +42,8 @@ class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
         fields = '__all__'
+
+class BagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bag
+        fields = '__all__'

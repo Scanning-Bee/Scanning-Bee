@@ -43,12 +43,15 @@ class Content(models.Model):
     def __str__(self):
         return self.name
 
+class Bag(models.Model):
+    name = models.CharField(max_length=100, null=True, blank=True)
 
 class Image(models.Model):
     image_name = models.CharField(max_length=100)
     x_pos = models.FloatField()
     y_pos = models.FloatField()
     timestamp = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    bag = models.ForeignKey(Bag, on_delete=models.PROTECT, null=True)
 
 
 class CellContent(models.Model):
