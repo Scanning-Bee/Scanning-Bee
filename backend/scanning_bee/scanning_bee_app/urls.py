@@ -50,5 +50,10 @@ urlpatterns = [
     path('image_list/<str:filter_type>/<float:x_pos>/<float:y_pos>/<datetime:timestamp>', views.ImageList.as_view(), name='image-details'),
 
     path('image_detail/<int:id>', views.ImageDetail.as_view(), name='image-details'),
+
+    path('bag_list', views.BagList.as_view(), name='bag-list'),
+    path('bag_list/<int:id>', views.BagList.as_view(), name='bag-list'),
+
+    path('bag_detail/<int:id>', views.BagDetail.as_view(), name='bag-detail'),
 ]
 

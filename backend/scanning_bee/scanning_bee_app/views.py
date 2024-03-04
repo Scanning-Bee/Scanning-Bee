@@ -298,7 +298,31 @@ class ImageList(ListCreateAPIView):
         serializer.save()
 
 
+# class ImageScrape(ListCreateASPIView):
+#     # 
+
+
 class ImageDetail(RetrieveUpdateDestroyAPIView):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
+    lookup_field = 'id'
+
+
+######################## BAG ##################################
+class BagList(ListCreateAPIView):
+    serializer_class = BagSerializer
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = Bag.objects.all()
+        pk = self.kwargs.get('id')
+
+        if pk:
+            queryset = queryset.filter(id=pk)
+
+        return queryset
+    
+
+class BagDetail(RetrieveUpdateDestroyAPIView):
+    queryset = Bag.objects.all()
+    serializer_class = BagSerializer
     lookup_field = 'id'
