@@ -47,6 +47,7 @@ urlpatterns = [
     path('image_list/<int:id>', views.ImageList.as_view(), name='image-details'),
     path('image_list/<str:filter_type>/<str:name>', views.ImageList.as_view(), name='image-details'),
     path('image_list/<str:filter_type>/<float:x_pos>/<float:y_pos>', views.ImageList.as_view(), name='image-details'),
+    path('image_list/<str:filter_type>/<float:x_pos>/<float:y_pos>/<datetime:timestamp>', views.ImageList.as_view(), name='image-details'),
 
     path('image_detail/<int:id>', views.ImageDetail.as_view(), name='image-details'),
 ]
