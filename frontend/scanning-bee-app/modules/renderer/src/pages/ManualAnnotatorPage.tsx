@@ -10,6 +10,7 @@ import { useTheme } from '@frontend/slices/themeSlice';
 import { AnnotatedImage } from '@frontend/toolbars/ManualAnnotator/AnnotatedImage';
 import { AnnotationEditorTools } from '@frontend/toolbars/ManualAnnotator/AnnotationEditorTools';
 import { ManualAnnotatorPanel } from '@frontend/toolbars/ManualAnnotator/ManualAnnotatorPanel';
+import { ModeButton } from '@frontend/toolbars/ManualAnnotator/ModeButton';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import React, { useEffect, useState } from 'react';
 
@@ -127,6 +128,7 @@ export const ManualAnnotatorPage = () => {
                         setGridOpen(!gridOpen);
                     }}
                 />
+                <ModeButton />
             </div>
         </div>
     );
