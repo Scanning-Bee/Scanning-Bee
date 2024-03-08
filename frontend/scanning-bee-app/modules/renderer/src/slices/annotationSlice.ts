@@ -44,8 +44,16 @@ const annotationSlice = createSlice({
             const { folder, annotations, images } = action.payload;
             state.annotationsFolder = folder;
             state.annotationObjects = annotations;
-            state.images = images;
             state.activeAnnotationIds = [];
+
+            const sortedImages = [...images].sort((a, b) => {
+                const imageNumberA = parseInt(a.split('.')[0].split('_')[1], 10);
+                const imageNumberB = parseInt(b.split('.')[0].split('_')[1], 10);
+
+                return imageNumberA - imageNumberB;
+            });
+
+            state.images = sortedImages;
         },
         addAnnotation(state, action: PayloadAction<AnnotationPropsWithID>) {
             state.annotationObjects = [...state.annotationObjects, action.payload];

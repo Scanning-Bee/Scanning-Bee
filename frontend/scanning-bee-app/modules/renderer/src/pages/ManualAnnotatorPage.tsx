@@ -1,4 +1,4 @@
-import { Button, Icon } from '@blueprintjs/core';
+import { Button, ButtonGroup, Icon } from '@blueprintjs/core';
 import CellType from '@frontend/models/cellType';
 import {
     useActiveAnnotations,
@@ -48,6 +48,8 @@ export const ManualAnnotatorPage = () => {
         return <PickFolderPage />;
     }
 
+    const shownImageIndex = images.indexOf(shownImageUrl);
+
     return (
         <div style={{
             color: theme.primaryForeground,
@@ -78,10 +80,39 @@ export const ManualAnnotatorPage = () => {
                 />
             </div>
 
-            <div className='column-flex-center' style={{ width: '100%', height: '100%' }}>
+            <div className='column-flex-center' style={{ width: '100%' }}>
                 <AnnotatedImage
                     shownImageUrl={images.find(image => image === shownImageUrl)}
                 />
+
+                <ButtonGroup>
+                    <Button
+                        icon={<Icon icon="chevron-left" style={{ color: theme.primaryForeground }} />}
+                        disabled={shownImageIndex === 0}
+                        onClick={() => {
+                            const index = shownImageIndex;
+                            setShownImageUrl(images[index - 1]);
+                        }}
+                        style={{ background: theme.secondaryBackground, margin: '10px' }}
+                        minimal
+                        large
+                    />
+                    <p
+                        style={{ color: 'black' }}
+                        className='ellipsis-overflow image-navigator-image-name'
+                    >{getFileName(shownImageUrl)}</p>
+                    <Button
+                        icon={<Icon icon="chevron-right" style={{ color: theme.primaryForeground }} />}
+                        disabled={shownImageIndex === images.length - 1}
+                        onClick={() => {
+                            const index = shownImageIndex;
+                            setShownImageUrl(images[index + 1]);
+                        }}
+                        style={{ background: theme.secondaryBackground, margin: '10px' }}
+                        minimal
+                        large
+                    />
+                </ButtonGroup>
                 <AnnotationEditorTools
                     annotations={activeAnnotations}
                     newAnnotationProps={{

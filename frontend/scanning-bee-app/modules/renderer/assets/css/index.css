@@ -376,3 +376,20 @@ a {
   padding: 0;
   color: #333;
 }
+
+.image-navigator-image-name {
+  align-self: center;
+  margin: 0px;
+  max-width: 100px;
+  min-width: 100px;
+  justify-content: center;
+  text-align: center;
+}
+
+.ellipsis-overflow {
+  overflow-wrap: normal;
+  white-space: nowrap; /* Prevent the text from wrapping */
+  overflow: hidden; /* Hide the overflow text */
+  text-overflow: ellipsis; /* Display an ellipsis for clipped text */
+  font-weight: normal;
+}
