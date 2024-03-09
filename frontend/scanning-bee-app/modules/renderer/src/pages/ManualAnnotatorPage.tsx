@@ -86,7 +86,7 @@ export const ManualAnnotatorPage = () => {
                     shownImageUrl={images.find(image => image === shownImageUrl)}
                 />
 
-                <ButtonGroup>
+                <ButtonGroup style={{ height: '60px' }}>
                     <Button
                         icon={<Icon icon="chevron-left" style={{ color: theme.primaryForeground }} />}
                         disabled={shownImageIndex === 0}
