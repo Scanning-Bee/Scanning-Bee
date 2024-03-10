@@ -9,13 +9,15 @@ import {
     removeAnnotation,
 } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 const RadiusSlider = (props: {
     annotations: Annotation[],
 }) => {
     const { annotations } = props;
+
+    const [displayedRadius, setDisplayedRadius] = useState(annotations[0]?.radius || 86);
 
     const dispatch = useDispatch();
 
@@ -38,14 +40,15 @@ const RadiusSlider = (props: {
                 <Slider
                     disabled={disabled}
                     min={0}
-                    max={100}
+                    max={200}
                     stepSize={1}
-                    labelStepSize={10}
-                    onChange={value => dispatch(mutateAnnotation({
+                    labelStepSize={40}
+                    onRelease={value => dispatch(mutateAnnotation({
                         id: annotations[0].id,
                         mutations: { radius: value },
                     }))}
-                    value={annotations[0]?.radius || 86}
+                    value={displayedRadius}
+                    onChange={value => setDisplayedRadius(value)}
                 />
             </div>
         </Popover>
