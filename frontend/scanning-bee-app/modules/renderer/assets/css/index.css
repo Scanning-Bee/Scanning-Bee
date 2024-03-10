@@ -262,7 +262,6 @@ a {
   /* top: 4px; */
   top: 40%;
 
-  box-shadow:   -1px 2px 6px 1px rgba(0,0,0,0.2) !important   ;
   border-radius: 6px;
   z-index: 100;
 }
@@ -326,10 +325,9 @@ a {
 .closed-margin-left {
   /* left:var(--buttonOffset); */
   /* position: relative !important; */
-  right: -58px;
-  /* margin: -20px; */
+  right: -60px;
    /* left: 4px; */
-  top: 8px !important;
+  top: 15px !important;
 }
 
 .button-animation{
@@ -362,8 +360,8 @@ a {
 
 .manual-annotator-toolbar{
   position:absolute;
-  top: 20px;
-  right: 20px;
+  top: 10px;
+  right: 10px;
   padding: 5px;
   border-radius: 5px;
   margin: 5px;
