@@ -10,15 +10,29 @@ import Header from './toolbars/Header';
 
 require('@assets/css/index.css');
 
-const App = (props: { page: PageType, setPage: any, goBack: any }) => {
-    const { page, setPage, goBack } = props;
+const App = (props: {
+    page: PageType,
+    setPage: any,
+    goBack: any,
+    goForward: any
+    getPreviousPage: any,
+    getNextPage: any,
+}) => {
+    const { page, setPage, goBack, goForward, getNextPage, getPreviousPage } = props;
 
     return (
         <Provider store={store}>
             <div
                 id="main-content"
             >
-                <Header page={page} setPage={setPage} />
+                <Header
+                    page={page}
+                    setPage={setPage}
+                    goBack={goBack}
+                    goForward={goForward}
+                    getPreviousPage={getPreviousPage}
+                    getNextPage={getNextPage}
+                />
 
                 {
                     (() => {
@@ -28,7 +42,7 @@ const App = (props: { page: PageType, setPage: any, goBack: any }) => {
                         case 'manual-annotator':
                             return <ManualAnnotatorPage />;
                         case 'settings':
-                            return <SettingsPage goBack={goBack} />;
+                            return <SettingsPage />;
                         case 'statistics':
                             return <StatisticsPage />;
                         default:

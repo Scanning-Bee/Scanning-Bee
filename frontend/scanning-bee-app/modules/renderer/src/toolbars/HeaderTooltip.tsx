@@ -1,10 +1,29 @@
-import { Button, Divider, Menu, MenuDivider, MenuItem, Popover } from '@blueprintjs/core';
+import { Button, Divider, Icon, Menu, MenuDivider, MenuItem, Popover } from '@blueprintjs/core';
 import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
 import { resetAnnotations, useAnnotationsFolder } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import React from 'react';
 import { useDispatch } from 'react-redux';
+
+const HomeButton = (props: { setPage: any }) => {
+    const { setPage } = props;
+
+    const theme = useTheme();
+
+    return (
+        <Button
+            minimal
+            icon={<Icon icon="home" style={{ color: theme.secondaryForeground }} />}
+            onClick={(e) => {
+                e.preventDefault();
+                setPage('home');
+            }}
+            style={{ padding: '5px', margin: '2px 5px 2px 2px' }}
+            className='header-button'
+        />
+    );
+};
 
 const TooltipButton = (props: { folder: string }) => {
     const theme = useTheme();
@@ -74,12 +93,42 @@ const TooltipMenu = (props: { folder: string }) => {
     </div>);
 };
 
-export const HeaderTooltip = (props: { page: any, setPage: any }) => {
+export const HeaderTooltip = (props: {
+    page: any,
+    setPage: any,
+    goBack: any,
+    goForward: any,
+    getPreviousPage: any,
+    getNextPage: any,
+}) => {
     const folder = useAnnotationsFolder();
 
-    return (<div className="header-container flex-center header-container-left" style={{ width: '35%', marginLeft: '10px' }}>
-        {(props.page === 'manual-annotator' || props.page === 'statistics')
-        && <Popover
+    const hideTooltip = props.page === 'home' && !folder;
+
+    if (hideTooltip) {
+        return null;
+    }
+
+    return (<div
+        className="header-container flex-center header-container-left"
+        style={{ margin: '0 30px 0 -30px', width: '100%' }}
+    >
+        <Button
+            icon='arrow-left'
+            style={{ alignSelf: 'center' }}
+            onClick={() => props.goBack()}
+            disabled={!props.getPreviousPage()}
+            minimal
+        />
+        <Button
+            icon='arrow-right'
+            style={{ alignSelf: 'center' }}
+            onClick={() => props.goForward()}
+            disabled={!props.getNextPage()}
+            minimal
+        />
+        <HomeButton setPage={props.setPage} />
+        <Popover
             interactionKind='click'
             position='bottom'
             disabled={!folder}
@@ -90,6 +139,5 @@ export const HeaderTooltip = (props: { page: any, setPage: any }) => {
             <TooltipButton folder={folder} />
             <TooltipMenu folder={folder} />
         </Popover>
-        }
     </div>);
 };

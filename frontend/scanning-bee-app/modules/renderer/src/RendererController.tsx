@@ -59,6 +59,12 @@ export class RendererController {
         this.renderAgain();
     }
 
+    public goForward() : void {
+        this.historyService.goForward();
+
+        this.renderAgain();
+    }
+
     public setPage(page: PageType) : void {
         this.historyService.addPage(page);
 
@@ -78,6 +84,9 @@ export class RendererController {
                     page={this.getCurrentPage()}
                     setPage = {p => this.setPage(p)}
                     goBack = {() => this.goBack()}
+                    goForward = {() => this.goForward()}
+                    getPreviousPage = {() => this.historyService.getPreviousPage()}
+                    getNextPage = {() => this.historyService.getNextPage()}
                 />
             </StrictMode>,
             document.getElementById('root'),
@@ -87,7 +96,7 @@ export class RendererController {
     initialize(): void {
         const startPage = 'home';
 
-        this.historyService = new HistoryService(startPage);
+        this.historyService = new HistoryService();
 
         this.setPage(startPage);
     }

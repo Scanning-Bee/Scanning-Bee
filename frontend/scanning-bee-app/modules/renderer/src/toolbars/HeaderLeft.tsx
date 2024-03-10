@@ -1,6 +1,6 @@
 import BeeBlack from '@assets/images/bee-black.png';
 import BeeWhite from '@assets/images/bee-white.png';
-import { Button, Divider } from '@blueprintjs/core';
+import { Button } from '@blueprintjs/core';
 import { useTheme } from '@frontend/slices/themeSlice';
 import React from 'react';
 
@@ -24,7 +24,7 @@ export const HeaderLeft = (props: { page: any, setPage: any }) => {
             className='header-button'
             style={{ padding: '5px' }}
         />
-        {props.page !== 'home' && <>
+        {/* {props.page !== 'home' && <>
             <Divider style={{ margin: '0px 5px 0px 2px', backgroundColor: theme.secondaryForeground, width: '1px', height: '50%' }} />
             <p style={{ margin: 0, color: theme.tertiaryForeground }}>
                 {
@@ -42,6 +42,6 @@ export const HeaderLeft = (props: { page: any, setPage: any }) => {
                     })()
                 }
             </p>
-        </>}
+        </>} */}
     </div>);
 };

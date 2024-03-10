@@ -1,4 +1,4 @@
-import { Button, Tab, Tabs } from '@blueprintjs/core';
+import { Tab, Tabs } from '@blueprintjs/core';
 import { useTheme } from '@frontend/slices/themeSlice';
 import {
     AccessibilitySettings,
@@ -8,9 +8,7 @@ import {
 } from '@frontend/toolbars/SettingsContent/SettingsContent';
 import React, { useState } from 'react';
 
-export const SettingsPage = (props: { goBack: any }) => {
-    const { goBack } = props;
-
+export const SettingsPage = () => {
     const theme = useTheme();
 
     const [activeTab, setActiveTab] = useState('general');
@@ -63,12 +61,6 @@ export const SettingsPage = (props: { goBack: any }) => {
                     />
                     <Tabs.Expander />
                 </Tabs>
-                <Button
-                    icon='arrow-left'
-                    style={{ alignSelf: 'center', position: 'absolute', top: '20px', left: '20px' }}
-                    onClick={() => goBack()}
-                    minimal
-                />
             </div>
         </div>
     );

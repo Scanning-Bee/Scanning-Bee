@@ -8,7 +8,14 @@ import { HeaderButtons } from './HeaderButtons';
 import { HeaderLeft } from './HeaderLeft';
 import { HeaderTooltip } from './HeaderTooltip';
 
-export default function Header(props: { page: PageType, setPage: (page: PageType) => void }) {
+export default function Header(props: {
+    page: PageType,
+    setPage: (page: PageType) => void,
+    goBack: () => void,
+    goForward: () => void,
+    getPreviousPage: () => PageType,
+    getNextPage: () => PageType,
+}) {
     const theme: Theme = useTheme();
 
     const zoom = useZoom();
@@ -29,9 +36,22 @@ export default function Header(props: { page: PageType, setPage: (page: PageType
                     : `0 ${Math.ceil(120 - (zoom * 23))}px 0 0`,
             }}
         >
-            <HeaderLeft page={props.page} setPage={props.setPage} />
-            <HeaderTooltip page={props.page} setPage={props.setPage} />
-            <HeaderButtons page={props.page} setPage={props.setPage} />
+            <div className='header-sub-flex-box' style={{ width: '30%' }}>
+                <HeaderLeft page={props.page} setPage={props.setPage} />
+            </div>
+            <div className='header-sub-flex-box' style={{ width: '40%' }}>
+                <HeaderTooltip
+                    page={props.page}
+                    setPage={props.setPage}
+                    goBack={props.goBack}
+                    goForward={props.goForward}
+                    getPreviousPage={props.getPreviousPage}
+                    getNextPage={props.getNextPage}
+                />
+            </div>
+            <div className='header-sub-flex-box' style={{ width: '30%' }}>
+                <HeaderButtons page={props.page} setPage={props.setPage} />
+            </div>
         </div>
     );
 }

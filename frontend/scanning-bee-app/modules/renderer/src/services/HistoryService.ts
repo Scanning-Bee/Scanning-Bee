@@ -4,14 +4,20 @@ export class HistoryService {
 
     private index: number;
 
-    constructor(startPage: PageType) {
-        this.history = [startPage];
-        this.index = 0;
+    constructor() {
+        this.history = [];
+        this.index = -1;
     }
 
     goBack() {
         if (this.index > 0) {
             this.index--;
+        }
+    }
+
+    goForward() {
+        if (this.index < this.history.length - 1) {
+            this.index++;
         }
     }
 
@@ -29,25 +35,26 @@ export class HistoryService {
     }
 
     getPreviousPage() {
+        console.log(this.history, this.index);
+
         if (this.index > 0) {
-            this.index--;
-            return this.history[this.index];
+            return this.history[this.index - 1];
         }
         return null;
     }
 
     getNthPreviousPage(n: number) {
         if (this.index - n >= 0) {
-            this.index -= n;
-            return this.history[this.index];
+            return this.history[this.index - n];
         }
         return null;
     }
 
     getNextPage() {
+        console.log(this.history, this.index);
+
         if (this.index < this.history.length - 1) {
-            this.index++;
-            return this.history[this.index];
+            return this.history[this.index + 1];
         }
         return null;
     }
