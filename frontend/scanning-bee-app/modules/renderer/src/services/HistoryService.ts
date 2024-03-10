@@ -35,8 +35,6 @@ export class HistoryService {
     }
 
     getPreviousPage() {
-        console.log(this.history, this.index);
-
         if (this.index > 0) {
             return this.history[this.index - 1];
         }
@@ -51,8 +49,6 @@ export class HistoryService {
     }
 
     getNextPage() {
-        console.log(this.history, this.index);
-
         if (this.index < this.history.length - 1) {
             return this.history[this.index + 1];
         }
