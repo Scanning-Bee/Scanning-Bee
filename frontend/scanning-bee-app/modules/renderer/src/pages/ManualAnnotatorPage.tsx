@@ -58,8 +58,8 @@ export const ManualAnnotatorPage = () => {
         }} className={`page ${gridOpen && 'grid'}`}>
             <div id="left-panel" className='panel'>
                 <Button
-                    icon={<Icon icon={leftPanelOpen ? 'arrow-left' : 'arrow-right'} style={{ color: theme.primaryForeground }} />}
-                    className={`panel-button button-animation ${leftPanelOpen ? 'open-margin-left' : 'closed-margin-left'}`}
+                    icon={<Icon icon={'menu'} style={{ color: theme.primaryForeground }} />}
+                    className={'panel-button button-animation closed-margin-left'}
                     onClick={
                         (e) => {
                             // ? this section prevents button spamming with spacebar.
