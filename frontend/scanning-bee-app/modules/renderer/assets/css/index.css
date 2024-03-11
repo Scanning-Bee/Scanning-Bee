@@ -61,6 +61,7 @@ a {
   height: calc(100% - var(--headerSpace));
   
   overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 #left-panel {

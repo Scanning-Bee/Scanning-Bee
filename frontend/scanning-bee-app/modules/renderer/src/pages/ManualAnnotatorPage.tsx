@@ -1,10 +1,12 @@
 import { Button, ButtonGroup, Icon } from '@blueprintjs/core';
 import CellType from '@frontend/models/cellType';
 import {
+    showImageWithURL,
     useActiveAnnotations,
     useAnnotations,
     useAnnotationsFolder,
     useImages,
+    useShownImageUrl,
 } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { AnnotatedImage } from '@frontend/toolbars/ManualAnnotator/AnnotatedImage';
@@ -13,20 +15,27 @@ import { ManualAnnotatorPanel } from '@frontend/toolbars/ManualAnnotator/ManualA
 import { ModeButton } from '@frontend/toolbars/ManualAnnotator/ModeButton';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { PickFolderPage } from './PickFolderPage';
 
 export const ManualAnnotatorPage = () => {
     const theme = useTheme();
 
-    const [shownImageUrl, setShownImageUrl] = useState<string | undefined>(undefined);
     const [leftPanelOpen, setLeftPanelOpen] = useState<boolean>(true);
     const [gridOpen, setGridOpen] = useState<boolean>(true);
 
     const folder = useAnnotationsFolder();
+    const shownImageUrl = useShownImageUrl();
     const activeAnnotations = useActiveAnnotations();
     const annotations = useAnnotations();
     const images = useImages();
+
+    const dispatch = useDispatch();
+
+    const setShownImageUrl = (url: string) => {
+        dispatch(showImageWithURL(url));
+    };
 
     useEffect(() => {
         // if no image is shown or the image shown is not in the folder, set the shown image to the first image in the folder

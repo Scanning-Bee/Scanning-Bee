@@ -1,6 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 
+import { HotkeyHandler } from './Hotkeys';
 import { HomePage } from './pages/HomePage';
 import { ManualAnnotatorPage } from './pages/ManualAnnotatorPage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -49,6 +50,10 @@ const App = (props: {
                             return <div>Page not found</div>;
                         }
                     })()
+                }
+
+                {
+                    page === 'manual-annotator' && <HotkeyHandler />
                 }
             </div>
         </Provider>
