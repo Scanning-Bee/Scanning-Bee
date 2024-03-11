@@ -125,7 +125,7 @@ export const ManualAnnotatorPage = () => {
                     />
                 </ButtonGroup>
                 <AnnotationEditorTools
-                    annotations={activeAnnotations}
+                    activeAnnotations={activeAnnotations}
                     newAnnotationProps={{
                         center: [480, 270],
                         radius: 86,

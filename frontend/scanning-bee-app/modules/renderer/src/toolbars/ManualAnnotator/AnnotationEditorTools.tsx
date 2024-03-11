@@ -13,15 +13,15 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 const RadiusSlider = (props: {
-    annotations: Annotation[],
+    activeAnnotations: Annotation[],
 }) => {
-    const { annotations } = props;
+    const { activeAnnotations } = props;
 
-    const [displayedRadius, setDisplayedRadius] = useState(annotations[0]?.radius || 86);
+    const [displayedRadius, setDisplayedRadius] = useState(activeAnnotations[0]?.radius || 86);
 
     const dispatch = useDispatch();
 
-    const disabled = annotations.length !== 1;
+    const disabled = activeAnnotations.length !== 1;
 
     const theme = useTheme();
 
@@ -44,10 +44,11 @@ const RadiusSlider = (props: {
                     stepSize={1}
                     labelStepSize={40}
                     onRelease={value => dispatch(mutateAnnotation({
-                        id: annotations[0].id,
+                        id: activeAnnotations[0].id,
                         mutations: { radius: value },
                     }))}
                     value={displayedRadius}
+                    initialValue={displayedRadius}
                     onChange={value => setDisplayedRadius(value)}
                 />
             </div>
@@ -56,16 +57,16 @@ const RadiusSlider = (props: {
 };
 
 const CellTypePicker = (props: {
-    annotations: Annotation[],
+    activeAnnotations: Annotation[],
 }) => {
-    const { annotations } = props;
+    const { activeAnnotations } = props;
 
     const dispatch = useDispatch();
 
-    const allAnnotationsAreSameCellType = annotations.length !== 0
-        && annotations.every(annotation => annotation.cell_type === annotations[0].cell_type);
+    const allAnnotationsAreSameCellType = activeAnnotations.length !== 0
+        && activeAnnotations.every(annotation => annotation.cell_type === activeAnnotations[0].cell_type);
 
-    const disabled = annotations.length === 0;
+    const disabled = activeAnnotations.length === 0;
 
     const theme = useTheme();
 
@@ -84,11 +85,11 @@ const CellTypePicker = (props: {
                 {Object.keys(CellType).map((cellType, index) => (
                     <MenuItem
                         key={index}
-                        onClick={() => annotations.forEach(annotation => dispatch(mutateAnnotation({
+                        onClick={() => activeAnnotations.forEach(annotation => dispatch(mutateAnnotation({
                             id: annotation.id,
                             mutations: { cell_type: CellType[cellType] },
                         })))}
-                        active={allAnnotationsAreSameCellType && annotations[0].cell_type === CellType[cellType]}
+                        active={allAnnotationsAreSameCellType && activeAnnotations[0].cell_type === CellType[cellType]}
                         disabled={disabled}
                         text={cellType}
                     />
@@ -99,9 +100,9 @@ const CellTypePicker = (props: {
 };
 
 const DeleteAnnotationButton = (props: {
-    annotations: Annotation[],
+    activeAnnotations: Annotation[],
 }) => {
-    const { annotations } = props;
+    const { activeAnnotations } = props;
 
     const dispatch = useDispatch();
 
@@ -110,8 +111,8 @@ const DeleteAnnotationButton = (props: {
             icon={<Icon icon='trash' />}
             intent='danger'
             minimal
-            onClick={() => annotations.forEach(annotation => dispatch(removeAnnotation(annotation.id)))}
-            disabled={annotations.length === 0}
+            onClick={() => activeAnnotations.forEach(annotation => dispatch(removeAnnotation(annotation.id)))}
+            disabled={activeAnnotations.length === 0}
         />
     );
 };
@@ -154,11 +155,11 @@ const EditorButtonPopover = (props: { children: any, disabled?: boolean }) => <P
 </Popover>;
 
 export const AnnotationEditorTools = (props: {
-    annotations: Annotation[],
+    activeAnnotations: Annotation[],
     newAnnotationProps: AnnotationProps,
     toggleGrid: () => void,
 }) => {
-    const { annotations, newAnnotationProps, toggleGrid } = props;
+    const { activeAnnotations, newAnnotationProps, toggleGrid } = props;
 
     const theme = useTheme();
 
@@ -175,20 +176,20 @@ export const AnnotationEditorTools = (props: {
                 <div style={{ padding: '10px' }}>Create Annotation</div>
             </EditorButtonPopover>
 
-            <EditorButtonPopover disabled={annotations.length === 0}>
-                <DeleteAnnotationButton annotations={annotations} />
+            <EditorButtonPopover disabled={activeAnnotations.length === 0}>
+                <DeleteAnnotationButton activeAnnotations={activeAnnotations} />
                 <div style={{ padding: '10px' }}>Delete</div>
             </EditorButtonPopover>
 
             <Divider style={{ width: '100%', backgroundColor: theme.secondaryForeground }} />
 
-            <EditorButtonPopover disabled={annotations.length === 0}>
-                <RadiusSlider annotations={annotations} />
+            <EditorButtonPopover disabled={activeAnnotations.length === 0}>
+                <RadiusSlider activeAnnotations={activeAnnotations} />
                 <div style={{ padding: '10px' }}>Set Radius</div>
             </EditorButtonPopover>
 
-            <EditorButtonPopover disabled={annotations.length === 0}>
-                <CellTypePicker annotations={annotations} />
+            <EditorButtonPopover disabled={activeAnnotations.length === 0}>
+                <CellTypePicker activeAnnotations={activeAnnotations} />
                 <div style={{ padding: '10px' }}>Set Cell Type</div>
             </EditorButtonPopover>
 
