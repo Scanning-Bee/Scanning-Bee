@@ -1,8 +1,10 @@
 import { Button, ButtonGroup, Card, Menu, MenuItem, Popover } from '@blueprintjs/core';
+import { initializeHotkeyConfiguration } from '@frontend/controllers/hotkeyConfiguration';
 import StorageService from '@frontend/services/StorageService';
 import { setTheme, useTheme } from '@frontend/slices/themeSlice';
 import { resetZoom, setZoom } from '@frontend/slices/zoomSlice';
 import { Themes } from '@frontend/utils/colours';
+import { getUnicodeIconRepresentation } from '@frontend/utils/miscUtils';
 import { webFrame } from 'electron';
 import React from 'react';
 import { useDispatch } from 'react-redux';
@@ -84,6 +86,39 @@ export const AccessibilitySettings = () => {
                             intent='primary'
                         />
                     </div>
+                </div>
+            </Card>
+        </div>
+    );
+};
+
+export const KeyboardShortcuts = () => {
+    const theme = useTheme();
+
+    const dispatch = useDispatch();
+
+    const hotkeysContent = initializeHotkeyConfiguration({ dispatch });
+
+    return (
+        <div>
+            <h2 className='settings-title'>Manual Annotator</h2>
+            <Card style={{ backgroundColor: theme.secondaryBackground }}>
+                <div className='settings-card' style={{ flexDirection: 'column' }}>
+                    {
+                        hotkeysContent.map(hotkey => (
+                            <div
+                                key={hotkey.combo}
+                                className='shortcut-settings'
+                            >
+                                <p>
+                                    {hotkey.label}
+                                </p>
+                                <p>
+                                    {getUnicodeIconRepresentation(hotkey.combo)}
+                                </p>
+                            </div>
+                        ))
+                    }
                 </div>
             </Card>
         </div>

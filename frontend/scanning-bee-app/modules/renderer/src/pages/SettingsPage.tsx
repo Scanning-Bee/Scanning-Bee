@@ -4,6 +4,7 @@ import {
     AccessibilitySettings,
     AdvancedSettings,
     GeneralSettings,
+    KeyboardShortcuts,
     ThemeSettings,
 } from '@frontend/toolbars/SettingsContent/SettingsContent';
 import React, { useState } from 'react';
@@ -49,6 +50,13 @@ export const SettingsPage = () => {
                         id='accessibility'
                         title='Accessibility'
                         panel={<AccessibilitySettings />}
+                        className='settings-tab'
+                        style={{ color: theme.primaryForeground }}
+                    />
+                    <Tab
+                        id='keyboard-shortcuts'
+                        title='Keyboard Shortcuts'
+                        panel={<KeyboardShortcuts />}
                         className='settings-tab'
                         style={{ color: theme.primaryForeground }}
                     />

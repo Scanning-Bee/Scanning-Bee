@@ -411,3 +411,17 @@ a {
   text-overflow: ellipsis; /* Display an ellipsis for clipped text */
   font-weight: normal;
 }
+
+.shortcut-settings{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+.shortcut-settings > p{
+  margin: 0px;
+}
