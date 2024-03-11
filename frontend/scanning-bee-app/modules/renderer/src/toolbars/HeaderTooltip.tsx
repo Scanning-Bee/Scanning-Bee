@@ -101,6 +101,8 @@ export const HeaderTooltip = (props: {
     getPreviousPage: any,
     getNextPage: any,
 }) => {
+    const theme = useTheme();
+
     const folder = useAnnotationsFolder();
 
     const hideTooltip = props.page === 'home' && !folder;
@@ -114,14 +116,14 @@ export const HeaderTooltip = (props: {
         style={{ margin: '0 30px 0 -30px', width: '100%' }}
     >
         <Button
-            icon='arrow-left'
+            icon={<Icon icon='arrow-left' style={{ color: theme.secondaryForeground }}/>}
             style={{ alignSelf: 'center' }}
             onClick={() => props.goBack()}
             disabled={!props.getPreviousPage()}
             minimal
         />
         <Button
-            icon='arrow-right'
+            icon={<Icon icon='arrow-right' style={{ color: theme.secondaryForeground }}/>}
             style={{ alignSelf: 'center' }}
             onClick={() => props.goForward()}
             disabled={!props.getNextPage()}
