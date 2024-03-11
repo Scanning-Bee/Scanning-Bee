@@ -3,9 +3,9 @@ import { useTheme } from '@frontend/slices/themeSlice';
 import {
     AccessibilitySettings,
     AdvancedSettings,
+    AppearanceSettings,
     GeneralSettings,
     KeyboardShortcuts,
-    ThemeSettings,
 } from '@frontend/toolbars/SettingsContent/SettingsContent';
 import React, { useState } from 'react';
 
@@ -40,9 +40,9 @@ export const SettingsPage = () => {
                         style={{ color: theme.primaryForeground }}
                     />
                     <Tab
-                        id='theme'
-                        title='Theme'
-                        panel={<ThemeSettings />}
+                        id='appearance'
+                        title='Appearance'
+                        panel={<AppearanceSettings />}
                         className='settings-tab'
                         style={{ color: theme.primaryForeground }}
                     />

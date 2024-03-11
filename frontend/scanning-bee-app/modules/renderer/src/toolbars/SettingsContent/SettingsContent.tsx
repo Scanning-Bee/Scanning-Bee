@@ -16,14 +16,14 @@ export const GeneralSettings = () => (
     </div>
 );
 
-export const ThemeSettings = () => {
+export const AppearanceSettings = () => {
     const theme = useTheme();
 
     const dispatch = useDispatch();
 
     return (
         <div>
-            <h2 className='settings-title'>Theme Settings</h2>
+            <h2 className='settings-title'>Theme</h2>
             <Card style={{ backgroundColor: theme.secondaryBackground }}>
                 <div className='settings-card'>
                     <p>
