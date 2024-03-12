@@ -89,31 +89,31 @@ export const initializeHotkeyConfiguration = (ifc: HotkeyConfigurationInterface)
         },
     },
     {
-        combo: 'up',
+        combo: 'shift + up',
         global: true,
         label: 'Move active annotation up',
         onKeyDown: () => moveAnnotationInDirection(ifc, 'up'),
     },
     {
-        combo: 'down',
+        combo: 'shift + down',
         global: true,
         label: 'Move active annotation down',
         onKeyDown: () => moveAnnotationInDirection(ifc, 'down'),
     },
     {
-        combo: 'left',
+        combo: 'shift + left',
         global: true,
         label: 'Move active annotation left',
         onKeyDown: () => moveAnnotationInDirection(ifc, 'left'),
     },
     {
-        combo: 'right',
+        combo: 'shift + right',
         global: true,
         label: 'Move active annotation right',
         onKeyDown: () => moveAnnotationInDirection(ifc, 'right'),
     },
     {
-        combo: 'shift + right',
+        combo: 'right',
         global: true,
         label: 'Next image',
         onKeyDown: () => {
@@ -134,7 +134,7 @@ export const initializeHotkeyConfiguration = (ifc: HotkeyConfigurationInterface)
         },
     },
     {
-        combo: 'shift + left',
+        combo: 'left',
         global: true,
         label: 'Previous image',
         onKeyDown: () => {
