@@ -67,13 +67,6 @@ export const ManualAnnotatorPanel = (props:{
 
     const annotatedImageNames = annotations.map(annotation => annotation.source_name);
 
-    const sortedImages = [...images].sort((a, b) => {
-        const imageNumberA = parseInt(a.split('.')[0].split('_')[1], 10);
-        const imageNumberB = parseInt(b.split('.')[0].split('_')[1], 10);
-
-        return imageNumberA - imageNumberB;
-    });
-
     return (
         // @ts-ignore
         <SplitPane
@@ -127,7 +120,7 @@ export const ManualAnnotatorPanel = (props:{
             </div>
             <div className='annotated-images-panel'>
                 <h2 style={{ margin: '0 35px 10px ' }}>Images</h2>
-                {sortedImages.map(image => (
+                {images.map(image => (
                     <Button
                         key={image}
                         text={

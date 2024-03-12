@@ -61,6 +61,7 @@ a {
   height: calc(100% - var(--headerSpace));
   
   overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 #left-panel {
@@ -133,6 +134,16 @@ a {
 
 .header-button:focus{
   outline: none;
+}
+
+.header-sub-flex-box{
+  display: flex;
+  align-items: center;
+  height: var(--headerSpace);
+  position: relative;
+  top: 0;
+  margin: unset;
+  /* width: 33%; this is set by header component */
 }
 
 .main-logo{
@@ -252,7 +263,6 @@ a {
   /* top: 4px; */
   top: 40%;
 
-  box-shadow:   -1px 2px 6px 1px rgba(0,0,0,0.2) !important   ;
   border-radius: 6px;
   z-index: 100;
 }
@@ -316,10 +326,9 @@ a {
 .closed-margin-left {
   /* left:var(--buttonOffset); */
   /* position: relative !important; */
-  right: -58px;
-  /* margin: -20px; */
+  right: -60px;
    /* left: 4px; */
-  top: 8px !important;
+  top: 15px !important;
 }
 
 .button-animation{
@@ -352,7 +361,16 @@ a {
 
 .manual-annotator-toolbar{
   position:absolute;
-  top: 20px;
+  top: 10px;
+  right: 10px;
+  padding: 5px;
+  border-radius: 5px;
+  margin: 5px;
+}
+
+.manual-annotator-mode-button{
+  position:absolute;
+  bottom: 20px;
   right: 20px;
   padding: 5px;
   border-radius: 5px;
@@ -375,4 +393,35 @@ a {
   margin: 0;
   padding: 0;
   color: #333;
+}
+
+.image-navigator-image-name {
+  align-self: center;
+  margin: 0px;
+  max-width: 100px;
+  min-width: 100px;
+  justify-content: center;
+  text-align: center;
+}
+
+.ellipsis-overflow {
+  overflow-wrap: normal;
+  white-space: nowrap; /* Prevent the text from wrapping */
+  overflow: hidden; /* Hide the overflow text */
+  text-overflow: ellipsis; /* Display an ellipsis for clipped text */
+  font-weight: normal;
+}
+
+.shortcut-settings{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+.shortcut-settings > p{
+  margin: 0px;
 }

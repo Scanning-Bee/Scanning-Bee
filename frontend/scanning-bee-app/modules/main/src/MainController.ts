@@ -73,7 +73,17 @@ class MainController {
     }
 
     private initMainMenu() {
-        let generalSubmenuItems: MenuItemConstructorOptions[] = [];
+        app.setAboutPanelOptions({
+            applicationName: 'Scanning Bee',
+            applicationVersion: app.getVersion(),
+            version: app.getVersion(),
+            iconPath: ICON_PATH,
+        });
+
+        let generalSubmenuItems: MenuItemConstructorOptions[] = [{
+            label: 'About Scanning Bee',
+            click: () => { app.showAboutPanel(); },
+        }];
 
         if (IS_MAC) {
             const servicesMenu = new Menu();

@@ -96,7 +96,7 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
     };
 
     return (
-        <span style={{ height: '540px' }}>
+        <span style={{ height: '540px', marginTop: '60px' }}>
             <img
                 src={shownImageUrl}
                 alt='Annotated image'

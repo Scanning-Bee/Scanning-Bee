@@ -1,41 +1,18 @@
-import { Button, Tab, Tabs } from '@blueprintjs/core';
+import { Tab, Tabs } from '@blueprintjs/core';
 import { useTheme } from '@frontend/slices/themeSlice';
 import {
     AccessibilitySettings,
     AdvancedSettings,
+    AppearanceSettings,
     GeneralSettings,
-    ThemeSettings,
+    KeyboardShortcuts,
 } from '@frontend/toolbars/SettingsContent/SettingsContent';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-const themeAdopterForTabList = (theme: any) => {
-    const tabIds = ['general', 'theme', 'accessibility', 'advanced'];
-
-    tabIds.forEach((tabId) => {
-        const tab = document.getElementById(`bp3-tab-title_SettingsTabs_${tabId}`);
-
-        if (!tab) {
-            return;
-        }
-
-        tab.style.color = theme.secondaryForeground;
-    });
-};
-
-export const SettingsPage = (props: { goBack: any }) => {
-    const { goBack } = props;
-
+export const SettingsPage = () => {
     const theme = useTheme();
 
     const [activeTab, setActiveTab] = useState('general');
-
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            themeAdopterForTabList(theme);
-        }, 100);
-
-        return () => clearTimeout(timeout);
-    }, [theme, activeTab]);
 
     return (
         <div
@@ -55,18 +32,43 @@ export const SettingsPage = (props: { goBack: any }) => {
                     vertical
                     renderActiveTabPanelOnly
                 >
-                    <Tab id='general' title='General' panel={<GeneralSettings />} className='settings-tab' />
-                    <Tab id='theme' title='Theme' panel={<ThemeSettings />} className='settings-tab' />
-                    <Tab id='accessibility' title='Accessibility' panel={<AccessibilitySettings />} className='settings-tab' />
-                    <Tab id='advanced' title='Advanced' panel={<AdvancedSettings />} className='settings-tab' />
+                    <Tab
+                        id='general'
+                        title='General'
+                        panel={<GeneralSettings />}
+                        className='settings-tab'
+                        style={{ color: theme.primaryForeground }}
+                    />
+                    <Tab
+                        id='appearance'
+                        title='Appearance'
+                        panel={<AppearanceSettings />}
+                        className='settings-tab'
+                        style={{ color: theme.primaryForeground }}
+                    />
+                    <Tab
+                        id='accessibility'
+                        title='Accessibility'
+                        panel={<AccessibilitySettings />}
+                        className='settings-tab'
+                        style={{ color: theme.primaryForeground }}
+                    />
+                    <Tab
+                        id='keyboard-shortcuts'
+                        title='Keyboard Shortcuts'
+                        panel={<KeyboardShortcuts />}
+                        className='settings-tab'
+                        style={{ color: theme.primaryForeground }}
+                    />
+                    <Tab
+                        id='advanced'
+                        title='Advanced'
+                        panel={<AdvancedSettings />}
+                        className='settings-tab'
+                        style={{ color: theme.primaryForeground }}
+                    />
                     <Tabs.Expander />
                 </Tabs>
-                <Button
-                    icon='arrow-left'
-                    style={{ alignSelf: 'center', position: 'absolute', top: '20px', left: '20px' }}
-                    onClick={() => goBack()}
-                    minimal
-                />
             </div>
         </div>
     );

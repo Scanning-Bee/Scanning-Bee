@@ -1,31 +1,41 @@
-import { Button, Icon } from '@blueprintjs/core';
+import { Button, ButtonGroup, Icon } from '@blueprintjs/core';
 import CellType from '@frontend/models/cellType';
 import {
+    showImageWithURL,
     useActiveAnnotations,
     useAnnotations,
     useAnnotationsFolder,
     useImages,
+    useShownImageUrl,
 } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { AnnotatedImage } from '@frontend/toolbars/ManualAnnotator/AnnotatedImage';
 import { AnnotationEditorTools } from '@frontend/toolbars/ManualAnnotator/AnnotationEditorTools';
 import { ManualAnnotatorPanel } from '@frontend/toolbars/ManualAnnotator/ManualAnnotatorPanel';
+import { ModeButton } from '@frontend/toolbars/ManualAnnotator/ModeButton';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { PickFolderPage } from './PickFolderPage';
 
 export const ManualAnnotatorPage = () => {
     const theme = useTheme();
 
-    const [shownImageUrl, setShownImageUrl] = useState<string | undefined>(undefined);
     const [leftPanelOpen, setLeftPanelOpen] = useState<boolean>(true);
     const [gridOpen, setGridOpen] = useState<boolean>(true);
 
     const folder = useAnnotationsFolder();
+    const shownImageUrl = useShownImageUrl();
     const activeAnnotations = useActiveAnnotations();
     const annotations = useAnnotations();
     const images = useImages();
+
+    const dispatch = useDispatch();
+
+    const setShownImageUrl = (url: string) => {
+        dispatch(showImageWithURL(url));
+    };
 
     useEffect(() => {
         // if no image is shown or the image shown is not in the folder, set the shown image to the first image in the folder
@@ -48,6 +58,8 @@ export const ManualAnnotatorPage = () => {
         return <PickFolderPage />;
     }
 
+    const shownImageIndex = images.indexOf(shownImageUrl);
+
     return (
         <div style={{
             color: theme.primaryForeground,
@@ -55,8 +67,8 @@ export const ManualAnnotatorPage = () => {
         }} className={`page ${gridOpen && 'grid'}`}>
             <div id="left-panel" className='panel'>
                 <Button
-                    icon={<Icon icon={leftPanelOpen ? 'arrow-left' : 'arrow-right'} style={{ color: theme.primaryForeground }} />}
-                    className={`panel-button button-animation ${leftPanelOpen ? 'open-margin-left' : 'closed-margin-left'}`}
+                    icon={<Icon icon={'menu'} style={{ color: theme.primaryForeground }} />}
+                    className='panel-button button-animation closed-margin-left'
                     onClick={
                         (e) => {
                             // ? this section prevents button spamming with spacebar.
@@ -66,6 +78,7 @@ export const ManualAnnotatorPage = () => {
                         }
                     }
                     style={{ background: theme.secondaryBackground }}
+                    minimal
                 />
 
                 <ManualAnnotatorPanel
@@ -78,12 +91,41 @@ export const ManualAnnotatorPage = () => {
                 />
             </div>
 
-            <div className='column-flex-center' style={{ width: '100%', height: '100%' }}>
+            <div className='column-flex-center' style={{ width: '100%' }}>
                 <AnnotatedImage
                     shownImageUrl={images.find(image => image === shownImageUrl)}
                 />
+
+                <ButtonGroup style={{ height: '60px' }}>
+                    <Button
+                        icon={<Icon icon="chevron-left" style={{ color: theme.primaryForeground }} />}
+                        disabled={shownImageIndex === 0}
+                        onClick={() => {
+                            const index = shownImageIndex;
+                            setShownImageUrl(images[index - 1]);
+                        }}
+                        style={{ background: theme.secondaryBackground, margin: '10px' }}
+                        minimal
+                        large
+                    />
+                    <p
+                        style={{ color: 'black' }}
+                        className='ellipsis-overflow image-navigator-image-name'
+                    >{getFileName(shownImageUrl)}</p>
+                    <Button
+                        icon={<Icon icon="chevron-right" style={{ color: theme.primaryForeground }} />}
+                        disabled={shownImageIndex === images.length - 1}
+                        onClick={() => {
+                            const index = shownImageIndex;
+                            setShownImageUrl(images[index + 1]);
+                        }}
+                        style={{ background: theme.secondaryBackground, margin: '10px' }}
+                        minimal
+                        large
+                    />
+                </ButtonGroup>
                 <AnnotationEditorTools
-                    annotations={activeAnnotations}
+                    activeAnnotations={activeAnnotations}
                     newAnnotationProps={{
                         center: [480, 270],
                         radius: 86,
@@ -96,6 +138,7 @@ export const ManualAnnotatorPage = () => {
                         setGridOpen(!gridOpen);
                     }}
                 />
+                <ModeButton />
             </div>
         </div>
     );

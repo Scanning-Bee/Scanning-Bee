@@ -19,7 +19,10 @@ export type ManualAnnotatorModeParams = {
 type AnnotationsState = {
     // contains the plain object versions of the annotations. contains AnnotationProps and the id
     annotationObjects: AnnotationPropsWithID[];
+
     images: string[];
+    shownImageUrl: string;
+
     activeAnnotationIds: UUID[];
     annotationsFolder: string | null;
 
@@ -30,6 +33,7 @@ type AnnotationsState = {
 const initialState: AnnotationsState = {
     annotationObjects: [],
     images: [], // file://blahblahblah
+    shownImageUrl: null,
     activeAnnotationIds: [],
     annotationsFolder: null,
     mode: ManualAnnotatorMode.Default,
@@ -44,8 +48,19 @@ const annotationSlice = createSlice({
             const { folder, annotations, images } = action.payload;
             state.annotationsFolder = folder;
             state.annotationObjects = annotations;
-            state.images = images;
             state.activeAnnotationIds = [];
+
+            const sortedImages = [...images].sort((a, b) => {
+                const imageNumberA = parseInt(a.split('.')[0].split('_')[1], 10);
+                const imageNumberB = parseInt(b.split('.')[0].split('_')[1], 10);
+
+                return imageNumberA - imageNumberB;
+            });
+
+            state.images = sortedImages;
+        },
+        showImageWithURL(state, action: PayloadAction<string>) {
+            state.shownImageUrl = action.payload;
         },
         addAnnotation(state, action: PayloadAction<AnnotationPropsWithID>) {
             state.annotationObjects = [...state.annotationObjects, action.payload];
@@ -98,6 +113,7 @@ const annotationSlice = createSlice({
 
 export const {
     openFolder,
+    showImageWithURL,
     addAnnotation,
     setAnnotations,
     removeAnnotation,
@@ -110,15 +126,28 @@ export const {
 } = annotationSlice.actions;
 
 export const selectAnnotations = (state: RootState) => state.annotation.annotationObjects.map(Annotation.fromPlainObject);
+export const selectShownImageUrl = (state: RootState) => state.annotation.shownImageUrl;
 export const selectActiveAnnotationIds = (state: RootState) => state.annotation.activeAnnotationIds;
 export const selectAnnotationsFolder = (state: RootState) => state.annotation.annotationsFolder;
 export const selectImages = (state: RootState) => state.annotation.images;
 export const selectMode = (state: RootState) => state.annotation.mode;
 export const selectModeParams = (state: RootState) => state.annotation.modeParams;
 
+export const getAnnotations = () => (window as any).store.getState().annotation.annotationObjects.map(Annotation.fromPlainObject);
+export const getShownImageUrl = () => (window as any).store.getState().annotation.shownImageUrl;
+export const getActiveAnnotationIds = () => (window as any).store.getState().annotation.activeAnnotationIds;
+export const getAnnotationsFolder = () => (window as any).store.getState().annotation.annotationsFolder;
+export const getImages = () => (window as any).store.getState().annotation.images;
+export const getManualAnnotatorMode = () => (window as any).store.getState().annotation.mode;
+export const getManualAnnotatorModeParams = () => (window as any).store.getState().annotation.modeParams;
+
 export const useAnnotations = () => {
     const annotations = useSelector(selectAnnotations);
     return annotations;
+};
+export const useShownImageUrl = () => {
+    const shownImageUrl = useSelector(selectShownImageUrl);
+    return shownImageUrl;
 };
 export const useActiveAnnotations = () => {
     const activeAnnotationIds = useSelector(selectActiveAnnotationIds);
