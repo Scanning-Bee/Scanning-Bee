@@ -30,7 +30,7 @@ export const getUnicodeIconForKey = (key: string) => {
         return 'Tab';
     case 'esc':
         return 'Esc';
-    case 'delete':
+    case 'del':
         return 'Del';
     default:
         return key;

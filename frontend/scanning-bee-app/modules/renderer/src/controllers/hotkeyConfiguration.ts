@@ -155,7 +155,7 @@ export const initializeHotkeyConfiguration = (ifc: HotkeyConfigurationInterface)
         },
     },
     {
-        combo: isMac() ? 'mod + backspace' : 'delete',
+        combo: isMac() ? 'mod + backspace' : 'del',
         global: true,
         label: 'Delete active annotations',
         onKeyDown: () => {
