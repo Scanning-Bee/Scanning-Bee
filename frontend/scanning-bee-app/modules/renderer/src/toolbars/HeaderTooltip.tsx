@@ -121,6 +121,7 @@ export const HeaderTooltip = (props: {
             onClick={() => props.goBack()}
             disabled={!props.getPreviousPage()}
             minimal
+            className='header-button'
         />
         <Button
             icon={<Icon icon='arrow-right' style={{ color: theme.secondaryForeground }}/>}
@@ -128,6 +129,7 @@ export const HeaderTooltip = (props: {
             onClick={() => props.goForward()}
             disabled={!props.getNextPage()}
             minimal
+            className='header-button'
         />
         <HomeButton setPage={props.setPage} />
         <Popover
