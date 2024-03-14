@@ -5,11 +5,11 @@ export const uppercaseFirstLetter = (str: string) => str.charAt(0).toUpperCase()
 export const getUnicodeIconForKey = (key: string) => {
     switch (key) {
     case 'mod':
-        return isMac ? '⌘' : 'Ctrl';
+        return isMac() ? '⌘' : 'Ctrl';
     case 'shift':
         return '⇧';
     case 'alt':
-        return isMac ? '⌥' : 'Alt';
+        return isMac() ? '⌥' : 'Alt';
     case 'ctrl':
         return 'Ctrl';
     case 'enter':
@@ -31,7 +31,7 @@ export const getUnicodeIconForKey = (key: string) => {
     case 'esc':
         return 'Esc';
     case 'delete':
-        return '⌦';
+        return 'Del';
     default:
         return key;
     }
