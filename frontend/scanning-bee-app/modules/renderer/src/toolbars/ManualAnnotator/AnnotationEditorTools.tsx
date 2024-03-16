@@ -1,10 +1,10 @@
 import {
     Button, Divider, Icon, Menu, MenuItem, Popover, Slider,
 } from '@blueprintjs/core';
-import Annotation, { AnnotationProps } from '@frontend/models/annotation';
+import Annotation from '@frontend/models/annotation';
 import CellType from '@frontend/models/cellType';
 import {
-    addAnnotation,
+    createNewAnnotation,
     mutateAnnotation,
     removeAnnotation,
 } from '@frontend/slices/annotationSlice';
@@ -117,7 +117,7 @@ const DeleteAnnotationButton = (props: {
     );
 };
 
-const CreateAnnotationButton = (props: { annotationProps: AnnotationProps }) => {
+const CreateAnnotationButton = () => {
     const dispatch = useDispatch();
 
     return (
@@ -126,10 +126,8 @@ const CreateAnnotationButton = (props: { annotationProps: AnnotationProps }) => 
             intent='success'
             minimal
             onClick={() => {
-                const newAnnotation = new Annotation(props.annotationProps);
-                dispatch(addAnnotation(Annotation.toPlainObject(newAnnotation)));
+                dispatch(createNewAnnotation());
             }}
-            disabled={!props.annotationProps}
         />
     );
 };
@@ -156,10 +154,9 @@ const EditorButtonPopover = (props: { children: any, disabled?: boolean }) => <P
 
 export const AnnotationEditorTools = (props: {
     activeAnnotations: Annotation[],
-    newAnnotationProps: AnnotationProps,
     toggleGrid: () => void,
 }) => {
-    const { activeAnnotations, newAnnotationProps, toggleGrid } = props;
+    const { activeAnnotations, toggleGrid } = props;
 
     const theme = useTheme();
 
@@ -172,7 +169,7 @@ export const AnnotationEditorTools = (props: {
             }}
         >
             <EditorButtonPopover>
-                <CreateAnnotationButton annotationProps={newAnnotationProps} />
+                <CreateAnnotationButton />
                 <div style={{ padding: '10px' }}>Create Annotation</div>
             </EditorButtonPopover>
 

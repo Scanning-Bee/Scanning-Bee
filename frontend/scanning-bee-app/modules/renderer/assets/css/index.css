@@ -267,6 +267,27 @@ a {
   z-index: 100;
 }
 
+.annotations-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 200px;
+  justify-content: flex-start;
+}
+
+.annotation-button-in-panel {
+  display: flex;
+  justify-content: flex-start;
+  min-height: 40px !important;
+}
+
+.annotation-button-in-panel > .bp3-button-text {
+  margin: 0px;
+}
+
 .page{
   top: 0;
   position: absolute;
@@ -282,7 +303,7 @@ a {
 }
 
 .annotated-images-panel{
-  width: 250px;
+  width: 245px;
   max-height: 60vh;
   flex-direction: column;
   justify-content: flex-start;

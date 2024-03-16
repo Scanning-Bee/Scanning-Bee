@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import Annotation, { AnnotationMutation, AnnotationPropsWithID } from '@frontend/models/annotation';
 import CellType from '@frontend/models/cellType';
 import { RootState } from '@frontend/store';
+import { getFileName } from '@frontend/utils/fileNameUtils';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AnnotationYaml } from '@scanning_bee/ipc-interfaces';
 
@@ -188,5 +189,19 @@ export const generateAnnotationsFromYaml = (yaml: AnnotationYaml[]): Annotation[
 
     return annotation;
 });
+
+export const createNewAnnotation = () => {
+    const newAnnotationProps = {
+        center: [480, 270],
+        radius: 86,
+        cell_type: CellType.NOT_CLASSIFIED,
+        poses: [],
+        source_name: getFileName(getShownImageUrl()),
+        timestamp: 0,
+    };
+
+    const newAnnotation = new Annotation(newAnnotationProps);
+    return addAnnotation(Annotation.toPlainObject(newAnnotation));
+};
 
 export default annotationSlice.reducer;

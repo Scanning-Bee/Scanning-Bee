@@ -1,5 +1,4 @@
 import { Button, ButtonGroup, Icon } from '@blueprintjs/core';
-import CellType from '@frontend/models/cellType';
 import {
     showImageWithURL,
     useActiveAnnotations,
@@ -51,7 +50,7 @@ export const ManualAnnotatorPage = () => {
             return;
         }
 
-        panelElement.style.width = leftPanelOpen ? '250px' : '0px';
+        panelElement.style.width = leftPanelOpen ? '270px' : '0px';
     }, [leftPanelOpen]);
 
     if (!folder || !shownImageUrl) {
@@ -126,14 +125,6 @@ export const ManualAnnotatorPage = () => {
                 </ButtonGroup>
                 <AnnotationEditorTools
                     activeAnnotations={activeAnnotations}
-                    newAnnotationProps={{
-                        center: [480, 270],
-                        radius: 86,
-                        cell_type: CellType.NOT_CLASSIFIED,
-                        poses: [],
-                        source_name: getFileName(shownImageUrl),
-                        timestamp: 0,
-                    }}
                     toggleGrid={() => {
                         setGridOpen(!gridOpen);
                     }}
