@@ -1,4 +1,4 @@
-import { Button, Icon, Menu, MenuItem, Popover } from '@blueprintjs/core';
+import { Button, Icon } from '@blueprintjs/core';
 import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
 import Annotation from '@frontend/models/annotation';
 import { setActiveAnnotations } from '@frontend/slices/annotationSlice';
@@ -7,42 +7,6 @@ import { getFileName } from '@frontend/utils/fileNameUtils';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import SplitPane from 'react-split-pane';
-
-const SaveToDatabaseButton = (props: { annotations: Annotation[], shownImageUrl: string }) => (
-    <Popover
-        interactionKind='click'
-        position='right'
-        lazy
-        canEscapeKeyClose
-    >
-        <Button
-            text='Save annotations to database'
-            intent='primary'
-            icon='database'
-            style={{ margin: '5px' }}
-            className='inline-box-important'
-        />
-        <Menu>
-            <MenuItem
-                text={`Save annotations for ${getFileName(props.shownImageUrl)}`}
-                onClick={() => {
-                    const filteredAnnotations = props.annotations
-                        .filter(annotation => annotation.source_name === getFileName(props.shownImageUrl));
-
-                    BackendInterface.getInstance().saveAnnotationsToDatabase(filteredAnnotations);
-                }}
-                icon='media'
-            />
-            <MenuItem
-                text='Save all annotations'
-                onClick={() => {
-                    BackendInterface.getInstance().saveAnnotationsToDatabase(props.annotations);
-                }}
-                icon='tick'
-            />
-        </Menu>
-    </Popover>
-);
 
 export const ManualAnnotatorPanel = (props:{
     images: string[],
@@ -58,7 +22,6 @@ export const ManualAnnotatorPanel = (props:{
         shownImageUrl,
         setShownImageUrl,
         leftPanelOpen,
-        folder,
     } = props;
 
     const theme = useTheme();
@@ -86,27 +49,6 @@ export const ManualAnnotatorPanel = (props:{
             resizerClassName='resizer'
         >
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'start' }}>
-                <Button
-                    text='Open a folder'
-                    onClick={() => {
-                        BackendInterface.getInstance().openFolderDialog();
-                    }}
-                    intent='primary'
-                    icon='folder-new'
-                    style={{ margin: '5px' }}
-                    className='inline-box-important'
-                />
-                <Button
-                    text='Save annotations locally'
-                    onClick={() => {
-                        BackendInterface.getInstance().saveAnnotations(annotations, folder);
-                    }}
-                    intent='primary'
-                    icon='floppy-disk'
-                    style={{ margin: '5px' }}
-                    className='inline-box-important'
-                />
-                <SaveToDatabaseButton annotations={annotations} shownImageUrl={shownImageUrl} />
                 <Button
                     text='Generate annotations with AI'
                     onClick={() => {

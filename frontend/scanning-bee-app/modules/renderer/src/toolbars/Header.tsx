@@ -32,12 +32,12 @@ export default function Header(props: {
                     ? `1px solid ${theme.primaryBorder}` : 'none',
                 color: theme.secondaryForeground,
                 padding: isMac()
-                    ? '0px 0px 0px 60px'
+                    ? `0 0 0 ${Math.ceil(60 - (zoom * 17))}px`
                     : `0 ${Math.ceil(120 - (zoom * 23))}px 0 0`,
             }}
         >
             <div className='header-sub-flex-box' style={{ width: '30%' }}>
-                <HeaderLeft page={props.page} setPage={props.setPage} />
+                <HeaderLeft />
             </div>
             <div className='header-sub-flex-box' style={{ width: '40%' }}>
                 <HeaderTooltip

@@ -16,7 +16,6 @@ const SettingsButton = (props: { setPage: any }) => {
                 setPage('settings');
             }}
             style={{ padding: '5px', margin: '2px' }}
-            large
             className='header-button'
         />
     );
