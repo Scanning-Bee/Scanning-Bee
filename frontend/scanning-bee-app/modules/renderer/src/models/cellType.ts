@@ -1,8 +1,8 @@
 enum CellType {
     EMPTY = 'EMPTY',
     NECTAR = 'NECTAR',
-    LARVAE = 'LARVAE',
-    PUPPA = 'PUPPA',
+    LARVA = 'LARVA',
+    PUPA = 'PUPA',
     HONEY_CLOSED = 'HONEY_CLOSED',
     BEE_OCCLUDED = 'BEE_OCCLUDED',
     EGG = 'EGG',
