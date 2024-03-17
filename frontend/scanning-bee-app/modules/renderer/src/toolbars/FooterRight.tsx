@@ -10,7 +10,7 @@ export const FooterRight = () => {
 
     const dispatch = useDispatch();
 
-    const SCANNING_BEE_VERSION = process.env.SCANNING_BEE_VERSION || 'development';
+    const SCANNING_BEE_VERSION = 'v0.1.0-development';
 
     return (
         <div className='footer-right' style={{ marginRight: '10px' }}>
