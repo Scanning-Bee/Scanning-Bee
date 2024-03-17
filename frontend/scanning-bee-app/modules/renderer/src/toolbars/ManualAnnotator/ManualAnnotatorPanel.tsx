@@ -2,6 +2,7 @@ import { Button, Icon } from '@blueprintjs/core';
 import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
 import Annotation from '@frontend/models/annotation';
 import { createNewAnnotation, setActiveAnnotations, useActiveAnnotationIds } from '@frontend/slices/annotationSlice';
+import { useIsBackendOnline } from '@frontend/slices/backendStatusSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { CellTypeColours } from '@frontend/utils/colours';
 import { getFileName } from '@frontend/utils/fileNameUtils';
@@ -28,6 +29,8 @@ export const ManualAnnotatorPanel = (props:{
     const theme = useTheme();
 
     const dispatch = useDispatch();
+
+    const isBackendOnline = useIsBackendOnline();
 
     const annotatedImageNames = annotations.map(annotation => annotation.source_name);
     const activeAnnotationIds = useActiveAnnotationIds();
@@ -124,6 +127,7 @@ export const ManualAnnotatorPanel = (props:{
                     icon='send-to-graph'
                     style={{ margin: '5px', backgroundColor: 'darkgreen' }}
                     className='inline-box-important'
+                    disabled={!isBackendOnline}
                 />
             </div>
             <div className='annotated-images-panel'>
