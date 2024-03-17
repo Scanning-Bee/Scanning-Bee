@@ -4,10 +4,10 @@ import { checkIsBackendOnline, getMemoryUsage, initiateIsBackendOnlineCheck } fr
 import { Theme } from '@utils/colours';
 import React, { useEffect, useState } from 'react';
 
+import { FooterRight } from './FooterRight';
+
 export default function Footer() {
     const theme: Theme = useTheme();
-
-    const SCANNING_BEE_VERSION = process.env.SCANNING_BEE_VERSION || 'development';
 
     const [memoryUsage, setMemoryUsage] = useState(-1);
     const isBackendOnline = useIsBackendOnline();
@@ -63,12 +63,7 @@ export default function Footer() {
                     Memory Usage: {memoryUsage} MB
                 </p>
             </div>
-
-            <div className='footer-right' style={{ marginRight: '10px' }}>
-                <p style={{ margin: 0, fontSize: '12px' }}>
-                        Scanning Bee {SCANNING_BEE_VERSION}
-                </p>
-            </div>
+            <FooterRight />
         </div>
     );
 }

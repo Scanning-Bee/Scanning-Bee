@@ -169,6 +169,7 @@ a {
   justify-content: flex-start;
   flex-direction: row;
   width: 100%;
+  height: var(--footerSpace);
 }
 
 .footer-right {
@@ -176,6 +177,11 @@ a {
   justify-content: flex-end;
   flex-direction: row;
   width: 100%;
+  height: var(--footerSpace);
+}
+
+.footer-right > .bp3-popover-wrapper {
+  margin: 0;
 }
 
 .main-logo{
@@ -477,4 +483,15 @@ a {
 
 .shortcut-settings > p{
   margin: 0px;
+}
+
+.footer-zoom-icon {
+  height: var(--footerSpace);
+  width: var(--footerSpace);
+  display: flex;
+  margin: 0 5px;
+}
+
+.footer-zoom-icon:hover {
+  background-color: #99999988;
 }
