@@ -39,3 +39,8 @@ export const getUnicodeIconForKey = (key: string) => {
 
 export const getUnicodeIconRepresentation = (combo: string) => combo
     .split(' ').map(key => getUnicodeIconForKey(key)).join(' ');
+
+export const getMemoryUsage = () => {
+    const used = process.memoryUsage().heapTotal / (1024 * 1024);
+    return Math.round(used * 100) / 100;
+};
