@@ -9,7 +9,7 @@ export default function Footer() {
 
     const SCANNING_BEE_VERSION = process.env.SCANNING_BEE_VERSION || 'development';
 
-    const [memoryUsage, setMemoryUsage] = useState(getMemoryUsage());
+    const [memoryUsage, setMemoryUsage] = useState(-1);
     const isBackendOnline = useIsBackendOnline();
 
     const footerBackground = theme.type === 'dark' ? theme.secondaryBackground : theme.tertiaryBackground;
@@ -17,10 +17,14 @@ export default function Footer() {
     useEffect(() => {
         checkIsBackendOnline();
 
+        getMemoryUsage()
+            .then(usage => setMemoryUsage(usage));
+
         initiateIsBackendOnlineCheck();
 
         const interval = setInterval(async () => {
-            setMemoryUsage(getMemoryUsage());
+            getMemoryUsage()
+                .then(usage => setMemoryUsage(usage));
         }, 30_000);
 
         return () => clearInterval(interval);

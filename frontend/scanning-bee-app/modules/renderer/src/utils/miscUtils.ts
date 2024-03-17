@@ -1,3 +1,4 @@
+import { getProcessMemoryInfo } from 'process';
 import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
 import { setBackendOnline } from '@frontend/slices/backendStatusSlice';
 
@@ -43,9 +44,11 @@ export const getUnicodeIconForKey = (key: string) => {
 export const getUnicodeIconRepresentation = (combo: string) => combo
     .split(' ').map(key => getUnicodeIconForKey(key)).join(' ');
 
-export const getMemoryUsage = () => {
-    const used = process.memoryUsage().heapTotal / (1024 * 1024);
-    return Math.round(used * 100) / 100;
+export const getMemoryUsage = async () => {
+    const memInfo = (await getProcessMemoryInfo());
+    const usage = isMac() ? memInfo.private : memInfo.residentSet;
+
+    return Math.round(usage / (1024));
 };
 
 export const checkIsBackendOnline = async () => {
