@@ -1,6 +1,6 @@
 import { useIsBackendOnline } from '@frontend/slices/backendStatusSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
-import { getMemoryUsage, initiateIsBackendOnlineCheck } from '@frontend/utils/miscUtils';
+import { checkIsBackendOnline, getMemoryUsage, initiateIsBackendOnlineCheck } from '@frontend/utils/miscUtils';
 import { Theme } from '@utils/colours';
 import React, { useEffect, useState } from 'react';
 
@@ -15,6 +15,8 @@ export default function Footer() {
     const footerBackground = theme.type === 'dark' ? theme.secondaryBackground : theme.tertiaryBackground;
 
     useEffect(() => {
+        checkIsBackendOnline();
+
         initiateIsBackendOnlineCheck();
 
         const interval = setInterval(async () => {

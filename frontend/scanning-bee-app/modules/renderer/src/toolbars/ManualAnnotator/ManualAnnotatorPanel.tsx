@@ -53,7 +53,7 @@ export const ManualAnnotatorPanel = (props:{
             pane1Style={{ display: 'unset', width: '245px' }}
             resizerClassName='resizer'
         >
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'start', height: '250px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'start', height: '250px', marginTop: '5px' }}>
                 <div
                     className='annotations-panel'
                 >
