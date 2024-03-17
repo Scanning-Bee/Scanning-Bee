@@ -318,7 +318,7 @@ class MainController {
                 } else if (this.mainWindow.setTitleBarOverlay) {
                     // change title bar height
                     this.mainWindow.setTitleBarOverlay({
-                        height: Math.floor((38 * zoomFactor) / scaleFactor),
+                        height: Math.floor((20 * zoomFactor) / scaleFactor),
                     });
                 }
             }

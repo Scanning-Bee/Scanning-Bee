@@ -4,6 +4,7 @@ import { resetAnnotations, useAnnotations, useAnnotationsFolder, useUnsavedChang
 import { useIsBackendOnline } from '@frontend/slices/backendStatusSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { getFileName } from '@frontend/utils/fileNameUtils';
+import { isMac } from '@frontend/utils/platform';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -176,7 +177,7 @@ export const HeaderTooltip = (props: {
 
     return (<div
         className="header-container flex-center header-container-left"
-        style={{ margin: '0 30px 0 -30px', width: '100%' }}
+        style={{ margin: isMac() ? '0 30px 0 -30px' : 0, width: '100%' }}
     >
         <Button
             icon={<Icon icon='arrow-left' style={{ color: theme.secondaryForeground }}/>}
