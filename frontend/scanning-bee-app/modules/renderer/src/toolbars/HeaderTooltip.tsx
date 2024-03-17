@@ -1,6 +1,7 @@
 import { Button, Divider, Icon, Menu, MenuDivider, MenuItem, Popover } from '@blueprintjs/core';
 import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
 import { resetAnnotations, useAnnotations, useAnnotationsFolder, useUnsavedChanges } from '@frontend/slices/annotationSlice';
+import { useIsBackendOnline } from '@frontend/slices/backendStatusSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import React from 'react';
@@ -67,6 +68,8 @@ const TooltipMenu = (props: { page: PageType, setPage: any, folder: string, hide
 
     const annotations = useAnnotations();
 
+    const backendOnline = useIsBackendOnline();
+
     return (<div style={{ padding: '10px' }}>
         <Menu>
             {
@@ -86,6 +89,7 @@ const TooltipMenu = (props: { page: PageType, setPage: any, folder: string, hide
                             BackendInterface.getInstance().saveAnnotationsToDatabase(annotations);
                         }}
                         icon='database'
+                        disabled={!backendOnline}
                     />
                     <Divider />
                     <MenuItem
