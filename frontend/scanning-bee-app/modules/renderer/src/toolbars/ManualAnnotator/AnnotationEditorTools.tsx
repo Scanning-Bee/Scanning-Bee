@@ -32,7 +32,7 @@ const RadiusSlider = (props: {
             disabled={disabled}
         >
             <Button
-                icon={<Icon icon='circle' color={theme.secondaryForeground} />}
+                icon={<Icon icon='circle' color={`${theme.secondaryForeground}${disabled ? '80' : ''}`} />}
                 minimal
                 disabled={disabled}
             />
@@ -77,7 +77,7 @@ const CellTypePicker = (props: {
             disabled={disabled}
         >
             <Button
-                icon={<Icon icon='tag' color={theme.secondaryForeground} />}
+                icon={<Icon icon='tag' color={`${theme.secondaryForeground}${disabled ? '80' : ''}`} />}
                 minimal
                 disabled={disabled}
             />
