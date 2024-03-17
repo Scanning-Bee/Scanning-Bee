@@ -20,15 +20,15 @@ export default function Header(props: {
 
     const zoom = useZoom();
 
-    console.log(Math.ceil(120 - (zoom * 23)));
+    const headerBackground = theme.type === 'dark' ? theme.secondaryBackground : theme.tertiaryBackground;
 
     return (
         <div id="header"
             // eslint-disable-next-line no-useless-concat
             className={'noselect'}
             style={{
-                background: theme.secondaryBackground,
-                borderBottom: theme.secondaryBackground === theme.primaryBackground
+                background: headerBackground,
+                borderBottom: headerBackground === theme.primaryBackground
                     ? `1px solid ${theme.primaryBorder}` : 'none',
                 color: theme.secondaryForeground,
                 padding: isMac()

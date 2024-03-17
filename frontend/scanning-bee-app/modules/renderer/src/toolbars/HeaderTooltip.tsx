@@ -28,6 +28,9 @@ const HomeButton = (props: { setPage: any }) => {
 const TooltipButton = (props: { folder: string, showFolderActionsMenu: boolean }) => {
     const theme = useTheme();
 
+    const buttonColour = theme.type === 'dark' ? theme.tertiaryBackground : theme.secondaryBackground;
+    const outlineColour = theme.type === 'dark' ? theme.secondaryForeground : theme.tertiaryForeground;
+
     const handleClick = props.showFolderActionsMenu
         ? null
         : () => {
@@ -39,18 +42,19 @@ const TooltipButton = (props: { folder: string, showFolderActionsMenu: boolean }
         : props.folder ? getFileName(props.folder) : 'Select Folder';
 
     return (<Button
-        outlined
+        outlined={theme.secondaryBackground === theme.tertiaryBackground}
         text={buttonText}
         style={{
             width: '100%',
             display: 'inline',
             textAlign: 'center',
-            backgroundColor: theme.secondaryBackground,
+            backgroundColor: buttonColour,
             color: theme.secondaryForeground,
-            borderColor: theme.tertiaryForeground,
+            borderColor: outlineColour,
         }}
         onClick={handleClick}
         className='header-button'
+        minimal
     />);
 };
 

@@ -30,10 +30,10 @@ export const ManualAnnotatorPanel = (props:{
     const dispatch = useDispatch();
 
     const annotatedImageNames = annotations.map(annotation => annotation.source_name);
-
     const activeAnnotationIds = useActiveAnnotationIds();
-
     const shownImageAnnotations = annotations.filter(annotation => annotation.source_name === getFileName(shownImageUrl));
+
+    const panelBackground = theme.type === 'dark' ? theme.tertiaryBackground : theme.secondaryBackground;
 
     return (
         // @ts-ignore
@@ -43,7 +43,7 @@ export const ManualAnnotatorPanel = (props:{
             defaultSize={'270px'}
             maxSize={400}
             style={{
-                backgroundColor: theme.secondaryBackground,
+                backgroundColor: panelBackground,
                 opacity: leftPanelOpen ? 1 : 0,
                 width: !leftPanelOpen && '0px',
                 transition: 'opacity 0.1s',
@@ -101,9 +101,6 @@ export const ManualAnnotatorPanel = (props:{
                                         color={CellTypeColours[annotation.cell_type]}
                                         style={{ margin: '0 5px 0 0' }}
                                     />}
-                                    style={{
-                                        backgroundColor: theme.secondaryBackground,
-                                    }}
                                     onClick={() => {
                                         dispatch(setActiveAnnotations([annotation.id]));
                                     }}
