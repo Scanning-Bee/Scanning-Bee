@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import Annotation, { AnnotationMutation, AnnotationPropsWithID } from '@frontend/models/annotation';
 import CellType from '@frontend/models/cellType';
 import { RootState } from '@frontend/store';
+import { focusOnImageButton } from '@frontend/utils/annotationUtils';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AnnotationYaml } from '@scanning_bee/ipc-interfaces';
@@ -71,6 +72,8 @@ const annotationSlice = createSlice({
         },
         showImageWithURL(state, action: PayloadAction<string>) {
             state.shownImageUrl = action.payload;
+
+            focusOnImageButton(action.payload);
         },
         addAnnotation(state, action: PayloadAction<AnnotationPropsWithID>) {
             state.annotationObjects = [...state.annotationObjects, action.payload];

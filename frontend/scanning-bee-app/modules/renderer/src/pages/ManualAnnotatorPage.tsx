@@ -2,7 +2,6 @@ import { Button, ButtonGroup, Icon } from '@blueprintjs/core';
 import {
     showImageWithURL,
     useActiveAnnotations,
-    useAnnotations,
     useAnnotationsFolder,
     useImages,
     useShownImageUrl,
@@ -27,7 +26,6 @@ export const ManualAnnotatorPage = () => {
     const folder = useAnnotationsFolder();
     const shownImageUrl = useShownImageUrl();
     const activeAnnotations = useActiveAnnotations();
-    const annotations = useAnnotations();
     const images = useImages();
 
     const dispatch = useDispatch();
@@ -81,12 +79,7 @@ export const ManualAnnotatorPage = () => {
                 />
 
                 <ManualAnnotatorPanel
-                    images={images}
-                    annotations={annotations}
-                    folder={folder}
                     leftPanelOpen={leftPanelOpen}
-                    setShownImageUrl={setShownImageUrl}
-                    shownImageUrl={shownImageUrl}
                 />
             </div>
 
