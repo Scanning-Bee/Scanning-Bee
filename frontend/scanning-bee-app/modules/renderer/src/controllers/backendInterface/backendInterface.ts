@@ -3,7 +3,7 @@ import axios, { AxiosInstance } from 'axios';
 import { ipcRenderer, shell } from 'electron';
 import Annotation from '@frontend/models/annotation';
 import CellType from '@frontend/models/cellType';
-import { addAnnotation } from '@frontend/slices/annotationSlice';
+import { addAnnotation, saveChanges } from '@frontend/slices/annotationSlice';
 import { AppToaster } from '@frontend/Toaster';
 import { AnnotationYaml, RENDERER_QUERIES } from '@scanning_bee/ipc-interfaces';
 
@@ -43,6 +43,10 @@ export class BackendInterface {
         const annotationsYaml: AnnotationYaml[] = annotations.map(annotation => Annotation.toYaml(annotation));
 
         ipcRenderer.send(RENDERER_QUERIES.SAVE_ANNOTATIONS, { targetFolder, annotations: annotationsYaml });
+
+        const { dispatch } = (window as any).store;
+
+        dispatch(saveChanges());
     };
 
     public openFolderAtLocation = (folder: string) => {
@@ -161,6 +165,12 @@ export class BackendInterface {
             if (!res) {
                 success = false;
             }
+        }
+
+        if (success) {
+            const { dispatch } = (window as any).store;
+
+            dispatch(saveChanges());
         }
 
         AppToaster.show({

@@ -29,16 +29,23 @@ type AnnotationsState = {
 
     mode: ManualAnnotatorMode;
     modeParams: ManualAnnotatorModeParams;
+
+    unsavedChanges: boolean;
 };
 
 const initialState: AnnotationsState = {
     annotationObjects: [],
+
     images: [], // file://blahblahblah
     shownImageUrl: null,
+
     activeAnnotationIds: [],
     annotationsFolder: null,
+
     mode: ManualAnnotatorMode.Default,
     modeParams: {},
+
+    unsavedChanges: false,
 };
 
 const annotationSlice = createSlice({
@@ -59,12 +66,16 @@ const annotationSlice = createSlice({
             });
 
             state.images = sortedImages;
+
+            state.unsavedChanges = false;
         },
         showImageWithURL(state, action: PayloadAction<string>) {
             state.shownImageUrl = action.payload;
         },
         addAnnotation(state, action: PayloadAction<AnnotationPropsWithID>) {
             state.annotationObjects = [...state.annotationObjects, action.payload];
+
+            state.unsavedChanges = true;
         },
         setAnnotations(state, action: PayloadAction<AnnotationPropsWithID[]>) {
             state.annotationObjects = action.payload;
@@ -75,6 +86,8 @@ const annotationSlice = createSlice({
             }
 
             state.annotationObjects = state.annotationObjects.filter(annotation => annotation.id !== action.payload);
+
+            state.unsavedChanges = true;
         },
         resetAnnotations(state) {
             state.annotationObjects = [];
@@ -102,12 +115,17 @@ const annotationSlice = createSlice({
             annotations[index] = annotations[index].applyMutation(mutation);
 
             state.annotationObjects = annotations.map(Annotation.toPlainObject);
+
+            state.unsavedChanges = true;
         },
         setManualAnnotatorMode(state, action: PayloadAction<ManualAnnotatorMode>) {
             state.mode = action.payload;
         },
         setModeParams(state, action: PayloadAction<ManualAnnotatorModeParams>) {
             state.modeParams = action.payload;
+        },
+        saveChanges(state) {
+            state.unsavedChanges = false;
         },
     },
 });
@@ -124,6 +142,7 @@ export const {
     mutateAnnotation,
     setManualAnnotatorMode,
     setModeParams,
+    saveChanges,
 } = annotationSlice.actions;
 
 export const selectAnnotations = (state: RootState) => state.annotation.annotationObjects.map(Annotation.fromPlainObject);
@@ -133,6 +152,7 @@ export const selectAnnotationsFolder = (state: RootState) => state.annotation.an
 export const selectImages = (state: RootState) => state.annotation.images;
 export const selectMode = (state: RootState) => state.annotation.mode;
 export const selectModeParams = (state: RootState) => state.annotation.modeParams;
+export const selectUnsavedChanges = (state: RootState) => state.annotation.unsavedChanges;
 
 export const getAnnotations = () => (window as any).store.getState().annotation.annotationObjects.map(Annotation.fromPlainObject);
 export const getShownImageUrl = () => (window as any).store.getState().annotation.shownImageUrl;
@@ -141,6 +161,7 @@ export const getAnnotationsFolder = () => (window as any).store.getState().annot
 export const getImages = () => (window as any).store.getState().annotation.images;
 export const getManualAnnotatorMode = () => (window as any).store.getState().annotation.mode;
 export const getManualAnnotatorModeParams = () => (window as any).store.getState().annotation.modeParams;
+export const getUnsavedChanges = () => (window as any).store.getState().annotation.unsavedChanges;
 
 export const useAnnotations = () => {
     const annotations = useSelector(selectAnnotations);
@@ -182,6 +203,11 @@ export const useManualAnnotatorModeWithParams = () => {
     const modeParams = useSelector(selectModeParams);
 
     return { mode, modeParams };
+};
+
+export const useUnsavedChanges = () => {
+    const unsavedChanges = useSelector(selectUnsavedChanges);
+    return unsavedChanges;
 };
 
 export const generateAnnotationsFromYaml = (yaml: AnnotationYaml[]): Annotation[] => yaml.map((annotationYaml) => {

@@ -1,6 +1,6 @@
 import { Button, Divider, Icon, Menu, MenuDivider, MenuItem, Popover } from '@blueprintjs/core';
 import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
-import { resetAnnotations, useAnnotations, useAnnotationsFolder } from '@frontend/slices/annotationSlice';
+import { resetAnnotations, useAnnotations, useAnnotationsFolder, useUnsavedChanges } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import React from 'react';
@@ -28,6 +28,8 @@ const HomeButton = (props: { setPage: any }) => {
 const TooltipButton = (props: { folder: string, showFolderActionsMenu: boolean }) => {
     const theme = useTheme();
 
+    const changesUnsaved = useUnsavedChanges();
+
     const buttonColour = theme.type === 'dark' ? theme.tertiaryBackground : theme.secondaryBackground;
     const outlineColour = theme.type === 'dark' ? theme.secondaryForeground : theme.tertiaryForeground;
 
@@ -39,7 +41,7 @@ const TooltipButton = (props: { folder: string, showFolderActionsMenu: boolean }
 
     const buttonText = props.showFolderActionsMenu
         ? 'Select Page'
-        : props.folder ? getFileName(props.folder) : 'Select Folder';
+        : props.folder ? getFileName(props.folder) + (changesUnsaved ? '  •' : '') : 'Select Folder';
 
     return (<Button
         outlined={theme.secondaryBackground === theme.tertiaryBackground}
