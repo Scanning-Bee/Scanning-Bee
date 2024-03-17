@@ -167,7 +167,6 @@ a {
 .footer-left {
   display: flex;
   justify-content: flex-start;
-  padding: 0px 10px;
   flex-direction: row;
   width: 100%;
 }
@@ -175,7 +174,6 @@ a {
 .footer-right {
   display: flex;
   justify-content: flex-end;
-  padding: 0px 10px;
   flex-direction: row;
   width: 100%;
 }
