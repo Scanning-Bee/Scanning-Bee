@@ -66,6 +66,10 @@ export class RendererController {
     }
 
     public setPage(page: PageType) : void {
+        if (page === this.getCurrentPage()) {
+            return;
+        }
+
         this.historyService.addPage(page);
 
         this.renderAgain();
