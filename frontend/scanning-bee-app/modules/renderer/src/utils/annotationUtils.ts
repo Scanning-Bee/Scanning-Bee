@@ -39,3 +39,13 @@ export const findAnnotationWithCoords = (annotations: Annotation[], x: number, y
 
     return annotationId;
 };
+
+export const focusOnImageButton = (image: string) => {
+    const buttonElem = document.getElementById(`image-button-${image}`);
+
+    if (buttonElem) {
+        buttonElem.focus({
+            preventScroll: false,
+        });
+    }
+};

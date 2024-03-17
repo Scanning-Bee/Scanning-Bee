@@ -11,11 +11,12 @@
   --buttonOffset:-30px;
   --buttonOffsetInactive:-15px;
 
-  --headerSpace:48px;
+  --headerSpace:35px;
+  --footerSpace:20px;
 
   --primaryColor: #2d72d2;
 
-  --leftPanelWidth:260px;
+  --leftPanelWidth:270px;
 
   font-family: Saira-Regular;
 }
@@ -48,20 +49,45 @@ a {
   justify-content: space-between;
 }
 
+#footer {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: var(--footerSpace);
+  /* border-bottom: 1px solid var(--borderColor); */
+
+  z-index: 61 !important;
+
+  display: flex;
+  justify-content: space-between;
+
+  justify-content: space-between;
+}
+
 #main-content {
   position: fixed;
   left: 0px;
   width: 100%;
   top: var(--headerSpace);
+  bottom: var(--footerSpace);
 
   display: flex;
   flex-direction: column;
   justify-content:center;
 
-  height: calc(100% - var(--headerSpace));
+  height: calc(100% - var(--headerSpace) - var(--footerSpace));
   
   overflow-y: scroll;
   overflow-x: hidden;
+
+  /* hide scroll bar */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#main-content::-webkit-scrollbar {
+  display: none;
 }
 
 #left-panel {
@@ -120,8 +146,8 @@ a {
 }
 
 .header-logo{
-  width: calc(var(--headerSpace) - 20px);
-  height: calc(var(--headerSpace) - 20px);
+  width: calc(var(--headerSpace) - 12px);
+  height: calc(var(--headerSpace) - 12px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -144,6 +170,33 @@ a {
   top: 0;
   margin: unset;
   /* width: 33%; this is set by header component */
+}
+
+.header-tooltip-button {
+  width: 100%;
+  display: inline;
+  text-align: center;
+  min-height: calc(var(--headerSpace) - 10px) !important;
+}
+
+.footer-left {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  width: 100%;
+  height: var(--footerSpace);
+}
+
+.footer-right {
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: row;
+  width: 100%;
+  height: var(--footerSpace);
+}
+
+.footer-right > .bp3-popover-wrapper {
+  margin: 0;
 }
 
 .main-logo{
@@ -267,6 +320,27 @@ a {
   z-index: 100;
 }
 
+.annotations-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 200px;
+  justify-content: flex-start;
+}
+
+.annotation-button-in-panel {
+  display: flex;
+  justify-content: flex-start;
+  min-height: 40px !important;
+}
+
+.annotation-button-in-panel > .bp3-button-text {
+  margin: 0px;
+}
+
 .page{
   top: 0;
   position: absolute;
@@ -282,12 +356,12 @@ a {
 }
 
 .annotated-images-panel{
-  width: 250px;
+  width: 245px;
   max-height: 60vh;
   flex-direction: column;
   justify-content: flex-start;
   align-items: self-start;
-  overflow: scroll;
+  overflow-y: scroll;
   padding-bottom: '20px',
 }
 
@@ -424,4 +498,15 @@ a {
 
 .shortcut-settings > p{
   margin: 0px;
+}
+
+.footer-zoom-icon {
+  height: var(--footerSpace);
+  width: var(--footerSpace);
+  display: flex;
+  margin: 0 5px;
+}
+
+.footer-zoom-icon:hover {
+  background-color: #99999988;
 }

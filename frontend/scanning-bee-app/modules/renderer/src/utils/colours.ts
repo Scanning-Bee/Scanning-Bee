@@ -85,13 +85,13 @@ export const Themes: Theme[] = [
 ];
 
 export const CellTypeColours: { [key in CellType]: string } = {
-    [CellType.BEE_OCCLUDED]: 'rgb(255, 255, 0)',
-    [CellType.EGG]: 'rgb(0, 255, 0)',
-    [CellType.EMPTY]: 'rgb(0, 0, 255)',
-    [CellType.HONEY_CLOSED]: 'rgb(255, 140, 0)',
-    [CellType.LARVAE]: 'rgb(255, 255, 255)',
-    [CellType.NECTAR]: 'rgb(255, 255, 204)',
-    [CellType.NOT_CLASSIFIED]: 'rgb(255, 128, 128)',
-    [CellType.POLLEN]: 'rgb(0, 0, 139)',
-    [CellType.PUPPA]: 'rgb(165, 42, 42)',
+    [CellType.BEE_OCCLUDED]: 'rgb(0, 0, 0)',
+    [CellType.EGG]: 'rgb(200, 200, 200)',
+    [CellType.EMPTY]: 'rgba(255, 102, 195, 1)',
+    [CellType.HONEY_CLOSED]: 'rgba(129, 77, 1, 1)',
+    [CellType.LARVA]: 'rgba(93, 24, 235, 1)',
+    [CellType.NECTAR]: 'rgba(191, 27, 27, 1)',
+    [CellType.NOT_CLASSIFIED]: 'rgba(192, 145, 34, 1)',
+    [CellType.POLLEN]: 'rgba(0, 190, 98, 1)',
+    [CellType.PUPA]: 'rgba(1, 150, 178, 1)',
 };

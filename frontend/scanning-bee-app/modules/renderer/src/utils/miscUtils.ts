@@ -1,3 +1,7 @@
+import { getProcessMemoryInfo } from 'process';
+import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
+import { setBackendOnline } from '@frontend/slices/backendStatusSlice';
+
 import { isMac } from './platform';
 
 export const uppercaseFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
@@ -39,3 +43,31 @@ export const getUnicodeIconForKey = (key: string) => {
 
 export const getUnicodeIconRepresentation = (combo: string) => combo
     .split(' ').map(key => getUnicodeIconForKey(key)).join(' ');
+
+export const getMemoryUsage = async () => {
+    const memInfo = (await getProcessMemoryInfo());
+    const usage = isMac() ? memInfo.private : memInfo.residentSet;
+
+    return Math.round(usage / (1024));
+};
+
+export const checkIsBackendOnline = async () => {
+    const { dispatch } = (window as any).store;
+
+    BackendInterface.getInstance().getFrames().then((res) => {
+        dispatch(setBackendOnline(res !== null));
+    }).catch(() => {
+        dispatch(setBackendOnline(false));
+    });
+};
+
+let checkIsBackendOnlineInterval = null;
+export const initiateIsBackendOnlineCheck = () => {
+    if (checkIsBackendOnlineInterval) {
+        clearInterval(checkIsBackendOnlineInterval);
+    }
+
+    checkIsBackendOnlineInterval = setInterval(() => {
+        checkIsBackendOnline();
+    }, 15_000);
+};

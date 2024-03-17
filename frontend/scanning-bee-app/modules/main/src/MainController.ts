@@ -265,7 +265,7 @@ class MainController {
                 backgroundThrottling: true, // fix for main window freezing
             },
             titleBarStyle: 'hidden',
-            trafficLightPosition: { x: 12, y: 17 }, // only valid for macOS
+            trafficLightPosition: { x: 12, y: 11 }, // only valid for macOS
             titleBarOverlay: true,
         });
 
@@ -314,11 +314,11 @@ class MainController {
                 const { scaleFactor } = screen.getDisplayMatching(this.mainWindow.getBounds());
 
                 if (IS_MAC && this.mainWindow.setTrafficLightPosition) {
-                    this.mainWindow.setTrafficLightPosition({ x: 12, y: Math.round((17 * zoomFactor) / scaleFactor) });
+                    this.mainWindow.setTrafficLightPosition({ x: 12, y: Math.round((11 * zoomFactor) / scaleFactor) });
                 } else if (this.mainWindow.setTitleBarOverlay) {
                     // change title bar height
                     this.mainWindow.setTitleBarOverlay({
-                        height: Math.floor((46 * zoomFactor) / scaleFactor),
+                        height: Math.floor((20 * zoomFactor) / scaleFactor),
                     });
                 }
             }

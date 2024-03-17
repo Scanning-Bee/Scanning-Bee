@@ -45,10 +45,10 @@ export type CellContentDto = {
 export const CellTypeDto = {
     [CellType.EGG]: 1,
     [CellType.EMPTY]: 2,
-    [CellType.LARVAE]: 3,
+    [CellType.LARVA]: 3,
     [CellType.NECTAR]: 4,
     [CellType.POLLEN]: 5,
-    [CellType.PUPPA]: 6,
+    [CellType.PUPA]: 6,
     [CellType.HONEY_CLOSED]: 7,
     [CellType.BEE_OCCLUDED]: 8,
     [CellType.NOT_CLASSIFIED]: 9,

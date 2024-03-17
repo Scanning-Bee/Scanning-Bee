@@ -1,8 +1,10 @@
 import { Button, Divider, Icon, Menu, MenuDivider, MenuItem, Popover } from '@blueprintjs/core';
 import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
-import { resetAnnotations, useAnnotationsFolder } from '@frontend/slices/annotationSlice';
+import { resetAnnotations, useAnnotations, useAnnotationsFolder, useUnsavedChanges } from '@frontend/slices/annotationSlice';
+import { useIsBackendOnline } from '@frontend/slices/backendStatusSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { getFileName } from '@frontend/utils/fileNameUtils';
+import { isMac } from '@frontend/utils/platform';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -25,76 +27,142 @@ const HomeButton = (props: { setPage: any }) => {
     );
 };
 
-const TooltipButton = (props: { folder: string }) => {
+const TooltipButton = (props: { folder: string, showFolderActionsMenu: boolean }) => {
     const theme = useTheme();
 
-    return (<Button
-        outlined
-        text={props.folder ? getFileName(props.folder) : 'Select Folder'}
-        style={{
-            width: '100%',
-            display: 'inline',
-            textAlign: 'center',
-            backgroundColor: theme.secondaryBackground,
-            color: theme.secondaryForeground,
-            borderColor: theme.tertiaryForeground,
-        }}
-        onClick={() => {
+    const changesUnsaved = useUnsavedChanges();
+
+    const buttonColour = theme.type === 'dark' ? theme.tertiaryBackground : theme.secondaryBackground;
+    const outlineColour = theme.type === 'dark' ? theme.secondaryForeground : theme.tertiaryForeground;
+
+    const handleClick = props.showFolderActionsMenu
+        ? null
+        : () => {
             if (!props.folder) BackendInterface.getInstance().openFolderDialog();
+        };
+
+    const buttonText = props.showFolderActionsMenu
+        ? 'Select Page'
+        : props.folder ? getFileName(props.folder) + (changesUnsaved ? '  •' : '') : 'Select Folder';
+
+    return (<Button
+        outlined={theme.secondaryBackground === theme.tertiaryBackground}
+        text={<p style={{ margin: 0, fontSize: 'small' }}>{buttonText}</p>}
+        style={{
+            backgroundColor: buttonColour,
+            color: theme.secondaryForeground,
+            borderColor: outlineColour,
         }}
-        className='header-button'
+        onClick={handleClick}
+        className='header-button header-tooltip-button'
+        minimal
     />);
 };
 
-const TooltipMenu = (props: { folder: string }) => {
+const TooltipMenu = (props: { page: PageType, setPage: any, folder: string, hideFolderActionsMenu: boolean }) => {
+    const { page, setPage, folder, hideFolderActionsMenu } = props;
+
     const dispatch = useDispatch();
+
+    const annotations = useAnnotations();
+
+    const backendOnline = useIsBackendOnline();
 
     return (<div style={{ padding: '10px' }}>
         <Menu>
-            <p style={{ margin: '7px', fontWeight: 'bold' }}>{props.folder ? getFileName(props.folder) : 'None'}</p>
-            <Divider />
+            {
+                folder && !hideFolderActionsMenu && <>
+                    <p style={{ margin: '7px', fontWeight: 'bold' }}>{folder ? getFileName(folder) : 'None'}</p>
+                    <Divider />
+                    <MenuItem
+                        text="Save Annotations Locally"
+                        onClick={() => {
+                            BackendInterface.getInstance().saveAnnotations(annotations, folder);
+                        }}
+                        icon='floppy-disk'
+                    />
+                    <MenuItem
+                        text='Save Annotations to Database'
+                        onClick={() => {
+                            BackendInterface.getInstance().saveAnnotationsToDatabase(annotations);
+                        }}
+                        icon='database'
+                        disabled={!backendOnline}
+                    />
+                    <Divider />
+                    <MenuItem
+                        text='Select Another Folder'
+                        onClick={() => {
+                            BackendInterface.getInstance().openFolderDialog();
+                        }}
+                        icon='folder-new'
+                    />
+                    <MenuItem
+                        text='Open Folder Location'
+                        onClick={() => {
+                            if (folder) BackendInterface.getInstance().openFolderAtLocation(folder);
+                        }}
+                        icon='folder-open'
+                    />
+                    <MenuItem
+                        text='Open Annotations File'
+                        onClick={() => {
+                            if (folder) BackendInterface.getInstance().openFolderAtLocation(`${folder}/annotations/annotations.yaml`);
+                        }}
+                        icon='document-open'
+                    />
+                    <MenuItem
+                        text='Copy Folder Path'
+                        onClick={() => {
+                            if (folder) navigator.clipboard.writeText(folder);
+                        }}
+                        icon='clipboard'
+                    />
+                    <MenuItem
+                        text='Close Folder'
+                        onClick={() => {
+                            dispatch(resetAnnotations());
+                        }}
+                        icon='cross'
+                    />
+                    <MenuDivider />
+                </>
+            }
             <MenuItem
-                text='Select Another Folder'
+                text='Home'
                 onClick={() => {
-                    BackendInterface.getInstance().openFolderDialog();
+                    if (page !== 'home') setPage('home');
                 }}
-                icon='folder-new'
+                icon='home'
             />
             <MenuItem
-                text='Open Folder Location'
+                text='Manual Annotator'
                 onClick={() => {
-                    if (props.folder) BackendInterface.getInstance().openFolderAtLocation(props.folder);
+                    if (page !== 'manual-annotator') setPage('manual-annotator');
                 }}
-                icon='folder-open'
+                icon='annotation'
             />
             <MenuItem
-                text='Open Annotations File'
+                text='Statistics'
                 onClick={() => {
-                    if (props.folder) BackendInterface.getInstance().openFolderAtLocation(`${props.folder}/annotations/annotations.yaml`);
+                    if (page !== 'statistics') setPage('statistics');
                 }}
-                icon='document-open'
+                icon='chart'
             />
             <MenuItem
-                text='Copy Folder Path'
+                text='Beehive'
                 onClick={() => {
-                    if (props.folder) navigator.clipboard.writeText(props.folder);
+                    if (page !== 'beehive') setPage('beehive');
                 }}
-                icon='clipboard'
-            />
-            <MenuDivider />
-            <MenuItem
-                text='Close Folder'
-                onClick={() => {
-                    dispatch(resetAnnotations());
-                }}
-                icon='cross'
+                icon={'path-search'}
+                disabled
             />
         </Menu>
     </div>);
 };
 
 export const HeaderTooltip = (props: {
-    page: any,
+    page: PageType,
     setPage: any,
     goBack: any,
     goForward: any,
@@ -105,15 +173,11 @@ export const HeaderTooltip = (props: {
 
     const folder = useAnnotationsFolder();
 
-    const hideTooltip = props.page === 'home' && !folder;
-
-    if (hideTooltip) {
-        return null;
-    }
+    const hideFolderActionsMenu = props.page !== 'statistics' && props.page !== 'manual-annotator';
 
     return (<div
         className="header-container flex-center header-container-left"
-        style={{ margin: '0 30px 0 -30px', width: '100%' }}
+        style={{ margin: isMac() ? '0 30px 0 -30px' : 0, width: '100%' }}
     >
         <Button
             icon={<Icon icon='arrow-left' style={{ color: theme.secondaryForeground }}/>}
@@ -135,13 +199,19 @@ export const HeaderTooltip = (props: {
         <Popover
             interactionKind='click'
             position='bottom'
-            disabled={!folder}
+            disabled={!folder && !hideFolderActionsMenu}
             fill
             canEscapeKeyClose
             usePortal
+            minimal
         >
-            <TooltipButton folder={folder} />
-            <TooltipMenu folder={folder} />
+            <TooltipButton folder={folder} showFolderActionsMenu={hideFolderActionsMenu} />
+            <TooltipMenu
+                page={props.page}
+                setPage={props.setPage}
+                folder={folder}
+                hideFolderActionsMenu={hideFolderActionsMenu}
+            />
         </Popover>
     </div>);
 };

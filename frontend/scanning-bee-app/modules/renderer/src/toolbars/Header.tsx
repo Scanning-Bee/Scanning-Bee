@@ -20,24 +20,24 @@ export default function Header(props: {
 
     const zoom = useZoom();
 
-    console.log(Math.ceil(120 - (zoom * 23)));
+    const headerBackground = theme.type === 'dark' ? theme.secondaryBackground : theme.tertiaryBackground;
 
     return (
         <div id="header"
             // eslint-disable-next-line no-useless-concat
             className={'noselect'}
             style={{
-                background: theme.secondaryBackground,
-                borderBottom: theme.secondaryBackground === theme.primaryBackground
+                background: headerBackground,
+                borderBottom: headerBackground === theme.primaryBackground
                     ? `1px solid ${theme.primaryBorder}` : 'none',
                 color: theme.secondaryForeground,
                 padding: isMac()
-                    ? '0px 0px 0px 60px'
+                    ? `0 0 0 ${Math.ceil(60 - (zoom * 10))}px`
                     : `0 ${Math.ceil(120 - (zoom * 23))}px 0 0`,
             }}
         >
             <div className='header-sub-flex-box' style={{ width: '30%' }}>
-                <HeaderLeft page={props.page} setPage={props.setPage} />
+                <HeaderLeft />
             </div>
             <div className='header-sub-flex-box' style={{ width: '40%' }}>
                 <HeaderTooltip

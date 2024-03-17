@@ -16,7 +16,6 @@ const SettingsButton = (props: { setPage: any }) => {
                 setPage('settings');
             }}
             style={{ padding: '5px', margin: '2px' }}
-            large
             className='header-button'
         />
     );
@@ -25,17 +24,9 @@ const SettingsButton = (props: { setPage: any }) => {
 export const HeaderButtons = (props: { page: any, setPage: any }) => {
     const { setPage } = props;
 
-    const theme = useTheme();
-
     return (
         <div
             id="header-buttons"
-            style={{
-                background: theme.secondaryBackground,
-                borderBottom: theme.secondaryBackground === theme.primaryBackground
-                    ? `1px solid ${theme.primaryBorder}` : 'none',
-                color: theme.secondaryForeground,
-            }}
             className='header-container header-container-right'
         >
             <SettingsButton setPage={setPage} />

@@ -1,28 +1,16 @@
 import BeeBlack from '@assets/images/bee-black.png';
 import BeeWhite from '@assets/images/bee-white.png';
-import { Button } from '@blueprintjs/core';
 import { useTheme } from '@frontend/slices/themeSlice';
 import React from 'react';
 
-export const HeaderLeft = (props: { page: any, setPage: any }) => {
+export const HeaderLeft = () => {
     const theme = useTheme();
 
     return (<div className="header-container header-container-left">
-        <Button
-            minimal
-            icon={<img
-                src={theme.type === 'dark' ? BeeWhite : BeeBlack}
-                alt="Scanning Bee Logo"
-                className='header-logo'
-            />}
-            text={<p style={{ fontSize: 'large', margin: 0, color: theme.primaryForeground }}>Scanning Bee</p>}
-            onClick={(e) => {
-                e.preventDefault();
-                props.setPage('home');
-            }}
-            large
-            className='header-button'
-            style={{ padding: '5px' }}
+        <img
+            src={theme.type === 'dark' ? BeeWhite : BeeBlack}
+            alt="Scanning Bee Logo"
+            className='header-logo'
         />
         {/* {props.page !== 'home' && <>
             <Divider style={{ margin: '0px 5px 0px 2px', backgroundColor: theme.secondaryForeground, width: '1px', height: '50%' }} />

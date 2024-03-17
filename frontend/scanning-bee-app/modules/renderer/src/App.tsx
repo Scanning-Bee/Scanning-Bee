@@ -7,6 +7,7 @@ import { ManualAnnotatorPage } from './pages/ManualAnnotatorPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { StatisticsPage } from './pages/StatisticsPage';
 import store from './store';
+import Footer from './toolbars/Footer';
 import Header from './toolbars/Header';
 
 require('@assets/css/index.css');
@@ -55,6 +56,8 @@ const App = (props: {
                 {
                     page === 'manual-annotator' && <HotkeyHandler />
                 }
+
+                <Footer />
             </div>
         </Provider>
     );
