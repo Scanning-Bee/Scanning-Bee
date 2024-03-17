@@ -80,6 +80,14 @@ a {
   
   overflow-y: scroll;
   overflow-x: hidden;
+
+  /* hide scroll bar */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#main-content::-webkit-scrollbar {
+  display: none;
 }
 
 #left-panel {
@@ -353,7 +361,7 @@ a {
   flex-direction: column;
   justify-content: flex-start;
   align-items: self-start;
-  overflow: scroll;
+  overflow-y: scroll;
   padding-bottom: '20px',
 }
 
