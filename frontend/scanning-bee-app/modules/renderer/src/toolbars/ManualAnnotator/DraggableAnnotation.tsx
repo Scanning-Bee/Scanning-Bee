@@ -128,6 +128,7 @@ export const DraggableAnnotation = (props: {
                         borderRadius: '50%',
                         color: CellTypeColours[annotation.cell_type],
                         backgroundColor: isActive ? '#00FF0044' : 'transparent',
+                        cursor: 'pointer',
                     }}
                 >
                     {annotation.cell_type}
