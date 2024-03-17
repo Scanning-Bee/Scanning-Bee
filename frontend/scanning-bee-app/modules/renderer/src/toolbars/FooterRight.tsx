@@ -40,7 +40,7 @@ export const FooterRight = () => {
                     />
                 </Menu>
             </Popover>
-            <p style={{ margin: 0, fontSize: '12px', alignSelf: 'center' }}>
+            <p style={{ margin: '0 0 0 10px', fontSize: '12px', alignSelf: 'center' }}>
                         Scanning Bee {SCANNING_BEE_VERSION}
             </p>
         </div>

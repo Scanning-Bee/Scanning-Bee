@@ -1,37 +1,60 @@
 import CellType from '@frontend/models/cellType';
 
+export type CellID = number;
+export type FrameID = number;
+export type ContentID = number;
+export type CellContentID = number;
+export type UserID = number;
+export type ImageID = number;
+export type UserTypeID = number;
+export type BagID = number;
+
+export type BagDto = {
+    id?: BagID;
+    name: string;
+};
+
 export type UserTypeDto = {
+    id?: UserTypeID;
     type: string;
 };
 
 export type UserDto = {
+    id?: UserID;
     name: string;
-    user_type: UserTypeDto;
+    user_type: number;
 };
 
 export type FrameDto = {
+    id?: FrameID;
     description: string;
 };
 
 export type CellDto = {
+    id?: CellID;
     location_on_frame_x: number;
     location_on_frame_y: number;
-    frame: FrameDto;
+    frame: number;
 };
 
 export type ContentDto = {
+    id?: ContentID;
     name: string;
     content_description: string;
 };
 
 export type ImageDto = {
+    id?: ImageID;
     image_name: string;
     x_pos: number;
     y_pos: number;
+    timestamp: string;
+    bag: any;
 };
 
 export type CellContentDto = {
-    frame: FrameDto | number;
+    id?: CellContentID;
+    frame: number;
     timestamp: string;
     content: ContentDto | number;
     user: UserDto | number;
@@ -39,7 +62,7 @@ export type CellContentDto = {
     center_y: number;
     image: string | number;
     radius: number;
-    cell?: CellDto;
+    cell?: typeof CellTypeDto[keyof typeof CellTypeDto];
 };
 
 export const CellTypeDto = {

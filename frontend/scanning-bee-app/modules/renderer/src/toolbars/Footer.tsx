@@ -55,7 +55,7 @@ export default function Footer() {
                     Backend: {isBackendOnline ? 'Online' : 'Offline'}
                 </p>
                 <p style={{
-                    margin: '0 5px',
+                    margin: '0 10px',
                     fontSize: '12px',
                     display: 'flex',
                     alignItems: 'center',
