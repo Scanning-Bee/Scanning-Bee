@@ -65,7 +65,7 @@ export const DraggableAnnotation = (props: {
 
     const { mode, modeParams } = useManualAnnotatorModeWithParams();
 
-    const headerHeight = 40;
+    const headerHeight = 35;
     const footerHeight = 25;
 
     const radius = annotation.radius / 2;

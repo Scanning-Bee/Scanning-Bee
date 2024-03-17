@@ -11,7 +11,7 @@
   --buttonOffset:-30px;
   --buttonOffsetInactive:-15px;
 
-  --headerSpace:40px;
+  --headerSpace:35px;
   --footerSpace:20px;
 
   --primaryColor: #2d72d2;
@@ -138,8 +138,8 @@ a {
 }
 
 .header-logo{
-  width: calc(var(--headerSpace) - 20px);
-  height: calc(var(--headerSpace) - 20px);
+  width: calc(var(--headerSpace) - 12px);
+  height: calc(var(--headerSpace) - 12px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -162,6 +162,13 @@ a {
   top: 0;
   margin: unset;
   /* width: 33%; this is set by header component */
+}
+
+.header-tooltip-button {
+  width: 100%;
+  display: inline;
+  text-align: center;
+  min-height: calc(var(--headerSpace) - 10px) !important;
 }
 
 .footer-left {

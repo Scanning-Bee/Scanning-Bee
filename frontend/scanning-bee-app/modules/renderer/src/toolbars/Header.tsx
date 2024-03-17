@@ -32,7 +32,7 @@ export default function Header(props: {
                     ? `1px solid ${theme.primaryBorder}` : 'none',
                 color: theme.secondaryForeground,
                 padding: isMac()
-                    ? `0 0 0 ${Math.ceil(60 - (zoom * 17))}px`
+                    ? `0 0 0 ${Math.ceil(60 - (zoom * 10))}px`
                     : `0 ${Math.ceil(120 - (zoom * 23))}px 0 0`,
             }}
         >

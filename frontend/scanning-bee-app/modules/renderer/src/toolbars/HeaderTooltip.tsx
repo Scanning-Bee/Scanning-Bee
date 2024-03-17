@@ -46,17 +46,14 @@ const TooltipButton = (props: { folder: string, showFolderActionsMenu: boolean }
 
     return (<Button
         outlined={theme.secondaryBackground === theme.tertiaryBackground}
-        text={buttonText}
+        text={<p style={{ margin: 0, fontSize: 'small' }}>{buttonText}</p>}
         style={{
-            width: '100%',
-            display: 'inline',
-            textAlign: 'center',
             backgroundColor: buttonColour,
             color: theme.secondaryForeground,
             borderColor: outlineColour,
         }}
         onClick={handleClick}
-        className='header-button'
+        className='header-button header-tooltip-button'
         minimal
     />);
 };
