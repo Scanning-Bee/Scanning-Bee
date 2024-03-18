@@ -4,6 +4,7 @@ import { ipcRenderer, shell } from 'electron';
 import Annotation from '@frontend/models/annotation';
 import CellType from '@frontend/models/cellType';
 import { addAnnotation, saveChanges } from '@frontend/slices/annotationSlice';
+import { resetBackendStatus } from '@frontend/slices/backendStatusSlice';
 import { AppToaster } from '@frontend/Toaster';
 import { AnnotationYaml, RENDERER_QUERIES } from '@scanning_bee/ipc-interfaces';
 
@@ -53,6 +54,12 @@ export class BackendInterface {
 
     public openFolderAtLocation = (folder: string) => {
         shell.openPath(folder);
+    };
+
+    public invokeBackend = () => {
+        ipcRenderer.send(RENDERER_QUERIES.INVOKE_BACKEND);
+
+        resetBackendStatus();
     };
 
     private async apiQuery<RequestDto>(endpoint: string, method: APIMethods, data?: RequestDto): Promise<RequestDto | null> {

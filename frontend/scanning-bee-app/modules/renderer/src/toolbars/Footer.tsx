@@ -1,8 +1,10 @@
-import { useIsBackendOnline } from '@frontend/slices/backendStatusSlice';
+import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
+import { useBackendStatus } from '@frontend/slices/backendStatusSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
-import { checkIsBackendOnline, getMemoryUsage, initiateIsBackendOnlineCheck } from '@frontend/utils/miscUtils';
+import { capitalizeFirstLetter, checkIsBackendOnline, getMemoryUsage, initiateIsBackendOnlineCheck } from '@frontend/utils/miscUtils';
 import { Theme } from '@utils/colours';
 import React, { useEffect, useState } from 'react';
+import Loader from 'react-loader-spinner';
 
 import { FooterRight } from './FooterRight';
 
@@ -10,7 +12,7 @@ export default function Footer() {
     const theme: Theme = useTheme();
 
     const [memoryUsage, setMemoryUsage] = useState(-1);
-    const isBackendOnline = useIsBackendOnline();
+    const backendStatus = useBackendStatus();
 
     const footerBackground = theme.type === 'dark' ? theme.secondaryBackground : theme.tertiaryBackground;
 
@@ -42,17 +44,20 @@ export default function Footer() {
             }}
         >
             <div className='footer-left'>
-                <p style={{
-                    margin: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    backgroundColor: isBackendOnline ? '#116622' : '#771111',
-                    color: 'white',
-                    fontSize: '12px',
-                    padding: '0 10px',
-                    height: 'var(--footerSpace)',
-                }}>
-                    Backend: {isBackendOnline ? 'Online' : 'Offline'}
+                <p
+                    className={`backend-status-indicator ${backendStatus}`}
+                    onClick={() => {
+                        if (backendStatus === 'offline') BackendInterface.getInstance().invokeBackend();
+                    }}
+                >
+                    Backend: {capitalizeFirstLetter(backendStatus)}
+                    {backendStatus === 'connecting' && <Loader
+                        height={10}
+                        width={10}
+                        color='white'
+                        type='TailSpin'
+                        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginLeft: '5px' }}
+                    />}
                 </p>
                 <p style={{
                     margin: '0 10px',

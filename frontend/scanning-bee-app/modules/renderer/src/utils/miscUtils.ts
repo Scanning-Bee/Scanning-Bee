@@ -4,7 +4,7 @@ import { setBackendOnline } from '@frontend/slices/backendStatusSlice';
 
 import { isMac } from './platform';
 
-export const uppercaseFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+export const capitalizeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 export const getUnicodeIconForKey = (key: string) => {
     switch (key) {
@@ -52,12 +52,10 @@ export const getMemoryUsage = async () => {
 };
 
 export const checkIsBackendOnline = async () => {
-    const { dispatch } = (window as any).store;
-
     BackendInterface.getInstance().getFrames().then((res) => {
-        dispatch(setBackendOnline(res !== null));
+        setBackendOnline(res !== null);
     }).catch(() => {
-        dispatch(setBackendOnline(false));
+        setBackendOnline(false);
     });
 };
 

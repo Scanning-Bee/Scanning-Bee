@@ -57,6 +57,7 @@
         "@scanning_bee/ipc-interfaces": "workspace:*",
         "@scanning_bee/main": "workspace:*",
         "@scanning_bee/renderer": "workspace:*",
+        "react-loader-spinner": "^3.1.12",
         "recharts": "^2.12.1",
         "winston": "^3.11.0"
     },

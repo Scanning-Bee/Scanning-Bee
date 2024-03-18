@@ -385,6 +385,10 @@ class MainController {
             },
         );
 
+        ipcMain.on(RENDERER_QUERIES.INVOKE_BACKEND, () => {
+            this.initBackend();
+        });
+
         ipcMain.on(RENDERER_EVENTS.ZOOM_CHANGE, zoomChangeHandler);
         ipcMain.on(RENDERER_EVENTS.THEME_CHANGE, themeChangeHandler);
         zoomChangeHandler();

@@ -1,6 +1,9 @@
 @import "~normalize.css";
 @import "~@blueprintjs/core/lib/css/blueprint.css";
 @import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
+@import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+
+
 
 @import "./fonts.css";
 @import "./bp3_overrides.css";
@@ -509,4 +512,33 @@ a {
 
 .footer-zoom-icon:hover {
   background-color: #99999988;
+}
+
+.backend-status-indicator {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  color: white;
+  font-size: 12px;
+  padding: 0 10px;
+  height: var(--footerSpace);
+}
+
+.offline {
+  background-color: #771111;
+  cursor: pointer;
+}
+.offline:hover {
+  background-color: #550000;
+  cursor: pointer;
+}
+
+.connecting {
+  background-color: #666666;
+  cursor: default;
+}
+
+.online {
+  background-color: #116622;
+  cursor: default;
 }

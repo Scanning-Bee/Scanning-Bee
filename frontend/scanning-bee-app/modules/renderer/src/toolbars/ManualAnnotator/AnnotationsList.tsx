@@ -7,7 +7,7 @@ import {
     useAnnotations,
     useShownImageUrl,
 } from '@frontend/slices/annotationSlice';
-import { useIsBackendOnline } from '@frontend/slices/backendStatusSlice';
+import { useBackendStatus } from '@frontend/slices/backendStatusSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { CellTypeColours } from '@frontend/utils/colours';
 import { getFileName } from '@frontend/utils/fileNameUtils';
@@ -19,7 +19,7 @@ export const AnnotationsList = () => {
 
     const dispatch = useDispatch();
 
-    const isBackendOnline = useIsBackendOnline();
+    const backendStatus = useBackendStatus();
 
     const annotations = useAnnotations();
     const shownImageUrl = useShownImageUrl();
@@ -99,7 +99,7 @@ export const AnnotationsList = () => {
                 icon='send-to-graph'
                 style={{ margin: '5px', backgroundColor: 'darkgreen' }}
                 className='inline-box-important'
-                disabled={!isBackendOnline}
+                disabled={backendStatus !== 'online'}
             />
         </div>
     );

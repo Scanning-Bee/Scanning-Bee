@@ -7,7 +7,7 @@ import {
 } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { getIconForMode } from '@frontend/utils/annotationUtils';
-import { uppercaseFirstLetter } from '@frontend/utils/miscUtils';
+import { capitalizeFirstLetter } from '@frontend/utils/miscUtils';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -81,7 +81,7 @@ export const ModeButton = () => {
             >
                 <Button
                     icon={<Icon icon='style' color={theme.secondaryForeground} />}
-                    text={`Annotator Mode: ${uppercaseFirstLetter(annotatorMode.mode)}`}
+                    text={`Annotator Mode: ${capitalizeFirstLetter(annotatorMode.mode)}`}
                     minimal
                     style={{ color: theme.primaryForeground }}
                 />
