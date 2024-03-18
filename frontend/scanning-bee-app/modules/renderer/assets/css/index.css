@@ -97,6 +97,7 @@ a {
   max-width: 50%;
   left: 0 !important;
   width: var(--leftPanelWidth);
+  height: calc(100% - (var(--footerSpace) + var(--headerSpace)));
 }
 
 .panel {
