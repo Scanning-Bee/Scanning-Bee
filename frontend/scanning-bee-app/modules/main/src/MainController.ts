@@ -1,3 +1,4 @@
+import { spawn } from 'child_process';
 import http from 'http';
 import { AddressInfo } from 'net';
 import path from 'path';
@@ -9,6 +10,7 @@ import fs from 'fs-extra';
 import { AnnotationYaml, MAIN_EVENTS, RENDERER_EVENTS, RENDERER_QUERIES, THEME_STORAGE_ID } from '@scanning_bee/ipc-interfaces';
 
 import { loadAnnotations, loadImages, saveAnnotations } from './annotationUtils';
+import { invokeBackend } from './backendInvoker';
 import { isRunningDevMode } from './utils';
 
 // Determine the mode (dev or production)
@@ -65,11 +67,33 @@ class MainController {
     }
 
     private async initApplication() {
+        this.initBackend();
+
         this.initMainMenu();
         this.initTray();
         this.initSplash();
         this.initStore();
         this.initMainWindow();
+    }
+
+    private async initBackend() {
+        const dockerProcess = spawn('docker', ['info']);
+
+        dockerProcess.stdout.once('data', () => {
+            invokeBackend();
+        });
+
+        dockerProcess.stderr.once('data', () => {
+            console.error("Docker is not running, backend won't be started.");
+        });
+
+        dockerProcess.on('close', (code) => {
+            console.log(`Docker engine check done with code: ${code}`);
+        });
+
+        dockerProcess.on('error', (err) => {
+            console.error('Error while checking for docker engine', err);
+        });
     }
 
     private initMainMenu() {
