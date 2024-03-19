@@ -1,11 +1,13 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-underscore-dangle */
 import axios, { AxiosInstance } from 'axios';
 import { ipcRenderer, shell } from 'electron';
 import Annotation from '@frontend/models/annotation';
 import CellType from '@frontend/models/cellType';
-import { addAnnotation, saveChanges } from '@frontend/slices/annotationSlice';
+import { addAnnotation, getAnnotationsMetadata, saveChanges } from '@frontend/slices/annotationSlice';
 import { resetBackendStatus } from '@frontend/slices/backendStatusSlice';
 import { AppToaster } from '@frontend/Toaster';
+import { addTrailingZeros } from '@frontend/utils/miscUtils';
 import { AnnotationYaml, RENDERER_QUERIES } from '@scanning_bee/ipc-interfaces';
 
 import { BACKEND_ENDPOINTS, ENDPOINT_URL } from './endpoints';
@@ -173,11 +175,13 @@ export class BackendInterface {
         .apiQuery<ImageDto>(BACKEND_ENDPOINTS.IMAGE.GET.BY_LOCATION(x, y), 'get');
 
     public getImageByLocationAndTimestamp = async (x: number, y: number, timestamp: Date) => this
-        .apiQuery<ImageDto>(BACKEND_ENDPOINTS.IMAGE.GET.BY_LOCATION_AND_TIMESTAMP(x, y, timestamp), 'get');
+        .apiQuery<ImageDto[]>(BACKEND_ENDPOINTS.IMAGE.GET.BY_LOCATION_AND_TIMESTAMP(x, y, timestamp), 'get');
 
     public createImage = async (image: ImageDto) => this.apiQuery<ImageDto>(BACKEND_ENDPOINTS.IMAGE.POST.CREATE, 'post', image);
 
-    public scrapeImages = async () => this.apiQuery<ImageDto[]>(BACKEND_ENDPOINTS.IMAGE.POST.SCRAPE, 'post');
+    public scrapeImages = async (data: { path: string }) => this.apiQuery<{
+        path: string;
+    }>(BACKEND_ENDPOINTS.IMAGE.POST.SCRAPE, 'post', data);
 
     // * AI
     public getCellContentByAI = async (imageName: string) => this
@@ -191,6 +195,10 @@ export class BackendInterface {
     public createBag = async (bag: ImageDto) => this.apiQuery<ImageDto>(BACKEND_ENDPOINTS.BAG.POST.CREATE, 'post', bag);
 
     public saveAnnotationsToDatabase = async (annotations: Annotation[]) => {
+        const metadata = getAnnotationsMetadata();
+
+        const imageDtos = {} as { [image_name: string]: ImageDto };
+
         let success = true;
 
         AppToaster.show({
@@ -200,6 +208,32 @@ export class BackendInterface {
 
         for (let i = 0; i < annotations.length; i += 1) {
             const annotation = annotations[i];
+            const imageName = annotation.source_name;
+
+            const imageMetadata = metadata.image_data.find(meta => meta.image_name === imageName);
+
+            if (!Object.keys(imageDtos).includes(imageName)) {
+                const matchingImages = await this.getImageByLocationAndTimestamp(
+                    imageMetadata.x_pos,
+                    imageMetadata.y_pos,
+                    new Date(imageMetadata.sec),
+                );
+
+                let imageDto = matchingImages ? matchingImages[0] : null;
+
+                if (!imageDto || !imageDto.id) {
+                    imageDto = await this.createImage({
+                        image_name: imageName,
+                        timestamp: addTrailingZeros(new Date(imageMetadata.sec).toISOString()),
+                        x_pos: imageMetadata.x_pos,
+                        y_pos: imageMetadata.y_pos,
+                    });
+                }
+
+                imageDtos[imageName] = imageDto;
+            }
+
+            const annotationTimestamp = annotation.timestamp ? new Date(annotation.timestamp) : new Date();
 
             const obj = {
                 radius: annotation.radius,
@@ -207,8 +241,10 @@ export class BackendInterface {
                 center_y: annotation.center[1],
                 content: CellTypeDto[annotation.cell_type],
                 user: 1,
-                timestamp: `${annotation.timestamp || new Date().toISOString()}`,
+                timestamp: `${addTrailingZeros(annotationTimestamp.toISOString())}`,
                 frame: 1,
+                image: imageDtos[imageName].id,
+                cell: 1,
             } as CellContentDto;
 
             // eslint-disable-next-line no-await-in-loop

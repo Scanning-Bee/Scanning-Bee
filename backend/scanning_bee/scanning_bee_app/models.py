@@ -72,7 +72,7 @@ class CellContent(models.Model):
     radius = models.IntegerField()
     
     class Meta:
-        unique_together = ('cell', 'frame', 'content', 'center_x', 'center_y', 'image')
+        unique_together = ('frame', 'content', 'center_x', 'center_y', 'image')
 
     def __str__(self):
         return str(self.pk) + " - " + self.content.name + " - " + str(self.cell)

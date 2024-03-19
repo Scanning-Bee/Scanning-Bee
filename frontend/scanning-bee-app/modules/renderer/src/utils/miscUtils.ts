@@ -69,3 +69,17 @@ export const initiateIsBackendOnlineCheck = () => {
         checkIsBackendOnline();
     }, 15_000);
 };
+
+export const addTrailingZeros = (isoStr: string) => {
+    // this function ensures that the milliseconds part of the timestamp is always 6 digits long, by adding trailing zeros
+    const [start, secondsWithZ] = isoStr.split('.');
+    const seconds = secondsWithZ.split('Z')[0];
+
+    if (seconds.length === 6) {
+        return isoStr;
+    }
+
+    const zerosToAdd = 6 - seconds.length;
+
+    return `${start}.${seconds}${'0'.repeat(zerosToAdd)}Z`;
+};

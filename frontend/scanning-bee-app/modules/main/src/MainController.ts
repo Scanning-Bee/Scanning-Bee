@@ -9,7 +9,7 @@ import Store from 'electron-store';
 import fs from 'fs-extra';
 import { AnnotationYaml, MAIN_EVENTS, RENDERER_EVENTS, RENDERER_QUERIES, THEME_STORAGE_ID } from '@scanning_bee/ipc-interfaces';
 
-import { loadAnnotations, loadImages, saveAnnotations } from './annotationUtils';
+import { loadAnnotations, loadImages, loadMetadata, saveAnnotations } from './annotationUtils';
 import { invokeBackend } from './backendInvoker';
 import { isRunningDevMode } from './utils';
 
@@ -362,10 +362,10 @@ class MainController {
                     }
 
                     const annotations = loadAnnotations(annotationsFilePath);
-
                     const imageUrls = loadImages(folderPath);
+                    const metadata = loadMetadata(folderPath);
 
-                    this.send(MAIN_EVENTS.ANNOTATIONS_PARSED, { folder: folderPath, annotations, images: imageUrls });
+                    this.send(MAIN_EVENTS.ANNOTATIONS_PARSED, { folder: folderPath, annotations, images: imageUrls, metadata });
                 }
             }).catch((err) => {
                 console.log(err);

@@ -1,4 +1,4 @@
-import { AnnotationYaml, MAIN_EVENTS } from '@scanning_bee/ipc-interfaces';
+import { AnnotationYaml, MAIN_EVENTS, MetadataWrapperYaml } from '@scanning_bee/ipc-interfaces';
 import { ipcRenderer } from 'electron';
 import React, { StrictMode } from 'react';
 import { render } from 'react-dom';
@@ -41,7 +41,12 @@ export class RendererController {
         this.initialize();
     }
 
-    private handleParsedAnnotations(_event, payload: { folder: string, annotations: AnnotationYaml[], images: string[] }) {
+    private handleParsedAnnotations(_event, payload: {
+        folder: string,
+        annotations: AnnotationYaml[],
+        images: string[],
+        metadata: MetadataWrapperYaml,
+    }) {
         const { dispatch } = (window as any).store;
 
         const annotations = generateAnnotationsFromYaml(payload.annotations);
@@ -50,6 +55,7 @@ export class RendererController {
             folder: payload.folder,
             annotations: annotations.map(annotation => Annotation.toPlainObject(annotation)),
             images: payload.images,
+            metadata: payload.metadata,
         }));
     }
 
