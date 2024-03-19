@@ -9,3 +9,27 @@ export type AnnotationYaml = {
     x_pos: number;
     y_pos: number;
 };
+
+export type RawMetadataWrapperYaml = {
+    bag_name: string;
+    image_data: RawMetadataYaml[];
+};
+
+export type RawMetadataYaml = {
+    prev_image: string;
+    sec: number;
+    x_pos: number;
+    y_pos: number;
+};
+
+export type MetadataWrapperYaml = {
+    bag_name: string;
+    image_data: MetadataYaml[];
+};
+
+export type MetadataYaml = {
+    image_name: string;
+    sec: number;
+    x_pos: number;
+    y_pos: number;
+};
