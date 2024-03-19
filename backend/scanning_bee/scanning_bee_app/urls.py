@@ -58,5 +58,7 @@ urlpatterns = [
     path('bag_list/<int:id>', views.BagList.as_view(), name='bag-list'),
 
     path('bag_detail/<int:id>', views.BagDetail.as_view(), name='bag-detail'),
+
+    path('delete_all', views.DeleteAll.as_view(), name='delete-all'),
 ]
 

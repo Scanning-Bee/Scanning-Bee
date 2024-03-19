@@ -422,3 +422,18 @@ class BagDetail(RetrieveUpdateDestroyAPIView):
     queryset = Bag.objects.all()
     serializer_class = BagSerializer
     lookup_field = 'id'
+
+
+######################## DELETE ALL ##################################
+class DeleteAll(APIView):
+    def delete(self, request, *args, **kwargs):
+        CellContent.objects.all().delete()
+        User.objects.all().delete()
+        UserType.objects.all().delete()
+        Frame.objects.all().delete()
+        Cell.objects.all().delete()
+        Content.objects.all().delete()
+        Image.objects.all().delete()
+        Bag.objects.all().delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
