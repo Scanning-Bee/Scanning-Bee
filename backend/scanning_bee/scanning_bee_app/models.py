@@ -50,7 +50,7 @@ class Image(models.Model):
     image_name = models.CharField(max_length=100)
     x_pos = models.FloatField()
     y_pos = models.FloatField()
-    timestamp = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    timestamp = models.DateTimeField(blank=True, null=True)
     bag = models.ForeignKey(Bag, on_delete=models.PROTECT, null=True)
 
 
