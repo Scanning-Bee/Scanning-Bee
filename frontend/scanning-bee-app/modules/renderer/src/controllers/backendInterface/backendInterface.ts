@@ -221,12 +221,6 @@ export class BackendInterface {
 
                 let imageDto = matchingImages ? matchingImages[0] : null;
 
-                console.log(BACKEND_ENDPOINTS.IMAGE.GET.BY_LOCATION_AND_TIMESTAMP(
-                    imageMetadata.x_pos,
-                    imageMetadata.y_pos,
-                    new Date(imageMetadata.sec),
-                ), imageDto);
-
                 if (!imageDto || !imageDto.id) {
                     imageDto = await this.createImage({
                         image_name: imageName,
@@ -235,8 +229,6 @@ export class BackendInterface {
                         y_pos: imageMetadata.y_pos,
                     });
                 }
-
-                console.log('imageDto', imageDto);
 
                 imageDtos[imageName] = imageDto;
             }
@@ -252,6 +244,7 @@ export class BackendInterface {
                 timestamp: `${addTrailingZeros(annotationTimestamp.toISOString())}`,
                 frame: 1,
                 image: imageDtos[imageName].id,
+                cell: 1,
             } as CellContentDto;
 
             // eslint-disable-next-line no-await-in-loop
