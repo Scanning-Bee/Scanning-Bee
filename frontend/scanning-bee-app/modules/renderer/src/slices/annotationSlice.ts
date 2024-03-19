@@ -82,7 +82,6 @@ const annotationSlice = createSlice({
 
             state.unsavedChanges = false;
 
-            console.log(m);
             metadata = m;
         },
         showImageWithURL(state, action: PayloadAction<string>) {
