@@ -1,12 +1,16 @@
 from django.forms import ValidationError
 from django.db import transaction
 from django.http import JsonResponse
+from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.decorators import api_view  # Import the api_view decorator
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import AllowAny
+from django.contrib.auth import authenticate
 
 from .models import *
 from .serializers import *
@@ -24,7 +28,30 @@ logger = logging.getLogger(__name__)
 sys.path.insert(0, '../../')
 
 from AI.test import test_lines
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
 
+class HomeView(APIView):
+     
+    permission_classes = (IsAuthenticated, )
+    def get(self, request):
+        content = {'message': 'Welcome to Scanning Bee App :)'}
+        return Response(content)
+
+class LogoutView(APIView):
+     permission_classes = (IsAuthenticated,)
+     def post(self, request):
+          
+          try:
+               refresh_token = request.data["refresh_token"]
+               token = RefreshToken(refresh_token)
+               token.blacklist()
+               return Response(status=status.HTTP_205_RESET_CONTENT)
+          except Exception as e:
+               print(e)
+               return Response(status=status.HTTP_400_BAD_REQUEST)
 
 ##################### USER TYPE #####################
 class UserTypeList(ListCreateAPIView):
@@ -45,11 +72,29 @@ class UserTypeDetail(RetrieveUpdateDestroyAPIView):
 
 
 ##################### USER #####################
+class UserRegistrationView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = CustomUserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = get_user_model().objects.create_user(
+                username=serializer.validated_data['username'],
+                password=serializer.validated_data['password'],
+                email=serializer.validated_data['email'],
+                user_type=serializer.validated_data.get('user_type') 
+            )
+            refresh = RefreshToken.for_user(user)
+            return Response({ 'refresh': str(refresh),
+                'access': str(refresh.access_token), "message": "User registered successfully.", "user": str(user)}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 class UserList(ListCreateAPIView):
-    serializer_class = UserSerializer
-
+    serializer_class = CustomUserSerializer
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email', 'user_type', 'password']
     def get_queryset(self, *args, **kwargs):
-        queryset = User.objects.all()
+        queryset = CustomUser.objects.all()
         pk = self.kwargs.get('id')
         if pk:
             queryset = queryset.filter(id=pk)
@@ -57,8 +102,8 @@ class UserList(ListCreateAPIView):
 
 
 class UserDetail(RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
     lookup_field = 'id'
 
 
@@ -247,7 +292,7 @@ class CellContentsByAI(ListCreateAPIView):
             all_detected_circles = test_lines("scanning_bee_app/AnnotationFiles/" + image.image_name)
 
             frame = Frame.objects.get(pk=1)
-            user = User.objects.get(pk=1)
+            user = CustomUser.objects.get(pk=1)
             content = Content.objects.get(pk=9)
 
             for circle in all_detected_circles:

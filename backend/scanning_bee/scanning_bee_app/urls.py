@@ -6,6 +6,10 @@ register_converter(FloatConverter, 'float')
 register_converter(DateTimeConverter, 'datetime')
 
 urlpatterns = [
+    path('home/', views.HomeView.as_view(), name ='home'),
+    path('logout/', views.LogoutView.as_view(), name ='logout'),
+    path('register/', views.UserRegistrationView.as_view(), name='register'),
+
     path('user_type_list', views.UserTypeList.as_view(), name='usertype-list'),
     path('user_type_list/<int:id>', views.UserTypeList.as_view(), name='usertype-list'),
 

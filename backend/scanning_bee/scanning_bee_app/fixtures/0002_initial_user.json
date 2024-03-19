@@ -1,10 +1,12 @@
 [
     {
-      "model": "scanning_bee_app.user",
+      "model": "scanning_bee_app.customuser",
       "pk": 1,
       "fields": {
-        "user_type": 1,
-        "name": "test user"
+        "username": "admin",
+        "email": "gizemt01@hotmail.com",
+        "password": "12345",
+        "user_type": 1
       }
     }
   ]
