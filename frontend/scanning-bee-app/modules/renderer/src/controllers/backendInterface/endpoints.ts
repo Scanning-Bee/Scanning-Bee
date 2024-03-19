@@ -1,3 +1,5 @@
+import { addTrailingZeros } from '@frontend/utils/miscUtils';
+
 import { BagID, CellContentID, CellID, ContentID, FrameID, UserTypeID } from './payloadTypes';
 
 export const ENDPOINT_URL = 'http://localhost:8000/scanning_bee';
@@ -105,7 +107,11 @@ export const BACKEND_ENDPOINTS = {
             LIST: `${ENDPOINT_URL}/image_list`,
             BY_LOCATION: (x: number, y: number) => `${ENDPOINT_URL}/image_list/location/${x}/${y}`,
             BY_LOCATION_AND_TIMESTAMP:
-                (x: number, y: number, timestamp: Date) => `${ENDPOINT_URL}/image_list/location/${x}/${y}/${timestamp.toISOString()}`,
+                (
+                    x: number,
+                    y: number,
+                    timestamp: Date,
+                ) => `${ENDPOINT_URL}/image_list/location/${x}/${y}/${addTrailingZeros(timestamp.toISOString())}`,
         },
         POST: {
             CREATE: `${ENDPOINT_URL}/image_list`,

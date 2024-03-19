@@ -7,6 +7,7 @@ import CellType from '@frontend/models/cellType';
 import { addAnnotation, getAnnotationsMetadata, saveChanges } from '@frontend/slices/annotationSlice';
 import { resetBackendStatus } from '@frontend/slices/backendStatusSlice';
 import { AppToaster } from '@frontend/Toaster';
+import { addTrailingZeros } from '@frontend/utils/miscUtils';
 import { AnnotationYaml, RENDERER_QUERIES } from '@scanning_bee/ipc-interfaces';
 
 import { BACKEND_ENDPOINTS, ENDPOINT_URL } from './endpoints';
@@ -212,19 +213,25 @@ export class BackendInterface {
             const imageMetadata = metadata.image_data.find(meta => meta.image_name === imageName);
 
             if (!Object.keys(imageDtos).includes(imageName)) {
-                const imageDto = (await this.getImageByLocationAndTimestamp(
+                let imageDto = await this.getImageByLocationAndTimestamp(
                     imageMetadata.x_pos,
                     imageMetadata.y_pos,
                     new Date(imageMetadata.sec),
-                )) || (await this.createImage({
-                    image_name: imageName,
-                    timestamp: new Date(imageMetadata.sec).toISOString(),
-                    x_pos: imageMetadata.x_pos,
-                    y_pos: imageMetadata.y_pos,
-                }));
+                );
+
+                if (!imageDto || !imageDto.id) {
+                    imageDto = await this.createImage({
+                        image_name: imageName,
+                        timestamp: addTrailingZeros(new Date(imageMetadata.sec).toISOString()),
+                        x_pos: imageMetadata.x_pos,
+                        y_pos: imageMetadata.y_pos,
+                    });
+                }
 
                 imageDtos[imageName] = imageDto;
             }
+
+            const annotationTimestamp = annotation.timestamp ? new Date(annotation.timestamp) : new Date();
 
             const obj = {
                 radius: annotation.radius,
@@ -232,7 +239,7 @@ export class BackendInterface {
                 center_y: annotation.center[1],
                 content: CellTypeDto[annotation.cell_type],
                 user: 1,
-                timestamp: `${annotation.timestamp || new Date().toISOString()}`,
+                timestamp: `${addTrailingZeros(annotationTimestamp.toISOString())}`,
                 frame: 1,
                 image: imageDtos[imageName].id,
             } as CellContentDto;
