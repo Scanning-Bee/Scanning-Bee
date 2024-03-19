@@ -71,7 +71,7 @@ const normalizeMetadata = (folderPath: string, rawMetadata: RawMetadataWrapperYa
         const nextEntry = rawMetadataEntries[i + 1];
 
         const entry: MetadataYaml = {
-            sec: originalEntry.sec,
+            sec: originalEntry.sec * 1000,
             x_pos: originalEntry.x_pos,
             y_pos: originalEntry.y_pos,
             image_name: null,
@@ -87,7 +87,7 @@ const normalizeMetadata = (folderPath: string, rawMetadata: RawMetadataWrapperYa
     const remainingImageName = imageNames.find(imageName => !entryImageNames.includes(imageName));
 
     const lastImageEntry: MetadataYaml = {
-        sec: rawMetadataEntries[rawMetadataEntries.length - 1].sec,
+        sec: rawMetadataEntries[rawMetadataEntries.length - 1].sec * 1000,
         x_pos: rawMetadataEntries[rawMetadataEntries.length - 1].x_pos,
         y_pos: rawMetadataEntries[rawMetadataEntries.length - 1].y_pos,
         image_name: remainingImageName,
