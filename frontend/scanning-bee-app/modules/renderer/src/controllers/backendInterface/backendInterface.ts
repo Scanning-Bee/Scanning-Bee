@@ -177,7 +177,9 @@ export class BackendInterface {
 
     public createImage = async (image: ImageDto) => this.apiQuery<ImageDto>(BACKEND_ENDPOINTS.IMAGE.POST.CREATE, 'post', image);
 
-    public scrapeImages = async () => this.apiQuery<ImageDto[]>(BACKEND_ENDPOINTS.IMAGE.POST.SCRAPE, 'post');
+    public scrapeImages = async (data: { path: string }) => this.apiQuery<{
+        path: string;
+    }>(BACKEND_ENDPOINTS.IMAGE.POST.SCRAPE, 'post', data);
 
     // * AI
     public getCellContentByAI = async (imageName: string) => this
