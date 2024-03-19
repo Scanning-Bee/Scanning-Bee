@@ -35,7 +35,7 @@ class Cell(models.Model):
     def __str__(self):
         return str(self.pk) + " - (" + str(self.location_on_frame_x) + ", " + str(self.location_on_frame_y) + ")"
     
-    def Meta(self):
+    class Meta:
         unique_together = ('location_on_frame_x', 'location_on_frame_y', 'frame')
 
 
