@@ -313,9 +313,7 @@ class ImageDetail(RetrieveUpdateDestroyAPIView):
     lookup_field = 'id'
 
     def delete(self, request, *args, **kwargs):
-        print("ZOOOOOORT")
         id = self.kwargs.get('id')
-        
         if id == "all":
             Image.objects.all().delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -382,7 +380,7 @@ class ImageScraper(ListCreateAPIView):
                 if existing_image:
                     # If the image already exists, append its data to the response but do not create a new one
                     serializer = self.get_serializer(existing_image)
-                    created_images.append(serializer.data)
+                    # created_images.append(serializer.data)
                 else:
                     # If the image does not exist, proceed with creation
                     serializer = self.get_serializer(data=image_instance_data)
