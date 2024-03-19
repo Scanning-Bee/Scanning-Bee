@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-underscore-dangle */
 import axios, { AxiosInstance } from 'axios';
 import { ipcRenderer, shell } from 'electron';
@@ -195,17 +196,7 @@ export class BackendInterface {
     public saveAnnotationsToDatabase = async (annotations: Annotation[]) => {
         const metadata = getAnnotationsMetadata();
 
-        const imageDtos = metadata.image_data.map((image) => {
-            const obj = {
-                image_name: image.image_name,
-                x_pos: image.x_pos,
-                y_pos: image.y_pos,
-                timestamp: `${image.sec}`,
-                bag: 1,
-            } as ImageDto;
-
-            return obj;
-        });
+        const imageDtos = {} as { [image_name: string]: ImageDto };
 
         let success = true;
 
@@ -216,6 +207,24 @@ export class BackendInterface {
 
         for (let i = 0; i < annotations.length; i += 1) {
             const annotation = annotations[i];
+            const imageName = annotation.source_name;
+
+            const imageMetadata = metadata.image_data.find(meta => meta.image_name === imageName);
+
+            if (!Object.keys(imageDtos).includes(imageName)) {
+                const imageDto = (await this.getImageByLocationAndTimestamp(
+                    imageMetadata.x_pos,
+                    imageMetadata.y_pos,
+                    new Date(imageMetadata.sec),
+                )) || (await this.createImage({
+                    image_name: imageName,
+                    timestamp: new Date(imageMetadata.sec).toISOString(),
+                    x_pos: imageMetadata.x_pos,
+                    y_pos: imageMetadata.y_pos,
+                }));
+
+                imageDtos[imageName] = imageDto;
+            }
 
             const obj = {
                 radius: annotation.radius,
@@ -225,7 +234,7 @@ export class BackendInterface {
                 user: 1,
                 timestamp: `${annotation.timestamp || new Date().toISOString()}`,
                 frame: 1,
-                image: imageDtos.find(image => image.image_name === annotation.source_name),
+                image: imageDtos[imageName].id,
             } as CellContentDto;
 
             // eslint-disable-next-line no-await-in-loop

@@ -104,9 +104,8 @@ export const BACKEND_ENDPOINTS = {
         GET: {
             LIST: `${ENDPOINT_URL}/image_list`,
             BY_LOCATION: (x: number, y: number) => `${ENDPOINT_URL}/image_list/location/${x}/${y}`,
-            BY_LOCATION_AND_TIMESTAMP: (x: number, y: number, timestamp: Date) => `
-                ${ENDPOINT_URL}/cellcontent_list/location/${x}/${y}/${timestamp.toISOString()}
-            `,
+            BY_LOCATION_AND_TIMESTAMP:
+                (x: number, y: number, timestamp: Date) => `${ENDPOINT_URL}/image_list/location/${x}/${y}/${timestamp.toISOString()}`,
         },
         POST: {
             CREATE: `${ENDPOINT_URL}/image_list`,

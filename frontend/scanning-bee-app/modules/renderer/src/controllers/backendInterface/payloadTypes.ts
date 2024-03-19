@@ -49,7 +49,7 @@ export type ImageDto = {
     x_pos: number;
     y_pos: number;
     timestamp: string;
-    bag: any;
+    bag?: any;
 };
 
 export type CellContentDto = {
