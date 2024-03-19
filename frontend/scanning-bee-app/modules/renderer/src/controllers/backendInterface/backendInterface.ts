@@ -244,7 +244,6 @@ export class BackendInterface {
                 timestamp: `${addTrailingZeros(annotationTimestamp.toISOString())}`,
                 frame: 1,
                 image: imageDtos[imageName].id,
-                cell: 1,
             } as CellContentDto;
 
             // eslint-disable-next-line no-await-in-loop
