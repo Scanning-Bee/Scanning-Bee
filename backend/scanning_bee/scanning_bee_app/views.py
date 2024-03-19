@@ -357,6 +357,14 @@ class ImageDetail(RetrieveUpdateDestroyAPIView):
     serializer_class = ImageSerializer
     lookup_field = 'id'
 
+    def delete(self, request, *args, **kwargs):
+        id = self.kwargs.get('id')
+        if id == "all":
+            Image.objects.all().delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return super().delete(request, *args, **kwargs)
+
 
 class ImageScraper(ListCreateAPIView):
     serializer_class = ImageSerializer
@@ -397,7 +405,7 @@ class ImageScraper(ListCreateAPIView):
                     image_name = image_data_list[i + 1]['prev_image']
                 else:
                     image_name = "final_image.jpg"  # Adjust as necessary
-                
+
                 timestamp = datetime.fromtimestamp(item['sec'], tz=timezone.utc)
                 image_instance_data = {
                     'image_name': image_name,
@@ -406,13 +414,27 @@ class ImageScraper(ListCreateAPIView):
                     'timestamp': timestamp,
                     'bag': bag.id
                 }
-                
-                serializer = self.get_serializer(data=image_instance_data)
-                if serializer.is_valid():
-                    serializer.save()
-                    created_images.append(serializer.data)
+
+                # Check if an image with these properties already exists
+                existing_image = Image.objects.filter(
+                    x_pos=image_instance_data['x_pos'],
+                    y_pos=image_instance_data['y_pos'],
+                    timestamp=image_instance_data['timestamp'],
+                ).first()
+
+                if existing_image:
+                    # If the image already exists, append its data to the response but do not create a new one
+                    serializer = self.get_serializer(existing_image)
+                    # created_images.append(serializer.data)
                 else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    # If the image does not exist, proceed with creation
+                    serializer = self.get_serializer(data=image_instance_data)
+                    if serializer.is_valid():
+                        serializer.save()
+                        created_images.append(serializer.data)
+                    else:
+                        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
             
             return Response({"created_images": created_images}, status=status.HTTP_201_CREATED)
         
@@ -445,3 +467,18 @@ class BagDetail(RetrieveUpdateDestroyAPIView):
     queryset = Bag.objects.all()
     serializer_class = BagSerializer
     lookup_field = 'id'
+
+
+######################## DELETE ALL ##################################
+class DeleteAll(APIView):
+    def delete(self, request, *args, **kwargs):
+        CellContent.objects.all().delete()
+        User.objects.all().delete()
+        UserType.objects.all().delete()
+        Frame.objects.all().delete()
+        Cell.objects.all().delete()
+        Content.objects.all().delete()
+        Image.objects.all().delete()
+        Bag.objects.all().delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

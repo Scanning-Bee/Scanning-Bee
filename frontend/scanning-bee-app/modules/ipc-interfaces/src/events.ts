@@ -2,7 +2,7 @@
 /* ------------ IPC Events ----------- */
 /* ----------------------------------- */
 
-import { AnnotationYaml } from 'miscTypes';
+import { AnnotationYaml, MetadataWrapperYaml } from 'miscTypes';
 
 /**
  * Events that are emitted by the renderer process and listened to by the main process.
@@ -37,6 +37,7 @@ export type MAIN_EVENT_PAYLOADS = {
         folder: string;
         annotations: AnnotationYaml[];
         images: string[];
+        metadata: MetadataWrapperYaml;
     },
     [MAIN_EVENTS.SAVE_ANNOTATIONS_SUCCESS]: { targetFolder: string },
     [MAIN_EVENTS.SAVE_ANNOTATIONS_ERROR]: { targetFolder: string, error: any },

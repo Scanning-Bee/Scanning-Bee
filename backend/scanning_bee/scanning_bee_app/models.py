@@ -24,7 +24,7 @@ class CustomUser(AbstractUser):
 
 
 class UserType(models.Model):
-    type = models.CharField(max_length=100)
+    type = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.type
@@ -44,6 +44,9 @@ class Cell(models.Model):
 
     def __str__(self):
         return str(self.pk) + " - (" + str(self.location_on_frame_x) + ", " + str(self.location_on_frame_y) + ")"
+    
+    class Meta:
+        unique_together = ('location_on_frame_x', 'location_on_frame_y', 'frame')
 
 
 class Content(models.Model):
@@ -54,14 +57,17 @@ class Content(models.Model):
         return self.name
 
 class Bag(models.Model):
-    name = models.CharField(max_length=100, null=True, blank=True)
+    name = models.CharField(max_length=100, null=True, blank=True, unique=True)
 
 class Image(models.Model):
     image_name = models.CharField(max_length=100)
     x_pos = models.FloatField()
     y_pos = models.FloatField()
-    timestamp = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    timestamp = models.DateTimeField(blank=True, null=True)
     bag = models.ForeignKey(Bag, on_delete=models.PROTECT, null=True)
+
+    class Meta:
+        unique_together = ('x_pos', 'y_pos', 'timestamp')
 
 
 class CellContent(models.Model):
@@ -74,6 +80,9 @@ class CellContent(models.Model):
     center_y = models.IntegerField()
     image = models.ForeignKey(Image, on_delete=models.CASCADE)
     radius = models.IntegerField()
+    
+    class Meta:
+        unique_together = ('frame', 'content', 'center_x', 'center_y', 'image')
 
     def __str__(self):
         return str(self.pk) + " - " + self.content.name + " - " + str(self.cell)

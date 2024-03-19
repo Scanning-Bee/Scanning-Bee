@@ -6,7 +6,7 @@ import { RootState } from '@frontend/store';
 import { focusOnImageButton } from '@frontend/utils/annotationUtils';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AnnotationYaml } from '@scanning_bee/ipc-interfaces';
+import { AnnotationYaml, MetadataWrapperYaml } from '@scanning_bee/ipc-interfaces';
 
 export enum ManualAnnotatorMode {
     Default = 'default',
@@ -17,6 +17,12 @@ export enum ManualAnnotatorMode {
 export type ManualAnnotatorModeParams = {
     cellType?: CellType;
 };
+
+// we put the metadata in a global variable so we can access it from the outside of the store. This is done to not populate the store
+// further.
+let metadata: MetadataWrapperYaml = null;
+
+export const getAnnotationsMetadata = () => metadata;
 
 type AnnotationsState = {
     // contains the plain object versions of the annotations. contains AnnotationProps and the id
@@ -53,10 +59,16 @@ const annotationSlice = createSlice({
     name: 'annotation',
     initialState,
     reducers: {
-        openFolder(state, action: PayloadAction<{ folder: string, annotations: AnnotationPropsWithID[], images: string[] }>) {
-            const { folder, annotations, images } = action.payload;
+        openFolder(state, action: PayloadAction<{
+            folder: string,
+            annotations: AnnotationPropsWithID[],
+            images: string[],
+            metadata: MetadataWrapperYaml,
+        }>) {
+            const { folder, annotations, images, metadata: m } = action.payload;
             state.annotationsFolder = folder;
             state.annotationObjects = annotations;
+
             state.activeAnnotationIds = [];
 
             const sortedImages = [...images].sort((a, b) => {
@@ -69,6 +81,8 @@ const annotationSlice = createSlice({
             state.images = sortedImages;
 
             state.unsavedChanges = false;
+
+            metadata = m;
         },
         showImageWithURL(state, action: PayloadAction<string>) {
             state.shownImageUrl = action.payload;

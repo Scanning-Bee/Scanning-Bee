@@ -49,7 +49,7 @@ export type ImageDto = {
     x_pos: number;
     y_pos: number;
     timestamp: string;
-    bag: any;
+    bag?: any;
 };
 
 export type CellContentDto = {
@@ -60,7 +60,7 @@ export type CellContentDto = {
     user: UserDto | number;
     center_x: number;
     center_y: number;
-    image: string | number;
+    image: string | number | ImageDto;
     radius: number;
     cell?: typeof CellTypeDto[keyof typeof CellTypeDto];
 };
