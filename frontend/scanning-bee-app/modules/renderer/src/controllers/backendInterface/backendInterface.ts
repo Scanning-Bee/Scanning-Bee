@@ -3,7 +3,7 @@ import axios, { AxiosInstance } from 'axios';
 import { ipcRenderer, shell } from 'electron';
 import Annotation from '@frontend/models/annotation';
 import CellType from '@frontend/models/cellType';
-import { addAnnotation, saveChanges } from '@frontend/slices/annotationSlice';
+import { addAnnotation, getAnnotationsMetadata, saveChanges } from '@frontend/slices/annotationSlice';
 import { resetBackendStatus } from '@frontend/slices/backendStatusSlice';
 import { AppToaster } from '@frontend/Toaster';
 import { AnnotationYaml, RENDERER_QUERIES } from '@scanning_bee/ipc-interfaces';
@@ -191,6 +191,20 @@ export class BackendInterface {
     public createBag = async (bag: ImageDto) => this.apiQuery<ImageDto>(BACKEND_ENDPOINTS.BAG.POST.CREATE, 'post', bag);
 
     public saveAnnotationsToDatabase = async (annotations: Annotation[]) => {
+        const metadata = getAnnotationsMetadata();
+
+        const imageDtos = metadata.image_data.map((image) => {
+            const obj = {
+                image_name: image.image_name,
+                x_pos: image.x_pos,
+                y_pos: image.y_pos,
+                timestamp: `${image.sec}`,
+                bag: 1,
+            } as ImageDto;
+
+            return obj;
+        });
+
         let success = true;
 
         AppToaster.show({
@@ -209,6 +223,7 @@ export class BackendInterface {
                 user: 1,
                 timestamp: `${annotation.timestamp || new Date().toISOString()}`,
                 frame: 1,
+                image: imageDtos.find(image => image.image_name === annotation.source_name),
             } as CellContentDto;
 
             // eslint-disable-next-line no-await-in-loop
