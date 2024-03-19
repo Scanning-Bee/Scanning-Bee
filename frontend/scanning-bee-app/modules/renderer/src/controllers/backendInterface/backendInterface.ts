@@ -175,7 +175,7 @@ export class BackendInterface {
         .apiQuery<ImageDto>(BACKEND_ENDPOINTS.IMAGE.GET.BY_LOCATION(x, y), 'get');
 
     public getImageByLocationAndTimestamp = async (x: number, y: number, timestamp: Date) => this
-        .apiQuery<ImageDto>(BACKEND_ENDPOINTS.IMAGE.GET.BY_LOCATION_AND_TIMESTAMP(x, y, timestamp), 'get');
+        .apiQuery<ImageDto[]>(BACKEND_ENDPOINTS.IMAGE.GET.BY_LOCATION_AND_TIMESTAMP(x, y, timestamp), 'get');
 
     public createImage = async (image: ImageDto) => this.apiQuery<ImageDto>(BACKEND_ENDPOINTS.IMAGE.POST.CREATE, 'post', image);
 
@@ -213,11 +213,19 @@ export class BackendInterface {
             const imageMetadata = metadata.image_data.find(meta => meta.image_name === imageName);
 
             if (!Object.keys(imageDtos).includes(imageName)) {
-                let imageDto = await this.getImageByLocationAndTimestamp(
+                const matchingImages = await this.getImageByLocationAndTimestamp(
                     imageMetadata.x_pos,
                     imageMetadata.y_pos,
                     new Date(imageMetadata.sec),
                 );
+
+                let imageDto = matchingImages ? matchingImages[0] : null;
+
+                console.log(BACKEND_ENDPOINTS.IMAGE.GET.BY_LOCATION_AND_TIMESTAMP(
+                    imageMetadata.x_pos,
+                    imageMetadata.y_pos,
+                    new Date(imageMetadata.sec),
+                ), imageDto);
 
                 if (!imageDto || !imageDto.id) {
                     imageDto = await this.createImage({
@@ -227,6 +235,8 @@ export class BackendInterface {
                         y_pos: imageMetadata.y_pos,
                     });
                 }
+
+                console.log('imageDto', imageDto);
 
                 imageDtos[imageName] = imageDto;
             }
