@@ -398,3 +398,70 @@ def filter_and_add_circles(first_detected: List[Tuple[int, int, int]], second_de
 
     return all_circles
 
+
+def get_anchor_row(img: np.ndarray, detected_circles: List[Tuple[int, int, int]], cell_space: float=0.03, error_margin: float=0.15, is_show: bool = False):
+    
+    
+    anchor_circle = detected_circles[0]
+    
+    anchor_x, anchor_y, anchor_r = anchor_circle
+    height,width = img.shape
+
+    plot_img = img.copy()
+    plot_img= cv2.cvtColor(plot_img, cv2.COLOR_GRAY2BGR)
+
+    line_up = anchor_y - anchor_r
+    line_down = anchor_y + anchor_r
+
+    if line_up < 0:
+        line_up = 0
+    if line_down > height:
+        line_down = height
+
+    cv2.line(plot_img, (0, line_up), (width - 1, line_up), (255, 0, 0), 1)
+    cv2.line(plot_img, (0, line_down), (width - 1, line_down), (255, 0, 0), 1)
+
+    patches = []
+
+    space_bw_two_cols = int(anchor_r * 2 * (1 + cell_space))
+    column = anchor_x
+    while column < width:
+        left = int(column - anchor_r)
+        right = int(column + anchor_r)
+        if left < 0 or right > width:
+            break
+        cv2.line(plot_img, (left, line_up), (left, line_down), (255, 255, 0), 1)
+        cv2.line(plot_img, (right, line_up), (right, line_down), (255, 255, 0), 1)
+        patches.append((left, right, line_up, line_down))
+        column += space_bw_two_cols
+
+    # columns, go left by starting from one right column of anchor
+    column = anchor_x - space_bw_two_cols
+    while column > 0:
+        left = int(column - anchor_r)
+        right = int(column + anchor_r)
+        if left < 0 or right > width:
+            break
+        cv2.line(plot_img, (left, line_up), (left, line_down), (255, 255, 0), 1)
+        cv2.line(plot_img, (right, line_up), (right, line_down), (255, 255, 0), 1)
+        patches.append((left, right, line_up, line_down))
+        column -= space_bw_two_cols
+
+    image_patches = []
+    for patch in patches:
+        l, r, u, d = patch
+        l = l - int(error_margin * anchor_r)
+        r = r + int(error_margin * anchor_r)
+        u = u - int(error_margin * anchor_r)
+        d = d + int(error_margin * anchor_r)
+        if l < 0 or r > width or u < 0 or d > height:
+            continue
+        image_patches.append((l,r,u,d))
+
+        cv2.rectangle(plot_img, (l, u), (r, d), (0, 255, 0), 2)
+
+    if is_show:
+        cv2.imshow("Line", plot_img)
+        cv2.waitKey(0)
+    
+    return image_patches

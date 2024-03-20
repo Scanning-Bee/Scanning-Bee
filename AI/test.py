@@ -77,7 +77,7 @@ manual_bbox_paths = {"..\datasets\2023-10-08-12-01-05\image_651.jpg ":"..\datase
                      "..\datasets\2023-10-08-12-01-05\image_7632.jpg ":"..\datasets\no_bee_test\image_7632.txt",
                      }
 
-def test_lines(image_path: str, occlude:bool = False, detection_model_path:str = 'AI/models/bee_detect_models/bee_model_v2.pt',cell_space:float = 0.4, error_margin:float = 0.7, intersect_threshold:float = 0.3) -> List[Tuple[int, int, int]]:
+def test_lines(image_path: str, occlude:bool = False, detection_model_path:str = 'AI/models/bee_detect_models/bee_model_v2.pt',cell_space:float = 0.03, error_margin:float = 0.15, intersect_threshold:float = 0.3) -> List[Tuple[int, int, int]]:
     '''
     The latest version of the circle detection code, made for the CENG49X Design Project Course.
     - image_path is the path of the object image
@@ -178,6 +178,70 @@ def test_lines(image_path: str, occlude:bool = False, detection_model_path:str =
 
     return return_list
 
+def rotation_robust_method(image_path: str, occlude:bool = False, detection_model_path:str = 'AI/models/bee_detect_models/bee_model_v2.pt',cell_space:float = 0.03, error_margin:float = 0.15, intersect_threshold:float = 0.3) -> List[Tuple[int, int, int]]:
+    '''
+    The latest version of the circle detection code, made for the CENG49X Design Project Course.
+    - image_path is the path of the object image
+    - occlude is a flag for choosing whether the bee occlusion mask should be enabled. It is highly
+    
+    recommended not to enable it for now, because the segmentation model must be strengthened.
+    
+    TODO update the docstring when the segmentation model is updated.
+
+    Returns a list of (x, y, r) tuples, that being the detected circles.
+    '''
+
+    ## read original image in gray_scale, used for first and second stage processing
+    sample_image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    height, width = sample_image.shape
+
+    ## get a rgb copy of original image for model input and plotting
+    plot_img = cv2.cvtColor(sample_image, cv2.COLOR_GRAY2RGB)
+
+    ## this is a binary mask which will be used to check intersection of bees with cells
+    mask = np.ones_like(sample_image) * 255
+    
+    if occlude:
+        try:
+            ## using yolov8 bee detection model
+            model = YOLO(detection_model_path)
+            # print("Bee detection model loaded")
+            prediction = model(plot_img,verbose= True)[0]
+            scores = prediction.boxes.conf
+            bboxes = prediction.boxes.xyxy
+
+            ## mark where bees are on binary mask
+            for score,bbox in zip(scores,bboxes):
+                if score < 0.4:
+                    continue
+                x1,y1,x2,y2 = list(map(int,bbox))
+                cv2.rectangle(mask,(x1,y1),(x2,y2),color = (0,0,0), thickness = -1)
+  
+        except Exception as error:
+            print(error)
+            print("Bee detection model could not be loaded, please fix the above error and try again")
+
+    ## first stage of detection, uses hough transform to detect circles, see function for preprocessing and detection
+    first_stage_circles = detect_circles_using_hough_transform(sample_image,use_dark=True,use_light=False)
+    
+    anchor_patches = get_anchor_row(sample_image, first_stage_circles)
+
+    # Search for circles in images patches
+    second_stage_circles = detect_second_stage(sample_image, anchor_patches, first_stage_circles, show_patches=True)
+
+    for circle in first_stage_circles:
+        x, y, r = circle
+        cv2.circle(plot_img, (x, y), r, (0, 255, 0), 5)
+
+    for circle in second_stage_circles:
+        x, y, r = circle
+        cv2.circle(plot_img, (x, y), r, (0, 255, 255), 5)
+
+    cv2.imshow("circles",plot_img)
+    cv2.waitKey(0)
+
 
 if __name__ == "__main__":
-    print(test_lines("AI/test_images/image_1219.jpg",True))
+    # print(test_lines("AI/test_images/image_1219.jpg",True))
+    rotation_robust_method("AI/test_images/image_1219.jpg")
+    
