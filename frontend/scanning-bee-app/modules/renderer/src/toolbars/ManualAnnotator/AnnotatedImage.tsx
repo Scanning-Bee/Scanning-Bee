@@ -82,8 +82,6 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
     const [topOffset, setTopOffset] = useState<number>(window.innerHeight / 2 - (defaultHeight * actualScale) / 2);
     const [leftOffset, setLeftOffset] = useState<number>(window.innerWidth / 2 - (defaultWidth * actualScale) / 2);
 
-    console.log('AnnotatedImage', shownImageUrl, actualScale, topOffset, leftOffset);
-
     const { mode, modeParams } = useManualAnnotatorModeWithParams();
 
     const allAnnotations = useAnnotations();
@@ -93,11 +91,14 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
 
     useEffect(() => {
         function handleScaleSizeChange() {
-            const xOffset = window.innerWidth / 2 - (defaultWidth * actualScale) / 2;
-            const yOffset = window.innerHeight / 2 - (defaultHeight * actualScale) / 2;
+            const scaledWidth = defaultWidth * actualScale;
+            const scaledHeight = defaultHeight * actualScale;
+
+            const xOffset = window.innerWidth / 2 - (scaledWidth) / 2;
+            const yOffset = window.innerHeight / 2 - (scaledHeight) / 2;
 
             setLeftOffset(xOffset < 0 ? 0 : xOffset);
-            setTopOffset(yOffset < 0 ? 0 : yOffset);
+            setTopOffset(yOffset < 30 ? 30 : yOffset);
         }
 
         window.onresize = handleScaleSizeChange;
@@ -112,7 +113,7 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
     const imageAnnotations = allAnnotations.filter(annotation => annotation.source_name === getFileName(shownImageUrl));
 
     return (
-        <span style={{ height: defaultHeight * actualScale, marginTop: '60px' }}>
+        <span style={{ height: defaultHeight * actualScale }}>
             <img
                 src={shownImageUrl}
                 alt='Annotated image'

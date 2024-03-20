@@ -69,6 +69,9 @@ export const DraggableAnnotation = (props: {
     const scale = useAnnotatorScale();
     const actualScale = scale / 2;
 
+    const headerHeight = 35;
+    const footerHeight = 25;
+
     const radius = annotation.radius * actualScale;
     const diameter = radius * 2;
 
@@ -125,7 +128,7 @@ export const DraggableAnnotation = (props: {
                     style={{
                         position: 'absolute',
                         left: `${leftOffset}px`,
-                        top: `${topOffset}px`,
+                        top: `${topOffset - headerHeight / 2 - footerHeight / 2}px`,
                         width: `${diameter}px`,
                         height: `${diameter}px`,
                         border: `3px solid ${CellTypeColours[annotation.cell_type]}`,
