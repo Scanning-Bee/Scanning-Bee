@@ -6,7 +6,9 @@ import {
     useImages,
     useShownImageUrl,
 } from '@frontend/slices/annotationSlice';
+import { setAnnotatorScale } from '@frontend/slices/annotatorScaleSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
+import { ZoomSlider } from '@frontend/toolbars/common/ZoomSlider';
 import { AnnotatedImage } from '@frontend/toolbars/ManualAnnotator/AnnotatedImage';
 import { AnnotationEditorTools } from '@frontend/toolbars/ManualAnnotator/AnnotationEditorTools';
 import { ManualAnnotatorPanel } from '@frontend/toolbars/ManualAnnotator/ManualAnnotatorPanel';
@@ -122,6 +124,9 @@ export const ManualAnnotatorPage = () => {
                         setGridOpen(!gridOpen);
                     }}
                 />
+                <ZoomSlider handleZoomChange={(zoom: number) => {
+                    dispatch(setAnnotatorScale(zoom));
+                }} />
                 <ModeButton />
             </div>
         </div>

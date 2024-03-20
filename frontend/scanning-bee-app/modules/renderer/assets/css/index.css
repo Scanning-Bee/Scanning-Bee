@@ -543,3 +543,19 @@ a {
   background-color: #116622;
   cursor: default;
 }
+
+.zoom-slider {
+  position: absolute;
+  bottom: 80px;
+  right: 20px;
+  margin: 5px;
+}
+
+.zoom-slider-slider > .bp3-slider-handle {
+  height: 5px;
+  right: 0;
+}
+
+.zoom-slider-slider > .bp3-slider-track {
+  left: 0 !important;
+}

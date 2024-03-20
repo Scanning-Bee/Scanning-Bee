@@ -9,10 +9,11 @@ import {
     useAnnotations,
     useManualAnnotatorModeWithParams,
 } from '@frontend/slices/annotationSlice';
+import { useAnnotatorScale } from '@frontend/slices/annotatorScaleSlice';
 import { findAnnotationWithCoords } from '@frontend/utils/annotationUtils';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import { UUID } from 'crypto';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { DraggableAnnotation } from './DraggableAnnotation';
@@ -25,9 +26,10 @@ const clickHandler = (
     mode: ManualAnnotatorMode,
     modeParams: ManualAnnotatorModeParams,
     shownImageUrl: string,
+    scale: number,
 ) => {
-    const x = e.nativeEvent.offsetX;
-    const y = e.nativeEvent.offsetY;
+    const x = e.nativeEvent.offsetX / scale;
+    const y = e.nativeEvent.offsetY / scale;
     const annotationId = findAnnotationWithCoords(imageAnnotations, x, y);
 
     const createAnnotation = (cellType: CellType) => {
@@ -71,8 +73,16 @@ const clickHandler = (
 export const AnnotatedImage = (props: { shownImageUrl: string }) => {
     const { shownImageUrl } = props;
 
-    const [topOffset, setTopOffset] = useState<number>(window.innerHeight / 2 - 270);
-    const [leftOffset, setLeftOffset] = useState<number>(window.innerWidth / 2 - 480);
+    const [defaultWidth, defaultHeight] = [1920, 1080];
+
+    const scale = useAnnotatorScale();
+
+    const actualScale = scale / 2;
+
+    const [topOffset, setTopOffset] = useState<number>(window.innerHeight / 2 - (defaultHeight * actualScale) / 2);
+    const [leftOffset, setLeftOffset] = useState<number>(window.innerWidth / 2 - (defaultWidth * actualScale) / 2);
+
+    console.log('AnnotatedImage', shownImageUrl, actualScale, topOffset, leftOffset);
 
     const { mode, modeParams } = useManualAnnotatorModeWithParams();
 
@@ -81,26 +91,32 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
 
     const dispatch = useDispatch();
 
+    useEffect(() => {
+        function handleScaleSizeChange() {
+            const xOffset = window.innerWidth / 2 - (defaultWidth * actualScale) / 2;
+            const yOffset = window.innerHeight / 2 - (defaultHeight * actualScale) / 2;
+
+            setLeftOffset(xOffset < 0 ? 0 : xOffset);
+            setTopOffset(yOffset < 0 ? 0 : yOffset);
+        }
+
+        window.onresize = handleScaleSizeChange;
+
+        handleScaleSizeChange();
+    }, [actualScale]);
+
     if (!shownImageUrl) {
         return <div />;
     }
 
     const imageAnnotations = allAnnotations.filter(annotation => annotation.source_name === getFileName(shownImageUrl));
 
-    window.onresize = () => {
-        const xOffset = window.innerHeight / 2 - 270;
-        const yOffset = window.innerWidth / 2 - 480;
-
-        setTopOffset(xOffset < 0 ? 0 : xOffset);
-        setLeftOffset(yOffset < 0 ? 0 : yOffset);
-    };
-
     return (
-        <span style={{ height: '540px', marginTop: '60px' }}>
+        <span style={{ height: defaultHeight * actualScale, marginTop: '60px' }}>
             <img
                 src={shownImageUrl}
                 alt='Annotated image'
-                style={{ width: '960px', height: '540px' }}
+                style={{ width: defaultWidth * actualScale, height: defaultHeight * actualScale }}
                 onClick={(e) => {
                     clickHandler(
                         e,
@@ -110,6 +126,7 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
                         mode,
                         modeParams,
                         shownImageUrl,
+                        scale,
                     );
                 }}
             />
