@@ -25,7 +25,7 @@ export const ZoomSlider = (props: {
     };
 
     return (
-        <div className='zoom-slider column-flex-center'>
+        <div className='zoom-slider column-flex-center shadowed'>
             <Button
                 icon={<Icon icon='plus' color={theme.primaryForeground} />}
                 onClick={() => handleZoom(zoom + 0.1)}

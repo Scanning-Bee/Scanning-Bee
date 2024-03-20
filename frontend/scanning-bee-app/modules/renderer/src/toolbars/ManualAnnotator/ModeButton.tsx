@@ -69,7 +69,7 @@ export const ModeButton = () => {
 
     return (
         <div
-            className='column-flex-center manual-annotator-mode-button'
+            className='column-flex-center manual-annotator-mode-button shadowed'
             style={{
                 backgroundColor: theme.secondaryBackground,
                 color: theme.secondaryForeground,
