@@ -162,7 +162,7 @@ export const AnnotationEditorTools = (props: {
 
     return (
         <div
-            className='column-flex-center manual-annotator-toolbar'
+            className='column-flex-center manual-annotator-toolbar shadowed'
             style={{
                 backgroundColor: theme.secondaryBackground,
                 color: theme.secondaryForeground,
