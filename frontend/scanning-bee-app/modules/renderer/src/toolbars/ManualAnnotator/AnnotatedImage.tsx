@@ -9,7 +9,7 @@ import {
     useAnnotations,
     useManualAnnotatorModeWithParams,
 } from '@frontend/slices/annotationSlice';
-import { useAnnotatorScale } from '@frontend/slices/annotatorScaleSlice';
+import { useViewScale } from '@frontend/slices/viewScaleSlice';
 import { findAnnotationWithCoords } from '@frontend/utils/annotationUtils';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import { UUID } from 'crypto';
@@ -75,7 +75,7 @@ export const AnnotatedImage = (props: { shownImageUrl: string }) => {
 
     const [defaultWidth, defaultHeight] = [1920, 1080];
 
-    const scale = useAnnotatorScale();
+    const scale = useViewScale();
 
     const actualScale = scale / 2;
 

@@ -6,8 +6,8 @@ import {
     useImages,
     useShownImageUrl,
 } from '@frontend/slices/annotationSlice';
-import { setAnnotatorScale } from '@frontend/slices/annotatorScaleSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
+import { setViewScale } from '@frontend/slices/viewScaleSlice';
 import { ZoomSlider } from '@frontend/toolbars/common/ZoomSlider';
 import { AnnotatedImage } from '@frontend/toolbars/ManualAnnotator/AnnotatedImage';
 import { AnnotationEditorTools } from '@frontend/toolbars/ManualAnnotator/AnnotationEditorTools';
@@ -123,7 +123,7 @@ export const ManualAnnotatorPage = () => {
                     }}
                 />
                 <ZoomSlider handleZoomChange={(zoom: number) => {
-                    dispatch(setAnnotatorScale(zoom));
+                    dispatch(setViewScale(zoom));
                 }} />
                 <ModeButton />
             </div>

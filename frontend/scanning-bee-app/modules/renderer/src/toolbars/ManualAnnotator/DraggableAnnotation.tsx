@@ -8,7 +8,7 @@ import {
     setAnnotationAsActive,
     useManualAnnotatorModeWithParams,
 } from '@frontend/slices/annotationSlice';
-import { useAnnotatorScale } from '@frontend/slices/annotatorScaleSlice';
+import { useViewScale } from '@frontend/slices/viewScaleSlice';
 import { CellTypeColours } from '@frontend/utils/colours';
 import { isMac } from '@frontend/utils/platform';
 import { UUID } from 'crypto';
@@ -66,7 +66,7 @@ export const DraggableAnnotation = (props: {
 
     const { mode, modeParams } = useManualAnnotatorModeWithParams();
 
-    const scale = useAnnotatorScale();
+    const scale = useViewScale();
     const actualScale = scale / 2;
 
     const headerHeight = 35;
