@@ -2,6 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 
 import { HotkeyHandler } from './Hotkeys';
+import { BeehivePage } from './pages/BeehivePage';
 import { HomePage } from './pages/HomePage';
 import { ManualAnnotatorPage } from './pages/ManualAnnotatorPage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -47,6 +48,8 @@ const App = (props: {
                             return <SettingsPage />;
                         case 'statistics':
                             return <StatisticsPage />;
+                        case 'beehive':
+                            return <BeehivePage />;
                         default:
                             return <div>Page not found</div>;
                         }

@@ -580,3 +580,12 @@ a {
 .shadowed {
   box-shadow: -1px 2px 6px 1px rgb(0 0 0 / 20%) !important;
 }
+
+#beehive-container {
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.beehive-cell {
+  position: absolute;
+}

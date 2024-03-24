@@ -1,7 +1,7 @@
 import BeeBlack from '@assets/images/bee-black.png';
 import BeeWhite from '@assets/images/bee-white.png';
 import ScanningBeeLogoBig from '@assets/images/scanning_bee_logo_big.png';
-import { Card, Icon, Popover } from '@blueprintjs/core';
+import { Card, Icon } from '@blueprintjs/core';
 import { useTheme } from '@frontend/slices/themeSlice';
 import React from 'react';
 
@@ -47,31 +47,20 @@ export const HomePage = (props: { setPage: (arg: PageType) => void }) => {
                         <Icon icon='timeline-bar-chart' iconSize={50} />
                         <h3 style={{ fontWeight: 'normal' }}>Statistics</h3>
                     </Card>
-                    <Popover
-                        interactionKind='hover-target'
-                        position='bottom'
-                        lazy
-                        canEscapeKeyClose
+                    <Card
+                        onClick={() => setPage('beehive')}
+                        interactive
+                        elevation={2}
+                        className='homepage-card'
+                        style={{ backgroundColor: theme.secondaryBackground, color: theme.primaryForeground }}
                     >
-                        <Card
-                            // onClick={() => setPage('beehive')} DISABLED
-                            interactive={false}
-                            elevation={2}
-                            className='homepage-card disabled'
-                            style={{ backgroundColor: theme.secondaryBackground, color: theme.primaryForeground }}
-                        >
-                            <img
-                                src={theme.type === 'dark' ? BeeWhite : BeeBlack}
-                                alt={'Scanning Bee Logo'}
-                                className='disabled-image-icon'
-                                style={{ width: '50px' }}
-                            />
-                            <h3 style={{ fontWeight: 'normal' }}>Beehive Information</h3>
-                        </Card>
-                        <div style={{ padding: '10px' }}>
-                            This feature is not yet implemented.
-                        </div>
-                    </Popover>
+                        <img
+                            src={theme.type === 'dark' ? BeeWhite : BeeBlack}
+                            alt={'Scanning Bee Logo'}
+                            style={{ width: '50px' }}
+                        />
+                        <h3 style={{ fontWeight: 'normal' }}>Beehive Information</h3>
+                    </Card>
                 </div>
             </div>
         </div>
