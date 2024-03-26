@@ -2,6 +2,7 @@ from detect import *
 from preprocess import *
 import random
 from typing import List, Tuple
+from scipy import stats
 FOUR_OVER_ROOT3 = 2.309401077
 TWO_OVER_ROOT3 = 1.154700538
 THREE_OVER_ROOT3 = 1.732050808
@@ -264,7 +265,7 @@ def detect_second_stage(img: np.ndarray, patch_corners: List[Tuple[int, int, int
 
         # if no circle is in this patch
         if not inside:
-            patch = img[u:d, l:r]
+            patch = img[u:d, l:r].copy()
             patches.append(patch)
             circles = detect_circle_on_clip(patch)[:1]
             if circles.size > 0:
@@ -465,3 +466,65 @@ def get_anchor_row(img: np.ndarray, detected_circles: List[Tuple[int, int, int]]
         cv2.waitKey(0)
     
     return image_patches
+
+def find_slope(detected_circles: List[Tuple[int, int, int]], plot_img: np.ndarray, is_show: bool = False):
+    x = [point[0] for point in detected_circles]
+    y = [point[1] for point in detected_circles]
+    r = [point[2] for point in detected_circles]
+
+    print("x:", x)
+    print("y:", y)
+    print("r:", r)
+    # Fit a line
+    slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+
+    randomp_1 = (min(x), int(slope * min(x) + intercept)) 
+    randomp_2 = (max(x), int(slope * max(x) + intercept))
+
+    angle_radians = np.arctan(slope)
+    angle_degrees = np.degrees(angle_radians)
+
+    print("Slope:", slope)
+    print("Angle in radians:", angle_radians)
+    print("Angle in degrees:", angle_degrees)
+
+    
+    # cv2.line(plot_img, randomp_1, randomp_2, (0, 0, 255), 2)
+    # cv2.imshow("Line", plot_img)
+    # cv2.waitKey(0)
+
+    # # Plot data and fitted line
+    # plt.scatter(x, y, label='Data')
+    # plt.plot(x, slope*x + intercept, color='red', label='Fitted line')
+    # plt.xlabel('x')
+    # plt.ylabel('y')
+    # plt.legend()
+    # plt.show()
+
+    # print("Slope:", slope)
+    # print("Intercept:", intercept)
+
+def rotate_image(image, angle):
+    '''
+    Rotate the image by the given angle in degrees.
+    '''
+    image_center = tuple(np.array(image.shape[1::-1]) / 2)
+    rot_mat = cv2.getRotationMatrix2D(image_center, angle, 1.0)
+    result = cv2.warpAffine(image, rot_mat, image.shape[1::-1], flags=cv2.INTER_LINEAR)
+    return result, rot_mat
+
+def rotate_point(point, angle, center):
+    '''
+    Rotate the point by the given angle in degrees around the center.
+    '''
+    angle = np.radians(angle)
+    temp_point = point - center
+    rotated_point = np.array([
+        temp_point[0] * np.cos(angle) - temp_point[1] * np.sin(angle),
+        temp_point[0] * np.sin(angle) + temp_point[1] * np.cos(angle)
+    ])
+
+    ## make the coordinates int
+    return_int = (rotated_point + center).astype(int)
+
+    return return_int
