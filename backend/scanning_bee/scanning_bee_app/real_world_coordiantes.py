@@ -1,9 +1,11 @@
 import numpy as np
 import cv2
 import pandas as pd
+from typing import Tuple
 
 
-def get_camera_info(camera_info_file_path="scanning_bee_app/camera_info.csv"):
+
+def get_camera_info(camera_info_file_path="scanning_bee_app/camera_info.csv") -> Tuple[np.ndarray, np.ndarray]:
     try:
         # Read the CSV file using Pandas
         camera_info = pd.read_csv(camera_info_file_path)
@@ -22,33 +24,75 @@ def get_camera_info(camera_info_file_path="scanning_bee_app/camera_info.csv"):
         raise ValueError(f"An error occurred while reading the camera info: {e}")
 
 
-def convert_to_world_coordinates(point_2d, x_pos, y_pos, Z=1, camera_info_path="scanning_bee_app/camera_info.csv"):
+def convert_to_world_coordinates(point_2d, x_pos, y_pos, Z=0.5, camera_info_path="scanning_bee_app/camera_info.csv"):
     """
-    Converts a 2D point in image coordinates to 3D world coordinates using the camera's calibration data.
+    Converts a 2D point in image coordinates (origin at top left, resolution 1920x1080) 
+    to 3D world coordinates (origin at bottom left) using the camera's calibration data.
 
     :param point_2d: A tuple or list with the x, y coordinates of the point in the image.
-    :param K: Intrinsic matrix of the camera.
-    :param D: Distortion coefficients of the camera.
-    :param x_pos: The x position of the camera in world coordinates.
-    :param y_pos: The y position of the camera in world coordinates.
-    :param Z: Assumed depth for the 3D point. Defaults to 1.
-    :return: Numpy array representing the 3D point in world coordinates.
+    :param x_pos: The x position of the camera in world coordinates, starts from the bottom left corner, increases to the right.
+    :param y_pos: The y position of the camera in world coordinates, starts from the bottom left corner, increases upwards.
+    :param Z: Assumed depth for the 3D point. Defaults to 0.5.
+    :param camera_info_path: Path to the camera calibration data.
+    :return: A tuple representing the 3D point in world coordinates.
     """
-    K, D = get_camera_info(camera_info_path)
-
-    # Ensure the point is in the correct shape for cv2.undistortPoints
+    K, D = get_camera_info(camera_info_path)  # Load camera intrinsic matrix and distortion coefficients
+    
+    # Adjust for distortion
     point_2d = np.array(point_2d, dtype='float64').reshape(1, 1, 2)
+    undistorted_point = cv2.undistortPoints(point_2d, K, D, None, K)
     
-    # Correct for distortion and convert to normalized camera coordinates
-    undistorted_normalized = cv2.undistortPoints(point_2d, K, D, None, K)
-
-    # Convert the normalized point to homogeneous coordinates
-    point_normalized_homogeneous = np.array([undistorted_normalized[0][0][0], undistorted_normalized[0][0][1], 1])
+    # Adjust for the y-coordinate inversion due to different origins
+    # Image height is 1080 pixels for a 1920x1080 resolution
+    image_height = 1080
+    adjusted_y = image_height - undistorted_point[0][0][1]
     
-    # Apply the camera's position as translation
-    world_point = np.dot(np.linalg.inv(K), point_normalized_homogeneous) * Z
-    world_point[0] += x_pos
-    world_point[1] += y_pos
+    # Convert to world coordinates considering the Z depth
+    point_3d_world = np.dot(np.linalg.inv(K), [undistorted_point[0][0][0], adjusted_y, 1]) * Z
+    world_x = point_3d_world[0] + x_pos
+    world_y = point_3d_world[1] + y_pos
+    
+    return world_x, world_y
 
-    return world_point[0], world_point[1]
+if __name__ == "__main__":
+    # Test the conversion function
 
+    # point41 and point42_1 are the same point in the real world
+    # point42_1 and point42_2 are different but adjacent points in the real world
+    # picture41 is shifted to the left approximately 4-5 cells => picture42
+
+    xpos41 = 0.21207468211650848
+    ypos41 = 0.33764541149139404
+
+    xpos42 = 0.18759207427501678
+    ypos42 = 0.3375004529953003
+
+    point41 = (404, 242)
+
+    point42_1 = (1182,234)
+
+    point42_2 = (1108, 378)
+
+
+    x41, y41 = convert_to_world_coordinates(point41, xpos41, ypos41, camera_info_path="backend/scanning_bee/scanning_bee_app/camera_info.csv")
+    print("point41  : ", x41, y41)
+
+
+    x42_1, y42_1 = convert_to_world_coordinates(point42_1, xpos42, ypos42, camera_info_path="backend/scanning_bee/scanning_bee_app/camera_info.csv")
+    print("point42_1: ", x42_1, y42_1)
+
+    x42_2, y42_2 = convert_to_world_coordinates(point42_2, xpos42, ypos42, camera_info_path="backend/scanning_bee/scanning_bee_app/camera_info.csv")
+    print("point42_2: ", x42_2, y42_2)
+
+    # Euclidean distance 41 and 42_1
+    distance1 = np.sqrt((x41 - x42_1)**2 + (y41 - y42_1)**2)
+    print("distance 41 - 42_1:   ", distance1)
+
+    # Euclidean distance 42_1 and 42_2
+    distance2 = np.sqrt((x42_1 - x42_2)**2 + (y42_1 - y42_2)**2)
+    print("distance 42_1 - 42_2: ", distance2)
+
+    if distance1 < distance2:
+        print("DOĞRU")
+    else:
+        print("yanlış")
