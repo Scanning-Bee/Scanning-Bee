@@ -8,6 +8,7 @@ import {
     setAnnotationAsActive,
     useManualAnnotatorModeWithParams,
 } from '@frontend/slices/annotationSlice';
+import { useViewScale } from '@frontend/slices/viewScaleSlice';
 import { CellTypeColours } from '@frontend/utils/colours';
 import { isMac } from '@frontend/utils/platform';
 import { UUID } from 'crypto';
@@ -65,12 +66,17 @@ export const DraggableAnnotation = (props: {
 
     const { mode, modeParams } = useManualAnnotatorModeWithParams();
 
+    const scale = useViewScale();
+    const actualScale = scale / 2;
+
     const headerHeight = 35;
     const footerHeight = 25;
 
-    const radius = annotation.radius / 2;
-    const centerX = annotation.center[0] / 2 - radius;
-    const centerY = annotation.center[1] / 2 - radius;
+    const radius = annotation.radius * actualScale;
+    const diameter = radius * 2;
+
+    const centerX = annotation.center[0] * actualScale - radius;
+    const centerY = annotation.center[1] * actualScale - radius;
 
     const isActive = activeAnnotationIds.includes(annotation.id);
 
@@ -85,8 +91,8 @@ export const DraggableAnnotation = (props: {
     const dragStopped = (e: any, pos: any) => {
         e.stopPropagation();
 
-        const newX = (pos.x + radius) * 2;
-        const newY = (pos.y + radius) * 2;
+        const newX = (pos.x + radius) / actualScale;
+        const newY = (pos.y + radius) / actualScale;
 
         const mutation = {
             id: annotation.id,
@@ -123,8 +129,8 @@ export const DraggableAnnotation = (props: {
                         position: 'absolute',
                         left: `${leftOffset}px`,
                         top: `${topOffset - headerHeight / 2 - footerHeight / 2}px`,
-                        width: `${radius * 2}px`,
-                        height: `${radius * 2}px`,
+                        width: `${diameter}px`,
+                        height: `${diameter}px`,
                         border: `3px solid ${CellTypeColours[annotation.cell_type]}`,
                         borderRadius: '50%',
                         color: CellTypeColours[annotation.cell_type],

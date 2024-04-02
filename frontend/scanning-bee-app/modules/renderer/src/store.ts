@@ -2,8 +2,10 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 
 import annotationReducer from './slices/annotationSlice';
+import annotatorScale from './slices/annotatorScaleSlice';
 import backendStatusReducer from './slices/backendStatusSlice';
 import themeReducer from './slices/themeSlice';
+import viewScaleReducer from './slices/viewScaleSlice';
 import zoomReducer from './slices/zoomSlice';
 
 const store = configureStore({
@@ -12,6 +14,7 @@ const store = configureStore({
         theme: themeReducer,
         zoom: zoomReducer,
         backendStatus: backendStatusReducer,
+        viewScale: viewScaleReducer,
     }),
 });
 

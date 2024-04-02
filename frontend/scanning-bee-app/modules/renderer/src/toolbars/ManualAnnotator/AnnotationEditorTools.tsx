@@ -21,7 +21,7 @@ const RadiusSlider = (props: {
 
     const dispatch = useDispatch();
 
-    const disabled = activeAnnotations.length !== 1;
+    const disabled = activeAnnotations.length < 1;
 
     const theme = useTheme();
 
@@ -43,10 +43,12 @@ const RadiusSlider = (props: {
                     max={200}
                     stepSize={1}
                     labelStepSize={40}
-                    onRelease={value => dispatch(mutateAnnotation({
-                        id: activeAnnotations[0].id,
-                        mutations: { radius: value },
-                    }))}
+                    onRelease={(value) => {
+                        activeAnnotations.forEach(annotation => dispatch(mutateAnnotation({
+                            id: annotation.id,
+                            mutations: { radius: value },
+                        })));
+                    }}
                     value={displayedRadius}
                     initialValue={displayedRadius}
                     onChange={value => setDisplayedRadius(value)}
@@ -162,7 +164,7 @@ export const AnnotationEditorTools = (props: {
 
     return (
         <div
-            className='column-flex-center manual-annotator-toolbar'
+            className='column-flex-center manual-annotator-toolbar shadowed'
             style={{
                 backgroundColor: theme.secondaryBackground,
                 color: theme.secondaryForeground,
