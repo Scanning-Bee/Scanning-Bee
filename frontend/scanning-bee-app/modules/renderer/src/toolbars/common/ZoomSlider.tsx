@@ -29,7 +29,7 @@ export const ZoomSlider = (props: {
         <div className='zoom-slider column-flex-center shadowed'>
             <Button
                 icon={<Icon icon='plus' color={theme.primaryForeground} />}
-                onClick={() => handleZoom(zoom + 0.1)}
+                onClick={() => handleZoom(zoom + 0.1, true)}
                 minimal
                 style={{ backgroundColor: theme.secondaryBackground, color: theme.primaryForeground }}
             />
@@ -47,7 +47,7 @@ export const ZoomSlider = (props: {
             />
             <Button
                 icon={<Icon icon='minus' color={theme.primaryForeground} />}
-                onClick={() => handleZoom(zoom - 0.1)}
+                onClick={() => handleZoom(zoom - 0.1, true)}
                 minimal
                 style={{ backgroundColor: theme.secondaryBackground, color: theme.primaryForeground }}
             />
