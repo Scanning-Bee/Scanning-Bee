@@ -162,7 +162,7 @@ def test_lines(image_path: str, occlude:bool = False, detection_model_path:str =
 
     return return_list
 
-def rotation_robust_method(image_path: str, occlude:bool = False, detection_model_path:str = 'AI/models/bee_detect_models/bee_model_v2.pt',cell_space:float = 0.03, error_margin:float = 0.15, intersect_threshold:float = 0.3) -> List[Tuple[int, int, int]]:
+def rotation_robust_method(image_path: str, occlude:bool = False, detection_model_path:str = 'AI/models/bee_detect_models/hive-state-bee-detector.pt',cell_space:float = 0.03, error_margin:float = 0.15, intersect_threshold:float = 0.3) -> List[Tuple[int, int, int]]:
     '''
     The latest version of the circle detection code, made for the CENG49X Design Project Course.
     - image_path is the path of the object image
@@ -258,13 +258,13 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
     merged_second_stage_circles_rotated = filter_and_add_circles(filtered_first_stage_circles_rotated,filtered_second_stage_circles_rotated)
 
     # In the patches that we cannot find a circle,assume there is one
-    tiled_circles_rotated = tile_circles(rotated_image,tight_patch_corners_rotated,merged_second_stage_circles_rotated)
+    tiled_circles_rotated = tile_circles(rotated_image,tight_patch_corners_rotated, merged_second_stage_circles_rotated)
 
     # Of those assumed circles, remove the ones occluded by bees
-    filtered_tiled_circles_rotated = filter_intersecting_circles(tiled_circles_rotated,mask,intersection_threshold=intersect_threshold)
+    filtered_tiled_circles_rotated = filter_intersecting_circles(tiled_circles_rotated, mask, intersection_threshold=intersect_threshold)
 
     # Check if tiled_circles are suitably away from other circles, if so add to final list one by one
-    merged_final_circles_rotated = filter_and_add_circles(merged_second_stage_circles_rotated,filtered_tiled_circles_rotated)
+    merged_final_circles_rotated = filter_and_add_circles(merged_second_stage_circles_rotated, filtered_tiled_circles_rotated)
 
     for circle in merged_final_circles_rotated:
         x,y,r = circle
@@ -276,15 +276,32 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
         ##bUNLARI ORİJİNAL RESME DÖNDÜRMEYİ YAPAMADIM, O KISMA BAKABİLİR MİSİN
         ## ONU HALLEDİP MERGED_FİNAL_CİRCLES'E ATABİLİRSİN
         ## ÇİZİM KISMINI EKLEDİM ZATEN
+    
+    # tabii ki
+    
+    # Rotating the detected circles back to fit the original image
+    print(f"merged_final_circles_rotated.shape: {merged_final_circles_rotated.shape}")
+    #print(merged_final_circles_rotated)
 
+    _, rotate_back_matrix = rotate_image(sample_image, -rotation_angle)
+    xy_coords = merged_final_circles_rotated[:, :2]  # This slices out the x and y
+    radii = merged_final_circles_rotated[:, 2]  # This slices out the radius
+    print(radii)
+    rotated_xy_coords = (xy_coords @ rotate_back_matrix).astype(int)
+    print(xy_coords)
+    print(rotated_xy_coords)
+    merged_final_circles = np.hstack((rotated_xy_coords[:, :2], radii.reshape(-1, 1)))
+    print(merged_final_circles)
     for circle in merged_final_circles:
         x,y,r = circle
         cv2.circle(plot_img,(x,y),r,(0,255,0),3)
 
-    all_image = np.hstack([plot_img,rotated_image])
-    cv2.namedWindow("All",cv2.WINDOW_NORMAL)
-    cv2.imshow("All",all_image)
-    cv2.resizeWindow("All", 1600, 800)
+    #all_image = np.hstack([plot_img,rotated_image])
+    #cv2.namedWindow("All",cv2.WINDOW_NORMAL)
+    #cv2.imshow("All",all_image)
+    cv2.namedWindow("plot img", cv2.WINDOW_NORMAL)
+    cv2.imshow("plot img", plot_img)
+    #cv2.resizeWindow("All", 1600, 800)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
