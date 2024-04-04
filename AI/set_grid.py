@@ -488,10 +488,10 @@ def find_slope(detected_circles: List[Tuple[int, int, int]], plot_img: np.ndarra
     print("Angle in radians:", angle_radians)
     print("Angle in degrees:", angle_degrees)
 
-    
-    # cv2.line(plot_img, randomp_1, randomp_2, (0, 0, 255), 2)
-    # cv2.imshow("Line", plot_img)
-    # cv2.waitKey(0)
+    if is_show:
+        cv2.line(plot_img, randomp_1, randomp_2, (0, 0, 255), 2)
+        cv2.imshow("Line", plot_img)
+        cv2.waitKey(0)
 
     # # Plot data and fitted line
     # plt.scatter(x, y, label='Data')

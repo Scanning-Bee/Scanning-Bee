@@ -1,7 +1,7 @@
 import yaml
 import os
 import sys
-from test import test_lines
+from test import rotation_robust_method,test_lines
 
 ## I couldn't manage to run this script inside image annotator, so if you want to use this one the best way 
 ## is to move all scanning-bee file to another directory, then run this script, make sure to adjust the paths
@@ -81,43 +81,34 @@ cell_space=[ 0.25, 0.75, 1.25]
 error_margin = [ 0.25, 0.75, 1.25]
 intersect_thres = [0.6]
 
-for o in occlude:
-    for s in cell_space:
-        for e in error_margin:
-            for i in intersect_thres:
-
-                avg_p = avg_r = avg_acc = avg_iou= 0
-                image_count = 0
-                for image_name in ground_truth_circles.keys():
-                    image_path = os.path.join(folder_path, image_name)
-                    gt_circles = ground_truth_circles[image_name]
-                    detected_circles = test_lines(image_path, occlude=o, detection_model_path=r"C:\Users\User\OneDrive - INFINIA\Masaüstü\scanning-bee\models\bee_detect_models\bee_model_v2.pt",cell_space=s,error_margin=e,intersect_threshold=i)
-                    if len(detected_circles) == 0:
-                        continue
-                    precision, recall, accuracy, iou = measure_success(gt_circles, detected_circles)
-                    
-                    avg_p += precision
-                    avg_r += recall
-                    avg_acc += accuracy
-                    avg_iou += iou
-                    
-                    image_count += 1 
-                    # print(f"Image {image_name}: Precision={precision}, Recall={recall}, Accuracy={accuracy}, IoU={iou}")
-
-                avg_acc /= max(1, image_count)
-                avg_p /= max(1, image_count)
-                avg_r /= max(1, image_count)
-                avg_iou /= max(1, image_count)
-
-                print(f"Occlude {o}, cell_space={s}, error margin={e}, intersect_thres={i}")
-                print(f"Averaged Metrics: Precision={avg_p}, Recall={avg_r}, Accuracy={avg_acc}, Avg IoU={avg_iou} over {image_count} images from {len(ground_truth_circles.keys())} total images")
-                result_tup = (o,s,e,i,avg_acc,avg_p,avg_r,avg_iou,image_count)
-                results.append(result_tup)
 
 
-print("-------------------")
-for result in results:
-    o,s,e,i,avg_acc,avg_p,avg_r,avg_iou,image_count = result
-    print(f"Occlude {o}, cell_space={s}, error margin={e}, intersect_thres={i}")
-    print(f"Averaged Metrics: Precision={avg_p}, Recall={avg_r}, Accuracy={avg_acc}, Avg IoU={avg_iou} over {image_count} images")
-                
+avg_p = avg_r = avg_acc = avg_iou= 0
+image_count = 0
+for image_name in ground_truth_circles.keys():
+    image_path = os.path.join(folder_path, image_name)
+    gt_circles = ground_truth_circles[image_name]
+    detected_circles = test_lines(image_path, occlude=True, detection_model_path=r"AI/models/bee_detect_models/epoch-150.pt")
+    if len(detected_circles) == 0:
+        continue
+    precision, recall, accuracy, iou = measure_success(gt_circles, detected_circles)
+    
+    avg_p += precision
+    avg_r += recall
+    avg_acc += accuracy
+    avg_iou += iou
+    
+    image_count += 1 
+    # print(f"Image {image_name}: Precision={precision}, Recall={recall}, Accuracy={accuracy}, IoU={iou}")
+
+avg_acc /= max(1, image_count)
+avg_p /= max(1, image_count)
+avg_r /= max(1, image_count)
+avg_iou /= max(1, image_count)
+
+
+print(f"Averaged Metrics: Precision={avg_p}, Recall={avg_r}, Accuracy={avg_acc}, Avg IoU={avg_iou} over {image_count} images from {len(ground_truth_circles.keys())} total images")
+
+
+
+             
