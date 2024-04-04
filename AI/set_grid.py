@@ -503,6 +503,7 @@ def find_slope(detected_circles: List[Tuple[int, int, int]], plot_img: np.ndarra
 
     # print("Slope:", slope)
     # print("Intercept:", intercept)
+    return angle_degrees
 
 def rotate_image(image, angle):
     '''
