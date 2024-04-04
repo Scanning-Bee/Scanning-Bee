@@ -583,7 +583,12 @@ a {
 
 #beehive-container {
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.5);
+  width: 0;
+  height: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: scale 0.2s;
 }
 
 .beehive-cell {

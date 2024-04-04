@@ -2,18 +2,17 @@ import React from 'react';
 
 export const HexagonBase = (props: {
     color: string,
-    scale: number,
 }) => {
-    const { color, scale } = props;
+    const { color } = props;
 
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"
-            width={42 * scale}
+            width="42"
             zoomAndPan="magnify"
             viewBox="0 0 2598 2999.999989"
-            height={48 * scale}
+            height="48"
             preserveAspectRatio="xMidYMid meet"
             version="1.0"
             fill={color}
