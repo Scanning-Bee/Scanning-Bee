@@ -193,7 +193,6 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
             ## using yolov8 bee detection model
             model = YOLO(detection_model_path)
             # print("Bee detection model loaded")
-            plot_img_downsampled = cv2.resize(plot_img, (height//4), (width//4))
             prediction = model(plot_img,verbose= True)[0]
             scores = prediction.boxes.conf
             bboxes = prediction.boxes.xyxy
@@ -217,7 +216,7 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
 
     ## if no circles found, return early since we have no anchor
     if len(filtered_first_stage_circles) == 0:
-        # print("No anchor found, auto detection is not possible")
+        print("No anchor found, auto detection is not possible")
         return []
 
     anchor_patches = get_anchor_row(sample_image, filtered_first_stage_circles, cell_space = 0.03, error_margin = 0.15)
@@ -268,19 +267,32 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
     # Of those assumed circles, remove the ones occluded by bees
     filtered_tiled_circles_rotated = filter_intersecting_circles(tiled_circles_rotated, mask, intersection_threshold=intersect_threshold)
 
+    color_copy = color_rotated_image.copy()
     # Check if tiled_circles are suitably away from other circles, if so add to final list one by one
-    merged_final_circles_rotated = filter_and_add_circles(merged_second_stage_circles_rotated, filtered_tiled_circles_rotated)
+    for circle in merged_second_stage_circles_rotated:
+        x,y,r = circle
+        cv2.circle(color_rotated_image,(x,y),r,(255,0,255),3)
 
-    ######NOTE TO GÖRKEM:
-        ##RESMİ DÖNDÜRÜP PİPELİNEDAN GEÇİRİYORUM, SONUÇLAR MERGED_FİNAL_CİRCLES_ROTATED'DA
-        ##bUNLARI ORİJİNAL RESME DÖNDÜRMEYİ YAPAMADIM, O KISMA BAKABİLİR MİSİN
-        ## ONU HALLEDİP MERGED_FİNAL_CİRCLES'E ATABİLİRSİN
-        ## ÇİZİM KISMINI EKLEDİM ZATEN
+    for circle in filtered_tiled_circles_rotated:
+        x,y,r = circle
+        cv2.circle(color_rotated_image,(x,y),r ,(0,255,255),3)
     
-    # tabii ki :)
+    ## I think tiled circles do not need to be tested for intersection, so just concatenate them
+    # merged_final_circles_rotated = filter_and_add_circles(merged_second_stage_circles_rotated, filtered_tiled_circles_rotated)
+    merged_final_circles_rotated = np.concatenate([merged_second_stage_circles_rotated,np.array(filtered_tiled_circles_rotated)])
+
+    # for circle in merged_final_circles_rotated:
+    #     x,y,r = circle
+    #     cv2.circle(color_copy,(x,y),r ,(100,100,255),3)
+
+    # color_plt = np.hstack([color_rotated_image,color_copy])
+    # cv2.namedWindow("rotated",cv2.WINDOW_NORMAL)
+    # cv2.resizeWindow("rotated", 1600, 800)
+    # cv2.imshow("rotated", color_plt)
     
-    # Rotating the detected circles back to fit the original image
+    # cv2.waitKey(0)
     
+    # Rotating the detected circles back to fit the original image    
     _, rotate_back_matrix = rotate_image(rotated_image, -rotation_angle)
     xy_coords = merged_final_circles_rotated[:, :2]  # This slices out the x and y
     radii = merged_final_circles_rotated[:, 2]  # This slices out the radius
@@ -298,9 +310,11 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
     #cv2.imshow("All",all_image)
 
     # print("Here")
-    # cv2.imshow("plot img", plot_img)
-    # #cv2.resizeWindow("All", 1600, 800)
-    # cv2.waitKey(0)
+    cv2.namedWindow("plot img",cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("plot img", 800, 800)
+    cv2.imshow("plot img", plot_img)
+    
+    cv2.waitKey(0)
 
     # Convert the NumPy array to a list of tuples, for the return
     return_list = [tuple(row) for row in merged_final_circles]
@@ -310,6 +324,6 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
 
 
 if __name__ == "__main__":
-    test_lines("AI/test_images/image_759.jpg")
-    rotation_robust_method("AI/test_images/image_759.jpg",occlude=False)
+    # test_lines("AI/test_images/image_759.jpg")
+    print(rotation_robust_method("AI/test_images/image_759.jpg",occlude=True, detection_model_path="AI/models/bee_detect_models/epoch-150.pt"))
     

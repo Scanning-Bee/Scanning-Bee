@@ -3,6 +3,7 @@ from preprocess import *
 import random
 from typing import List, Tuple
 from scipy import stats
+from math import sqrt
 FOUR_OVER_ROOT3 = 2.309401077
 TWO_OVER_ROOT3 = 1.154700538
 THREE_OVER_ROOT3 = 1.732050808
@@ -362,41 +363,31 @@ def filter_and_add_circles(first_detected: List[Tuple[int, int, int]], second_de
     ### As the first step, compare circles in second_detected with each other
     # Calculate distances between circles in 'second'
 
+    if len(first_detected) == 0:
+        return second_detected
+    
+    if len(second_detected) == 0:
+        return first_detected
+
     first_detected = np.array(first_detected)
     second_detected = np.array(second_detected)
 
-    if not second_detected.size:
-        return first_detected
-    points_second = second_detected[:, :2]
-    differences_second = points_second[:, np.newaxis, :] - points_second
-    distances_second = np.sqrt(np.sum(differences_second**2, axis=-1))
+    all_circles = np.concatenate([first_detected,second_detected],axis = 0)
 
-    # Calculate the sum of radii for 'second'
-    radii_sum_second = second_detected[:, 2] + second_detected[:, 2][:, np.newaxis]
+    result_circles = [i for i in first_detected]
 
-    # Create a boolean mask for circles in 'second' that satisfy the condition
-    mask_second = distances_second < radii_sum_second
+    for circle in second_detected:
+        x,y,r = circle
+        intersect = False
+        for accepted_circle in result_circles:
+            x_g, y_g, r_g = accepted_circle
+            distance = sqrt((x-x_g) ** 2 + (y-y_g) ** 2)
+            if distance < r+r_g:
+                intersect = True
+        if intersect == False:
+            result_circles.append(circle)
 
-    # Apply the mask to filter out circles in 'second'
-    filtered_circles_second = second_detected[mask_second.sum(axis=1) == 1]
-
-    ### As second step, compare filtered_circles_second with first detected
-    # calculate distances between circles in 'first' and filtered circles in 'second'
-    points_second = filtered_circles_second[:, :2]
-    differences_first_second = points_second[:, np.newaxis, :] - first_detected[:, :2]
-
-    distances_first_second = np.sqrt(np.sum(differences_first_second**2, axis=-1))
-
-    # Calculate the sum of radii for 'first' and filtered circles in 'second'
-    radii_sum_first_second = first_detected[:, 2] + filtered_circles_second[:, 2][:, np.newaxis]
-
-    # Create a boolean mask for circles in 'first' and filtered circles in 'second' that satisfy the condition
-    mask_first_second = distances_first_second < radii_sum_first_second
-
-    # Apply the mask to filter out circles in 'filtered_circles_second'
-    filtered_circles_final = filtered_circles_second[mask_first_second.sum(axis=1) == 0]
-    all_circles = np.concatenate([first_detected,filtered_circles_final],axis=0)
-
+    all_circles = np.array(result_circles)
     return all_circles
 
 
