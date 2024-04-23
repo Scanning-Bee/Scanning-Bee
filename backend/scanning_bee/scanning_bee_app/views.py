@@ -93,6 +93,25 @@ class UserRegistrationView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class UserLoginView(APIView):
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            refresh = RefreshToken.for_user(user)
+
+            return Response({
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh),
+            }, status=status.HTTP_200_OK)
+        else:
+            # Authentication failed
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
 class UserList(ListCreateAPIView):
     serializer_class = CustomUserSerializer
     permission_classes = [IsAuthenticated]
@@ -133,8 +152,11 @@ class UserDetail(RetrieveUpdateDestroyAPIView):
 
 
 ##################### FRAME #####################
+
 class FrameList(ListCreateAPIView):
     serializer_class = FrameSerializer
+    permission_classes = [IsAuthenticated]
+
     def get_queryset(self, *args, **kwargs):
         queryset = Frame.objects.all()
         pk = self.kwargs.get('id')
@@ -144,6 +166,7 @@ class FrameList(ListCreateAPIView):
 
 
 class FrameDetail(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Frame.objects.all()
     serializer_class = FrameSerializer
     lookup_field = 'id'
@@ -151,6 +174,7 @@ class FrameDetail(RetrieveUpdateDestroyAPIView):
 
 ##################### CELL #####################
 class CellList(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = CellSerializer
 
     def get_queryset(self, *args, **kwargs):
@@ -191,6 +215,7 @@ class CellList(ListCreateAPIView):
 
 
 class CellDetail(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Cell.objects.all()
     serializer_class = CellSerializer
     lookup_field = 'id'
@@ -198,6 +223,7 @@ class CellDetail(RetrieveUpdateDestroyAPIView):
 
 ##################### CONTENT #####################
 class ContentList(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = ContentSerializer
 
     def get_queryset(self, *args, **kwargs):
@@ -209,6 +235,7 @@ class ContentList(ListCreateAPIView):
 
 
 class ContentDetail(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Content.objects.all()
     serializer_class = ContentSerializer
     lookup_field = 'id'
@@ -216,6 +243,7 @@ class ContentDetail(RetrieveUpdateDestroyAPIView):
 
 ##################### CELL CONTENT #####################
 class CellContentList(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = CellContentSerializer
 
     def get_queryset(self, *args, **kwargs):
@@ -292,9 +320,10 @@ class CellContentList(ListCreateAPIView):
 
 
 class CellContentDetail(RetrieveUpdateDestroyAPIView):
-        queryset = CellContent.objects.all()
-        serializer_class = CellContentSerializer
-        lookup_field = 'id'
+    permission_classes = [IsAuthenticated]
+    queryset = CellContent.objects.all()
+    serializer_class = CellContentSerializer
+    lookup_field = 'id'
 
 
 class CellContentsByAI(ListCreateAPIView):
@@ -339,6 +368,7 @@ class CellContentsByAI(ListCreateAPIView):
 
 ######################## IMAGE ##################################
 class ImageList(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = ImageSerializer
 
     def get_queryset(self, *args, **kwargs):
@@ -377,6 +407,7 @@ class ImageList(ListCreateAPIView):
 
 
 class ImageDetail(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
     lookup_field = 'id'
@@ -391,6 +422,7 @@ class ImageDetail(RetrieveUpdateDestroyAPIView):
 
 
 class ImageScraper(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = ImageSerializer
 
     def post(self, request, *args, **kwargs):
@@ -475,6 +507,7 @@ class ImageScraper(ListCreateAPIView):
 
 ######################## BAG ##################################
 class BagList(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = BagSerializer
 
     def get_queryset(self, *args, **kwargs):
@@ -488,6 +521,7 @@ class BagList(ListCreateAPIView):
 
 
 class BagDetail(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Bag.objects.all()
     serializer_class = BagSerializer
     lookup_field = 'id'
