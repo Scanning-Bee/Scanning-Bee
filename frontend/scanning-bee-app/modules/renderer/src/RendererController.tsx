@@ -7,6 +7,7 @@ import { render } from 'react-dom';
 import App from './App';
 import Annotation from './models/annotation';
 import { HistoryService } from './services/HistoryService';
+import StorageService from './services/StorageService';
 import { generateAnnotationsFromYaml, openFolder } from './slices/annotationSlice';
 import { AppToaster } from './Toaster';
 
@@ -49,6 +50,8 @@ export class RendererController {
     }) {
         const { dispatch } = (window as any).store;
 
+        console.log('HERE', payload);
+
         const annotations = generateAnnotationsFromYaml(payload.annotations);
 
         dispatch(openFolder({
@@ -57,6 +60,8 @@ export class RendererController {
             images: payload.images,
             metadata: payload.metadata,
         }));
+
+        StorageService.saveProp('recentlyOpenedFolders', payload.folder, new Date().toISOString());
     }
 
     public goBack() : void {

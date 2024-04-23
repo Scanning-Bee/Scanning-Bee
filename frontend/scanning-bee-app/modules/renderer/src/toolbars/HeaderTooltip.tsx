@@ -100,14 +100,14 @@ const TooltipMenu = (props: { page: PageType, setPage: any, folder: string, hide
                     <MenuItem
                         text='Open Folder Location'
                         onClick={() => {
-                            if (folder) BackendInterface.getInstance().openFolderAtLocation(folder);
+                            if (folder) BackendInterface.getInstance().showFolder(folder);
                         }}
                         icon='folder-open'
                     />
                     <MenuItem
                         text='Open Annotations File'
                         onClick={() => {
-                            if (folder) BackendInterface.getInstance().openFolderAtLocation(`${folder}/annotations/annotations.yaml`);
+                            if (folder) BackendInterface.getInstance().showFolder(`${folder}/annotations/annotations.yaml`);
                         }}
                         icon='document-open'
                     />
