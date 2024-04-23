@@ -194,6 +194,14 @@ class CellContentList(ListCreateAPIView):
             image_list = list(image_queryset)
             queryset = queryset.filter(image__in=image_list)
 
+        elif filter_type == "time_range":
+            start_time = self.kwargs.get('start_time')
+            end_time = self.kwargs.get('end_time', None)
+            if end_time is None:
+                end_time = datetime.now(timezone.utc)
+
+            queryset = queryset.filter(timestamp__gte=start_time, timestamp__lte=end_time)
+
         return queryset
 
     def create(self, request, *args, **kwargs):
@@ -227,7 +235,6 @@ class CellContentDetail(RetrieveUpdateDestroyAPIView):
         serializer_class = CellContentSerializer
         lookup_field = 'id'
 
-# TODO: Ege'nin bu yaml metadatası ve image dosyalarını AnnotationFiles'tan otomatik olarak okuyup database'e kaydetme opsiyonu eklenecek
 
 class CellContentsByAI(ListCreateAPIView):
     serializer_class = CellContentSerializer
