@@ -33,27 +33,31 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
+
 class HomeView(APIView):
-     
     permission_classes = (IsAuthenticated, )
+
     def get(self, request):
         content = {'message': 'Welcome to Scanning Bee App :)'}
         return Response(content)
 
+
 class LogoutView(APIView):
-     permission_classes = (IsAuthenticated,)
-     def post(self, request):
-          
-          try:
-               refresh_token = request.data["refresh_token"]
-               token = RefreshToken(refresh_token)
-               token.blacklist()
-               return Response(status=status.HTTP_205_RESET_CONTENT)
-          except Exception as e:
-               print(e)
-               return Response(status=status.HTTP_400_BAD_REQUEST)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh_token"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            print(e)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 ##################### USER TYPE #####################
+
+
 class UserTypeList(ListCreateAPIView):
     serializer_class = UserTypeSerializer
 
@@ -83,12 +87,25 @@ class UserRegistrationView(APIView):
                 user_type=serializer.validated_data.get('user_type') 
             )
             refresh = RefreshToken.for_user(user)
-            return Response({ 'refresh': str(refresh),
-                'access': str(refresh.access_token), "message": "User registered successfully.", "user": str(user)}, status=status.HTTP_201_CREATED)
+            return Response({'refresh': str(refresh),
+                             'access': str(refresh.access_token), "message": "User registered successfully.",
+                             "user": str(user)}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 class UserList(ListCreateAPIView):
     serializer_class = CustomUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = None
+        user = self.request.user
+        if user.user_type.type == "Biolog":
+            print(3)
+            queryset = CustomUser.objects.all()
+        return queryset
+
+
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -102,15 +119,22 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class UserDetail(RetrieveUpdateDestroyAPIView):
-    queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
+    permission_classes = [IsAuthenticated]
     lookup_field = 'id'
+
+    def get_queryset(self):
+        queryset = None
+        user = self.request.user
+        if user.user_type.type == "Biolog":
+            print(3)
+            queryset = CustomUser.objects.all()
+        return queryset
 
 
 ##################### FRAME #####################
 class FrameList(ListCreateAPIView):
     serializer_class = FrameSerializer
-
     def get_queryset(self, *args, **kwargs):
         queryset = Frame.objects.all()
         pk = self.kwargs.get('id')
@@ -272,10 +296,10 @@ class CellContentDetail(RetrieveUpdateDestroyAPIView):
         serializer_class = CellContentSerializer
         lookup_field = 'id'
 
-# TODO: Ege'nin bu yaml metadatası ve image dosyalarını AnnotationFiles'tan otomatik olarak okuyup database'e kaydetme opsiyonu eklenecek
 
 class CellContentsByAI(ListCreateAPIView):
     serializer_class = CellContentSerializer
+    permission_classes = [IsAuthenticated]
 
     def get(self, request,  x_pos, y_pos, timestamp=None, format=None):
         queryset = Image.objects.filter(x_pos=x_pos, y_pos=y_pos)

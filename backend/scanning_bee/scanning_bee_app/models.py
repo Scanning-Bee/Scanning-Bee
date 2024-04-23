@@ -56,8 +56,10 @@ class Content(models.Model):
     def __str__(self):
         return self.name
 
+
 class Bag(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True, unique=True)
+
 
 class Image(models.Model):
     image_name = models.CharField(max_length=100)
