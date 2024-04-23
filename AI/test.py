@@ -234,6 +234,11 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
     rotated_image, rotation_matrix = rotate_image(sample_image,rotation_angle)
     color_rotated_image = cv2.cvtColor(rotated_image, cv2.COLOR_GRAY2RGB)
    
+    anchor_row_detections = np.array(filtered_second_stage_circles)[:, :2]
+    anchor_row_detections_rotated_xy = (anchor_row_detections @ rotation_matrix).astype(int)
+    anchor_row_detections_rotated = np.array(filtered_second_stage_circles.copy())
+    anchor_row_detections_rotated[:, :2] = anchor_row_detections_rotated_xy[:, :2]
+    optimum_cell_space = find_optimal_cellspace(anchor_row_detections_rotated)
 
     ## rotate the mask
     mask = cv2.warpAffine(mask,rotation_matrix,(width,height))
