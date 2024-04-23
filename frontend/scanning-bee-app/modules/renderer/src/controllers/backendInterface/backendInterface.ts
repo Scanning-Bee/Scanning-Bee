@@ -40,6 +40,10 @@ export class BackendInterface {
         return this._instance;
     }
 
+    public openFolderAtLocation = (folder: string) => {
+        ipcRenderer.send(RENDERER_QUERIES.OPEN_FOLDER_AT_LOCATION, folder);
+    };
+
     // Function to request opening the dialog
     public openFolderDialog = () => {
         ipcRenderer.send(RENDERER_QUERIES.SELECT_FOLDER);
@@ -55,7 +59,7 @@ export class BackendInterface {
         dispatch(saveChanges());
     };
 
-    public openFolderAtLocation = (folder: string) => {
+    public showFolder = (folder: string) => {
         shell.openPath(folder);
     };
 

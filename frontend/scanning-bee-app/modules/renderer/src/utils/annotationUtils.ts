@@ -1,6 +1,7 @@
 import { UUID } from 'crypto';
 import { IconName } from '@blueprintjs/core';
 import Annotation from '@frontend/models/annotation';
+import StorageService from '@frontend/services/StorageService';
 import { ManualAnnotatorMode } from '@frontend/slices/annotationSlice';
 
 export const getIconForMode = (mode: ManualAnnotatorMode): IconName => {
@@ -48,4 +49,16 @@ export const focusOnImageButton = (image: string) => {
             preventScroll: false,
         });
     }
+};
+
+export const getRecentlyOpenedFolders = (n?: number): string[] => {
+    const recentlyOpenedFolders = StorageService.getStorage('recentlyOpenedFolders');
+
+    if (!recentlyOpenedFolders) {
+        return [];
+    }
+
+    return Object.keys(recentlyOpenedFolders)
+        .sort((a, b) => new Date(recentlyOpenedFolders[b]).getTime() - new Date(recentlyOpenedFolders[a]).getTime())
+        .slice(0, n || 5);
 };

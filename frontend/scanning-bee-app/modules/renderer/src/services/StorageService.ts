@@ -41,7 +41,7 @@ class StorageService {
      * @param value  {any}
      */
     saveProp(storageId: string, prop: string, value: any) {
-        const data = this.getStorage(storageId);
+        const data = this.getStorage(storageId) || {};
 
         data[prop] = value;
 

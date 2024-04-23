@@ -9,6 +9,7 @@ import { AnnotationYaml } from 'miscTypes';
  */
 export enum RENDERER_QUERIES {
     SELECT_FOLDER = 'SELECT_FOLDER',
+    OPEN_FOLDER_AT_LOCATION = 'OPEN_FOLDER_AT_LOCATION',
     SAVE_ANNOTATIONS = 'SAVE_ANNOTATIONS',
     INVOKE_BACKEND = 'INVOKE_BACKEND',
 }
@@ -25,6 +26,7 @@ export enum MAIN_QUERIES {
 
 export type RENDERER_QUERY_PAYLOADS = {
     [RENDERER_QUERIES.SELECT_FOLDER]: undefined,
+    [RENDERER_QUERIES.OPEN_FOLDER_AT_LOCATION]: string,
     [RENDERER_QUERIES.SAVE_ANNOTATIONS]: { targetFolder: string; annotations: AnnotationYaml[] },
     [RENDERER_QUERIES.INVOKE_BACKEND]: undefined,
 };

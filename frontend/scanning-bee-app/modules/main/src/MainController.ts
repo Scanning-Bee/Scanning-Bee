@@ -348,24 +348,33 @@ class MainController {
             }
         };
 
+        const openFolderAtLocation = async (folderPath: string) => {
+            const annotationsFilePath = path.join(folderPath, 'annotations', 'annotations.yaml');
+
+            if (!fs.pathExistsSync(annotationsFilePath)) {
+                fs.ensureDirSync(path.join(folderPath, 'annotations'));
+                saveAnnotations([], folderPath);
+            }
+
+            const annotations = loadAnnotations(annotationsFilePath);
+            const imageUrls = loadImages(folderPath);
+            const metadata = loadMetadata(folderPath);
+
+            this.send(MAIN_EVENTS.ANNOTATIONS_PARSED, { folder: folderPath, annotations, images: imageUrls, metadata });
+        };
+
+        ipcMain.on(RENDERER_QUERIES.OPEN_FOLDER_AT_LOCATION, (_event, folderPath: string) => {
+            openFolderAtLocation(folderPath);
+        });
+
         ipcMain.on(RENDERER_QUERIES.SELECT_FOLDER, (_event) => {
             dialog.showOpenDialog({
                 properties: ['openDirectory'],
             }).then((result) => {
                 if (!result.canceled) {
                     const folderPath = result.filePaths[0];
-                    const annotationsFilePath = path.join(folderPath, 'annotations', 'annotations.yaml');
 
-                    if (!fs.pathExistsSync(annotationsFilePath)) {
-                        fs.ensureDirSync(path.join(folderPath, 'annotations'));
-                        saveAnnotations([], folderPath);
-                    }
-
-                    const annotations = loadAnnotations(annotationsFilePath);
-                    const imageUrls = loadImages(folderPath);
-                    const metadata = loadMetadata(folderPath);
-
-                    this.send(MAIN_EVENTS.ANNOTATIONS_PARSED, { folder: folderPath, annotations, images: imageUrls, metadata });
+                    openFolderAtLocation(folderPath);
                 }
             }).catch((err) => {
                 console.log(err);
