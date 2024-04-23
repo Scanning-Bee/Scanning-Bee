@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 
 export const ZoomSlider = (props: {
     handleZoomChange: (zoom: number) => void;
+    debounced?: boolean;
 }) => {
-    const { handleZoomChange } = props;
+    const { handleZoomChange, debounced } = props;
 
     const theme = useTheme();
 
@@ -13,14 +14,14 @@ export const ZoomSlider = (props: {
 
     const [lowerBound, upperBound] = [0, 2];
 
-    const handleZoom = (value: number) => {
+    const handleZoom = (value: number, ignoreDebounce?: boolean) => {
         if (value < lowerBound) {
             value = lowerBound;
         } else if (value > upperBound) {
             value = upperBound;
         } else {
             setZoom(value);
-            handleZoomChange(value);
+            if (!debounced || ignoreDebounce) handleZoomChange(value);
         }
     };
 
@@ -28,7 +29,7 @@ export const ZoomSlider = (props: {
         <div className='zoom-slider column-flex-center shadowed'>
             <Button
                 icon={<Icon icon='plus' color={theme.primaryForeground} />}
-                onClick={() => handleZoom(zoom + 0.1)}
+                onClick={() => handleZoom(zoom + 0.1, true)}
                 minimal
                 style={{ backgroundColor: theme.secondaryBackground, color: theme.primaryForeground }}
             />
@@ -42,10 +43,11 @@ export const ZoomSlider = (props: {
                 labelRenderer={false}
                 showTrackFill={false}
                 className='zoom-slider-slider'
+                onRelease={() => handleZoom(zoom, true)}
             />
             <Button
                 icon={<Icon icon='minus' color={theme.primaryForeground} />}
-                onClick={() => handleZoom(zoom - 0.1)}
+                onClick={() => handleZoom(zoom - 0.1, true)}
                 minimal
                 style={{ backgroundColor: theme.secondaryBackground, color: theme.primaryForeground }}
             />

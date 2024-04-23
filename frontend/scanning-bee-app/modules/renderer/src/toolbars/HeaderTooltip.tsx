@@ -155,7 +155,6 @@ const TooltipMenu = (props: { page: PageType, setPage: any, folder: string, hide
                     if (page !== 'beehive') setPage('beehive');
                 }}
                 icon={'path-search'}
-                disabled
             />
         </Menu>
     </div>);

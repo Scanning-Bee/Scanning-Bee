@@ -3,6 +3,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { ipcRenderer, shell } from 'electron';
 import Annotation from '@frontend/models/annotation';
+import { BeehiveCell } from '@frontend/models/beehive';
 import CellType from '@frontend/models/cellType';
 import { addAnnotation, getAnnotationsMetadata, saveChanges } from '@frontend/slices/annotationSlice';
 import { resetBackendStatus } from '@frontend/slices/backendStatusSlice';
@@ -301,5 +302,43 @@ export class BackendInterface {
                 intent: 'danger',
             });
         }
+    };
+
+    public getBeehiveData = (): BeehiveCell[] => {
+        // DUMMY FOR NOW. TODO:
+
+        const maxCellCount = 1000;
+        const minCellCount = 100;
+        const cellCount = Math.floor(Math.random() * (maxCellCount - minCellCount + 1) + minCellCount);
+
+        const cellCountPerRow = Math.floor(cellCount ** 0.51);
+
+        const cells: BeehiveCell[] = [];
+
+        const cellWidth = 48;
+        const cellHeight = 42;
+
+        let rowNumber = -1;
+
+        const cellTypes = Object.keys(CellType);
+
+        for (let i = 0; i < cellCount; i += 1) {
+            if (i % cellCountPerRow === 0) {
+                rowNumber += 1;
+            }
+
+            const cellTypeIdx = Math.floor(Math.random() * 16) + 1;
+
+            const cellType = cellTypeIdx <= 8 ? cellTypes[cellTypeIdx] : 'NOT_CLASSIFIED';
+
+            cells.push({
+                cellType: CellType[cellType],
+                id: i,
+                x: (i % cellCountPerRow) * cellWidth + (rowNumber % 2 === 0 ? 0 : cellWidth / 2),
+                y: rowNumber * cellHeight,
+            });
+        }
+
+        return cells;
     };
 }
