@@ -458,6 +458,31 @@ def get_anchor_row(img: np.ndarray, detected_circles: List[Tuple[int, int, int]]
     
     return image_patches
 
+def find_optimal_cellspace(anchor_row_detections: List[Tuple[int, int, int, int]]):
+    """
+    The function calculates the optimal value of the cell_space that needs to be used in the algorithm. The derivation can be found in the GitLab page. 
+
+    Parameters:
+    - anchor_row_detections (List): Array of circles detected in the anchor stage, with the last element being the anchor cell itself.
+
+    Returns:
+    - float: The optimal cellspace amount to be used in the grid fitting algorithm.
+    """
+    anchor_cell = anchor_row_detections[-1]
+    anchor_x, anchor_y, anchor_r, anchor_p = anchor_cell
+
+    d_score = 0
+    total_p_score = 0
+
+    for cell in anchor_row_detections[:-1]:
+        x_c, y_c, r_c, p_c = cell
+        total_p_score += abs(p_c - anchor_p)
+        d_score += abs(x_c - anchor_x)
+
+    optimal_cell_space = d_score / (2 * anchor_r * total_p_score) - 1
+    
+    return optimal_cell_space
+
 def find_slope(detected_circles: List[Tuple[int, int, int]], plot_img: np.ndarray, is_show: bool = False):
     x = [point[0] for point in detected_circles]
     y = [point[1] for point in detected_circles]
