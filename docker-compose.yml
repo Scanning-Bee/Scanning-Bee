@@ -10,6 +10,7 @@ services:
     volumes:
       - ./backend:/scanning_bee/backend
       - ./AI:/scanning_bee/AI
+      - ./AnnotationFiles:/scanning_bee/AnnotationFiles
     depends_on:
       - db
     environment:
