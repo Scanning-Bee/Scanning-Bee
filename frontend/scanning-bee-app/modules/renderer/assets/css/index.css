@@ -577,6 +577,35 @@ a {
   width: fit-content;
 }
 
+.recently-opened-folders {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  width: 500px;
+}
+
+.recently-opened-folder-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 490px;
+}
+
+.recently-opened-folder-title {
+  width: 50%;
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.recently-opened-folder-parent {
+  width: 50%;
+  font-size: 12px;
+  font-weight: 200;
+  text-align: right;
+}
+
 .shadowed {
   box-shadow: -1px 2px 6px 1px rgb(0 0 0 / 20%) !important;
 }

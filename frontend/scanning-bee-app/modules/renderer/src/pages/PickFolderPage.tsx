@@ -9,33 +9,22 @@ const RecentlyOpenedFolders = ({ folders }: { folders: string[] }) => {
     const theme = useTheme();
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                marginTop: '20px',
-                width: '500px',
-            }}>
+        <div className='recently-opened-folders'>
             <p style={{ fontWeight: 'bold', fontSize: '18px' }}>Recently opened folders</p>
             {(
                 folders.map((folder, index) => (
                     <Button
                         key={index}
                         text={
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    alignItems: 'flex-start',
-                                    justifyContent: 'space-between',
-                                    width: '490px',
-                                }}
-                            >
-                                <p style={{ fontWeight: 'normal', fontSize: '14px', color: theme.primaryForeground }} className='nomargin'>
+                            <div className='recently-opened-folder-button'>
+                                <p style={{
+                                    color: theme.primaryForeground,
+                                }} className='nomargin ellipsis-overflow recently-opened-folder-title'>
                                     {shortenFileName(getFileName(folder), 35)}
                                 </p>
-                                <p style={{ fontWeight: '200', fontSize: '12px', color: theme.secondaryForeground }} className='nomargin'>
+                                <p style={{
+                                    color: theme.secondaryForeground,
+                                }} className='nomargin ellipsis-overflow recently-opened-folder-parent'>
                                         at {shortenFolderPath(getParentFolder(folder), 35)}
                                 </p>
                             </div>
