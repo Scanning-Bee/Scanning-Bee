@@ -255,7 +255,7 @@ class CellContentsByAI(ListCreateAPIView):
         cell_contents = list()
 
         for image in image_list:
-            all_detected_circles = test_lines("../../AnnotationFiles/" + image.image_name)
+            all_detected_circles = test_lines("../../AnnotationFiles/" + image.image_path)
 
             frame = Frame.objects.get(pk=1)
             user = User.objects.get(pk=1)
