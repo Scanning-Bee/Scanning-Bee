@@ -29,6 +29,9 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('');
+
+    const [authType, setAuthType] = useState<'login' | 'signin'>('login');
 
     return (
         <div
@@ -74,17 +77,56 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                         />
                     </FormGroup>
-                    <Button
-                        icon='log-in'
-                        text='Login'
-                        onClick={() => {
-                            BackendInterface.getInstance().login({ username, password });
+                    {
+                        authType === 'signin' &&
+                            <FormGroup
+                                label='Email'
+                                labelFor='email'
+                                labelInfo='(required)'
+                                style={{ marginRight: '10px' }}
+                                inline
+                            >
+                                <InputGroup
+                                    id='email'
+                                    value={email}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                                />
+                            </FormGroup>
+                    }
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+
                         }}
-                        minimal
-                        outlined
-                        small
-                        style={{ width: 'min-content', alignSelf: 'center' }}
-                    />
+                    >
+                        <Button
+                            text='Login'
+                            onClick={() => {
+                                if (authType === 'signin') {
+                                    setAuthType('login');
+                                    return;
+                                }
+                                BackendInterface.getInstance().login({ username, password });
+                            }}
+                            minimal
+                            outlined
+                            style={{ marginBottom: '5px' }}
+                            fill
+                        />
+                        <Button
+                            text='Sign in'
+                            onClick={() => {
+                                if (authType === 'login') {
+                                    setAuthType('signin');
+                                    return;
+                                }
+                                BackendInterface.getInstance().signin({ username, password, email, user_type: '2' });
+                            }}
+                            intent='success'
+                            fill
+                        />
+                    </div>
                 </div>
             </div>
         </div>

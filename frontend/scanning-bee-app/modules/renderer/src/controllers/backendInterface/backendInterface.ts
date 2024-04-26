@@ -13,7 +13,7 @@ import { AnnotationYaml, RENDERER_QUERIES } from '@scanning_bee/ipc-interfaces';
 import { AUTH_ENDPOINTS, BACKEND_ENDPOINTS, ENDPOINT_URL } from './endpoints';
 import {
     BagID,
-    CellContentDto, CellContentID, CellDto, CellID, CellTypeDto, ContentDto, ContentID, FrameDto, FrameID, ImageDto, LoginDto, LogoutDto, TokenResponseDto, UserDto, UserTypeDto,
+    CellContentDto, CellContentID, CellDto, CellID, CellTypeDto, ContentDto, ContentID, FrameDto, FrameID, ImageDto, LoginDto, LogoutDto, RegisterResponseDto, SigninDto, LoginResponseDto, UserDto, UserTypeDto,
     UserTypeID,
 } from './payloadTypes';
 import StorageService from '@frontend/services/StorageService';
@@ -110,8 +110,21 @@ export class BackendInterface {
         }
     }
 
+    public signin = async (data: SigninDto) => {
+        const res: RegisterResponseDto = await this.apiQuery<any>(AUTH_ENDPOINTS.SIGNIN, 'post', data);
+
+        const { dispatch } = (window as any).store;
+
+        dispatch(authorizeUser());
+
+        StorageService.setAccessToken(res.access);
+        StorageService.setRefreshToken(res.refresh);
+
+        (window as any).RendererController.setPage('home');
+    }
+
     public login = async (data: LoginDto) => {
-        const res: TokenResponseDto = await this.apiQuery<any>(AUTH_ENDPOINTS.LOGIN, 'post', data);
+        const res: LoginResponseDto = await this.apiQuery<any>(AUTH_ENDPOINTS.LOGIN, 'post', data);
 
         const { dispatch } = (window as any).store;
 

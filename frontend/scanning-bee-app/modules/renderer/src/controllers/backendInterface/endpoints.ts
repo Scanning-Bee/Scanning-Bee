@@ -23,6 +23,7 @@ export type EndpointType = {
 };
 
 export const AUTH_ENDPOINTS = {
+    SIGNIN: `${ENDPOINT_URL}/register`,
     LOGIN: `${ENDPOINT_URL}/login`,
     LOGOUT: `${ENDPOINT_URL}/logout`,
 };

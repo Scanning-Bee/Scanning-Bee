@@ -9,6 +9,13 @@ export type ImageID = number;
 export type UserTypeID = number;
 export type BagID = number;
 
+export type SigninDto = {
+    username: string;
+    password: string;
+    email: string;
+    user_type: string;
+}
+
 export type LoginDto = {
     username: string;
     password: string;
@@ -18,9 +25,16 @@ export type LogoutDto = {
     refresh_token: string;
 };
 
-export type TokenResponseDto = {
+export type LoginResponseDto = {
     access_token: string;
     refresh_token: string;
+}
+
+export type RegisterResponseDto = {
+    refresh: string;
+    access: string;
+    message: string;
+    user: string;
 }
 
 export type BagDto = {
