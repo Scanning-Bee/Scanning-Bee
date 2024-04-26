@@ -237,7 +237,7 @@ class CellContentsByAI(ListCreateAPIView):
         print('queryset', queryset)
         if timestamp is not None:
             queryset = queryset.objects.filter(timestamp=timestamp)
-            print('timestampli queryset', queryset)
+            print('timestamplii queryset', queryset)
 
         image_list = list(queryset)
         print('image_list', image_list)
