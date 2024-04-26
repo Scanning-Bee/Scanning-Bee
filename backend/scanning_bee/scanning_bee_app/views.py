@@ -205,6 +205,10 @@ class CellContentList(ListCreateAPIView):
         return queryset
 
     def create(self, request, *args, **kwargs):
+        if not isinstance(request.data, list):  # Check if request is a list for bulk creation
+            request.data = [request.data]
+
+
         if isinstance(request.data, list):  # Check if request is a list for bulk creation
             created_instances = []  # To store the response data of created instances
             errors = []  # To accumulate any errors during creation
