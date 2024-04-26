@@ -13,7 +13,7 @@ class CustomUser(AbstractUser):
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(_("email address"), unique=True)
     user_type = models.ForeignKey("UserType", on_delete=models.PROTECT, null=True)
-    annotation_count = models.IntegerField(default=0)
+    annotation_count = models.IntegerField(default=0) # count of annotations made by the user
     
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = []
