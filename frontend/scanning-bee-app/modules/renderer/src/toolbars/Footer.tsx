@@ -51,6 +51,7 @@ export default function Footer() {
                     }}
                 >
                     Backend: {capitalizeFirstLetter(backendStatus)}
+                    {/* @ts-ignore */}
                     {backendStatus === 'connecting' && <Loader
                         height={10}
                         width={10}
