@@ -9,6 +9,7 @@ import { StatisticsPage } from './pages/StatisticsPage';
 import store from './store';
 import Footer from './toolbars/Footer';
 import Header from './toolbars/Header';
+import { LoginPage } from './pages/LoginPage';
 
 require('@assets/css/index.css');
 
@@ -47,6 +48,8 @@ const App = (props: {
                             return <SettingsPage />;
                         case 'statistics':
                             return <StatisticsPage />;
+                        case 'login':
+                            return <LoginPage setPage={setPage} />;
                         default:
                             return <div>Page not found</div>;
                         }

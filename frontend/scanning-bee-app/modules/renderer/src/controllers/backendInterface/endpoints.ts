@@ -22,6 +22,11 @@ export type EndpointType = {
     };
 };
 
+export const AUTH_ENDPOINTS = {
+    LOGIN: `${ENDPOINT_URL}/login`,
+    LOGOUT: `${ENDPOINT_URL}/logout`,
+};
+
 export const BACKEND_ENDPOINTS = {
     CELL: {
         GET: {

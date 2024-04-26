@@ -104,7 +104,7 @@ export class RendererController {
     }
 
     initialize(): void {
-        const startPage = 'home';
+        const startPage = 'login';
 
         this.historyService = new HistoryService();
 

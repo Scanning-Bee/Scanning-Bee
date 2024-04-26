@@ -10,12 +10,14 @@ import { AppToaster } from '@frontend/Toaster';
 import { addTrailingZeros } from '@frontend/utils/miscUtils';
 import { AnnotationYaml, RENDERER_QUERIES } from '@scanning_bee/ipc-interfaces';
 
-import { BACKEND_ENDPOINTS, ENDPOINT_URL } from './endpoints';
+import { AUTH_ENDPOINTS, BACKEND_ENDPOINTS, ENDPOINT_URL } from './endpoints';
 import {
     BagID,
-    CellContentDto, CellContentID, CellDto, CellID, CellTypeDto, ContentDto, ContentID, FrameDto, FrameID, ImageDto, UserDto, UserTypeDto,
+    CellContentDto, CellContentID, CellDto, CellID, CellTypeDto, ContentDto, ContentID, FrameDto, FrameID, ImageDto, LoginDto, LogoutDto, TokenResponseDto, UserDto, UserTypeDto,
     UserTypeID,
 } from './payloadTypes';
+import StorageService from '@frontend/services/StorageService';
+import { authorizeUser, unauthorizeUser } from '@frontend/slices/userInfoSlice';
 
 type APIMethods = 'get' | 'post' | 'put' | 'delete';
 
@@ -29,6 +31,29 @@ export class BackendInterface {
             baseURL: ENDPOINT_URL,
             timeout: 10_000,
         });
+
+        this.apiClient.interceptors.request.use((config) => {
+            const token = StorageService.getAccessToken();
+
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+
+            return config;
+        });
+
+        this.apiClient.interceptors.response.use(
+            (response) => response,
+            (error) => {
+                if (error.response.status === 401) {
+                    StorageService.clearTokens();
+                    (window as any).store.dispatch(unauthorizeUser());
+                    (window as any).RendererController.setPage('login');
+                }
+
+                return Promise.reject(error);
+            },
+        );
     }
 
     public static getInstance() {
@@ -83,6 +108,33 @@ export class BackendInterface {
             );
             return null;
         }
+    }
+
+    public login = async (data: LoginDto) => {
+        const res: TokenResponseDto = await this.apiQuery<any>(AUTH_ENDPOINTS.LOGIN, 'post', data);
+
+        const { dispatch } = (window as any).store;
+
+        dispatch(authorizeUser());
+
+        StorageService.setAccessToken(res.access_token);
+        StorageService.setRefreshToken(res.refresh_token);
+
+        (window as any).RendererController.setPage('home');
+    }
+
+    public logout = async () => {
+        const refresh_token = StorageService.getRefreshToken();
+
+        this.apiQuery<LogoutDto>(AUTH_ENDPOINTS.LOGOUT, 'post', { refresh_token });
+
+        StorageService.clearTokens();
+
+        const { dispatch } = (window as any).store;
+
+        dispatch(unauthorizeUser());
+
+        (window as any).RendererController.setPage('login');
     }
 
     // * CELLS

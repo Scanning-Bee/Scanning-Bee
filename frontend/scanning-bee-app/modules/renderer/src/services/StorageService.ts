@@ -5,6 +5,10 @@ import Store from 'electron-store';
 class StorageService {
     store: Store<Record<string, any>>;
 
+    access_token_key = 'access_token';
+
+    refresh_token_key = 'refresh_token';
+
     constructor() {
         this.store = new Store();
     }
@@ -68,6 +72,27 @@ class StorageService {
         }
 
         return size;
+    }
+
+    getAccessToken() {
+        return this.store.get(this.access_token_key);
+    }
+
+    setAccessToken(accessToken: string) {
+        this.store.set(this.access_token_key, accessToken);
+    }
+
+    getRefreshToken() {
+        return this.store.get(this.refresh_token_key);
+    }
+
+    setRefreshToken(refreshToken: string) {
+        this.store.set(this.refresh_token_key, refreshToken);
+    }
+
+    clearTokens() {
+        this.store.delete(this.access_token_key);
+        this.store.delete(this.refresh_token_key);
     }
 }
 
