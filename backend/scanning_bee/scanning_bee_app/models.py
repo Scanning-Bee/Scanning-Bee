@@ -50,7 +50,7 @@ class Bag(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True, unique=True)
 
 class Image(models.Model):
-    image_name = models.CharField(max_length=100)
+    image_path = models.CharField(max_length=100)
     x_pos = models.FloatField()
     y_pos = models.FloatField()
     timestamp = models.DateTimeField(blank=True, null=True)
