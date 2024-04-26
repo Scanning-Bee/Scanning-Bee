@@ -37,6 +37,8 @@ urlpatterns = [
     path('cellcontent_list/<str:filter_type>/<str:arg>', views.CellContentList.as_view(), name='cellcontent-detail'),
     path('cellcontent_list/<str:filter_type>/<float:x_pos>/<float:y_pos>', views.CellContentList.as_view(), name='cellcontent-detail'),
     path('cellcontent_list/<str:filter_type>/<float:x_pos>/<float:y_pos>/<datetime:timestamp>', views.CellContentList.as_view(), name='cellcontent-detail'),
+    path('cellcontent_list/<str:filter_type>/<datetime:start_time>/<datetime:end_time>', views.CellContentList.as_view(), name='cellcontent-detail'),
+    path('cellcontent_list/<str:filter_type>/<datetime:start_time>', views.CellContentList.as_view(), name='cellcontent-detail'),
 
     path('cellcontent_detail/<int:id>', views.CellContentDetail.as_view(), name='cellcontent-detail'),
 
