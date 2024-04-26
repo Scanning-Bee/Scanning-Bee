@@ -13,6 +13,7 @@ class CustomUser(AbstractUser):
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(_("email address"), unique=True)
     user_type = models.ForeignKey("UserType", on_delete=models.PROTECT, null=True)
+    annotation_count = models.IntegerField(default=0) # count of annotations made by the user
     
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = []
@@ -90,6 +91,12 @@ class CellContent(models.Model):
         return str(self.pk) + " - " + self.content.name + " - " + str(self.cell)
 
     def save(self, *args, **kwargs):
+        created = not self.pk
+
+        if created and self.user:
+            self.user.annotation_count += 1
+            self.user.save()
+
         my_image = Image.objects.get(pk=self.image.pk)
         x_pos = my_image.x_pos
         y_pos = my_image.y_pos

@@ -120,20 +120,7 @@ class UserList(ListCreateAPIView):
         queryset = None
         user = self.request.user
         if user.user_type.type == "Biolog":
-            print(3)
             queryset = CustomUser.objects.all()
-        return queryset
-
-
-class CustomUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomUser
-        fields = ['username', 'email', 'user_type', 'password']
-    def get_queryset(self, *args, **kwargs):
-        queryset = CustomUser.objects.all()
-        pk = self.kwargs.get('id')
-        if pk:
-            queryset = queryset.filter(id=pk)
         return queryset
 
 
@@ -146,7 +133,6 @@ class UserDetail(RetrieveUpdateDestroyAPIView):
         queryset = None
         user = self.request.user
         if user.user_type.type == "Biolog":
-            print(3)
             queryset = CustomUser.objects.all()
         return queryset
 
@@ -300,7 +286,14 @@ class CellContentList(ListCreateAPIView):
 
             with transaction.atomic():  # Ensure the operation is atomic
                 for item_data in request.data:
+                    # if there is a user field update it, if not then add it
+                    if 'user' not in item_data:
+                        item_data['user'] = request.user.id
+                    else:
+                        item_data.update({'user': request.user.pk})
+                    
                     serializer = self.get_serializer(data=item_data)
+                    print('serializer', serializer)
                     if serializer.is_valid():
                         # Create CellContent instance and link with Cell
                         cell_content_instance = serializer.save()  # Calls the custom save method
