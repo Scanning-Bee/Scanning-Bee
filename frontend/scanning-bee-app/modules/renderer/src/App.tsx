@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 
 import { HotkeyHandler } from './Hotkeys';
 import { BeehivePage } from './pages/BeehivePage';
-import { HomePage } from './pages/HomePage';
+import { StaticHomePage } from './pages/home/Static';
 import { ManualAnnotatorPage } from './pages/ManualAnnotatorPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { StatisticsPage } from './pages/StatisticsPage';
@@ -41,7 +41,7 @@ const App = (props: {
                     (() => {
                         switch (page) {
                         case 'home':
-                            return <HomePage setPage={setPage} />;
+                            return <StaticHomePage setPage={setPage} />;
                         case 'manual-annotator':
                             return <ManualAnnotatorPage />;
                         case 'settings':

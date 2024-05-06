@@ -1,9 +1,12 @@
-import BeeBlack from '@assets/images/bee-black.png';
-import BeeWhite from '@assets/images/bee-white.png';
-import ScanningBeeLogoBig from '@assets/images/scanning_bee_logo_big.png';
-import { Card, Icon } from '@blueprintjs/core';
+import FooterBlack from '@assets/svg/footer-black.svg';
+import FooterWhite from '@assets/svg/footer-white.svg';
 import { useTheme } from '@frontend/slices/themeSlice';
 import React from 'react';
+
+import { DynamicHomePage } from './home/Dynamic';
+import { StaticHomePage } from './home/Static';
+
+const homePageType = 'static';
 
 export const HomePage = (props: { setPage: (arg: PageType) => void }) => {
     const { setPage } = props;
@@ -19,50 +22,20 @@ export const HomePage = (props: { setPage: (arg: PageType) => void }) => {
             }}
             className='page'
         >
-            <div className='home'>
-                <img
-                    src={ScanningBeeLogoBig}
-                    className='main-logo'
-                    alt={'Scanning Bee Logo'}
-                />
-
-                <div style={{ display: 'flex' }}>
-                    <Card
-                        onClick={() => setPage('manual-annotator')}
-                        interactive
-                        elevation={2}
-                        className='homepage-card'
-                        style={{ backgroundColor: theme.secondaryBackground, color: theme.primaryForeground }}
-                    >
-                        <Icon icon='annotation' iconSize={50} />
-                        <h3 style={{ fontWeight: 'normal' }}>Manual Annotator</h3>
-                    </Card>
-                    <Card
-                        onClick={() => setPage('statistics')}
-                        interactive
-                        elevation={2}
-                        className='homepage-card'
-                        style={{ backgroundColor: theme.secondaryBackground, color: theme.primaryForeground }}
-                    >
-                        <Icon icon='timeline-bar-chart' iconSize={50} />
-                        <h3 style={{ fontWeight: 'normal' }}>Statistics</h3>
-                    </Card>
-                    <Card
-                        onClick={() => setPage('beehive')}
-                        interactive
-                        elevation={2}
-                        className='homepage-card'
-                        style={{ backgroundColor: theme.secondaryBackground, color: theme.primaryForeground }}
-                    >
-                        <img
-                            src={theme.type === 'dark' ? BeeWhite : BeeBlack}
-                            alt={'Scanning Bee Logo'}
-                            style={{ width: '50px' }}
-                        />
-                        <h3 style={{ fontWeight: 'normal' }}>Beehive Information</h3>
-                    </Card>
-                </div>
-            </div>
+            {
+                homePageType === 'static'
+                    ? <StaticHomePage setPage={setPage} />
+                    : <DynamicHomePage />
+            }
+            <img
+                src={theme.type === 'dark' ? FooterWhite : FooterBlack}
+                alt={'Footer'}
+                style={{
+                    width: '100%',
+                    position: 'absolute',
+                    bottom: 0,
+                }}
+            />
         </div>
     );
 };

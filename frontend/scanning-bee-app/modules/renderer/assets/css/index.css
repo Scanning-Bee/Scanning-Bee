@@ -288,20 +288,6 @@ a {
   background-size: 3em 3em;
 }
 
-.homepage-card{
-  width: 250px;
-  height: 150px;
-  object-fit: cover;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 10px;
-  padding: 10px;
-  text-align: center;
-  color: var(--primaryColor);
-}
-
 .floating-button{
   position: absolute;
   height:var(--buttonWidth);
@@ -353,11 +339,45 @@ a {
   overflow: scroll;
 }
 
-.home {
+.static {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  height: fit-content;
+  height: 100%;
+  width: 100%;
+  overflow-y: hidden;
+  position: absolute;
+}
+
+.static-hexagon-grid-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: -21px 0;
+  width: fit-content;
+  align-self: center;
+}
+
+.static-hexagon-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.static-hexagon-button-text {
+  font-weight: normal;
+  position: absolute;
+  width: 200px;
+  text-align: center;
+}
+
+.interactable {
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.interactable:hover {
+  transform: scale(1.1);
 }
 
 .annotated-images-panel{

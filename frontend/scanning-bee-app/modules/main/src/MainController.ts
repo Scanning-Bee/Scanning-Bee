@@ -275,7 +275,7 @@ class MainController {
         this.mainWindow = new BrowserWindow({
             width: 1600, // width of the window
             height: 1200, // height of the window
-            minWidth: 600,
+            minWidth: 1180,
             minHeight: 800,
             show: false, // don't show until window is ready
             icon: path.join(BUILD_ASSETS_PATH, 'scanning_bee.png'),
