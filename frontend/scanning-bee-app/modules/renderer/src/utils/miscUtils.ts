@@ -83,3 +83,7 @@ export const addTrailingZeros = (isoStr: string) => {
 
     return `${start}.${seconds}${'0'.repeat(zerosToAdd)}Z`;
 };
+
+export function repeatArray<T>(arr: T[], n: number): T[] {
+    return [].concat(...Array(n).fill(arr));
+}

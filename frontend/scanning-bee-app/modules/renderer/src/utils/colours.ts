@@ -97,12 +97,12 @@ export const CellTypeColours: { [key in CellType]: string } = {
 };
 
 export const StaticHomePageHexagonColours = [
+    '#00bf63',
+    '#c1ff72',
+    '#ffde59',
+    '#ff914d',
     '#ff5757',
     '#cb6ce6',
     '#5271ff',
     '#0097b2',
-    '#00bf63',
-    '#c1ff72',
-    '#ff914d',
-    '#ffde59',
 ];

@@ -3,6 +3,7 @@ import BeeWhite from '@assets/images/bee-white.png';
 import { Icon, IconName } from '@blueprintjs/core';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { StaticHomePageHexagonColours } from '@frontend/utils/colours';
+import { repeatArray } from '@frontend/utils/miscUtils';
 import { HexagonBase } from '@frontend/views/base/HexagonBase';
 import React, { useEffect, useState } from 'react';
 
@@ -26,27 +27,31 @@ const generateHexagonGrid = () => {
         rows: [],
     };
 
-    const rowCount = 5;
+    const N = 3;
 
-    let rowCellColours = StaticHomePageHexagonColours.slice(0, 6);
+    const rowCount = 5 * N - 2;
+
+    const repeatedColours = repeatArray(StaticHomePageHexagonColours, N + 1);
+
+    let rowCellColours = repeatedColours.slice(0, 6 * N);
 
     for (let i = 0; i < rowCount; i++) {
         const row: HexagonRowData = {
             cells: [],
         };
 
-        const isMiddleRow = i === 2;
+        const isMiddleRow = i === Math.floor(rowCount / 2);
 
         let rowCellCount: number;
 
         if (i % 2 === 0) {
-            rowCellCount = 6;
+            rowCellCount = 6 * N;
 
-            rowCellColours = rowCellColours.slice(0, 6);
+            rowCellColours = rowCellColours.slice(0, rowCellCount);
         } else {
-            rowCellCount = 7;
+            rowCellCount = 6 * N + 1;
 
-            rowCellColours = StaticHomePageHexagonColours.slice(5 + (i + 1) / 2, 6 + (i + 1) / 2).concat(rowCellColours);
+            rowCellColours = repeatedColours.slice(8 - (Math.ceil(i / 2) % 8), 9 - (Math.ceil(i / 2) % 8)).concat(rowCellColours);
         }
 
         for (let j = 0; j < rowCellCount; j++) {
@@ -56,21 +61,23 @@ const generateHexagonGrid = () => {
         }
 
         if (isMiddleRow) {
-            row.cells[1].icon = 'annotation';
-            row.cells[1].text = 'Manual Annotator';
-            row.cells[1].page = 'manual-annotator';
+            const startIdx = Math.floor(row.cells.length / 2) - 2;
 
-            row.cells[2].icon = 'timeline-bar-chart';
-            row.cells[2].text = 'Annotation Statistics';
-            row.cells[2].page = 'statistics';
+            row.cells[startIdx].icon = 'annotation';
+            row.cells[startIdx].text = 'Manual Annotator';
+            row.cells[startIdx].page = 'manual-annotator';
 
-            row.cells[3].icon = 'beehive';
-            row.cells[3].text = 'Visual Beehive';
-            row.cells[3].page = 'beehive';
+            row.cells[startIdx + 1].icon = 'timeline-bar-chart';
+            row.cells[startIdx + 1].text = 'Annotation Statistics';
+            row.cells[startIdx + 1].page = 'statistics';
 
-            row.cells[4].icon = 'settings';
-            row.cells[4].text = 'Settings';
-            row.cells[4].page = 'settings';
+            row.cells[startIdx + 2].icon = 'beehive';
+            row.cells[startIdx + 2].text = 'Visual Beehive';
+            row.cells[startIdx + 2].page = 'beehive';
+
+            row.cells[startIdx + 3].icon = 'settings';
+            row.cells[startIdx + 3].text = 'Settings';
+            row.cells[startIdx + 3].page = 'settings';
         }
 
         hexagonGrid.rows.push(row);
@@ -88,7 +95,7 @@ const HexagonButton = (props: { onClick: () => void, color: string, icon?: IconN
 
     return (
         <div
-            className={`${interactable && 'interactable '}static-hexagon-button`}
+            className={`${interactable ? 'interactable ' : ''}static-hexagon-button`}
             onClick={props.onClick}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
