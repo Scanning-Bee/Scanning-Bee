@@ -1,6 +1,7 @@
 import { useAnnotationsFolder } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { CellTypeChart } from '@frontend/toolbars/charts/CellTypeChart';
+import { HeatmapMounter } from '@frontend/toolbars/charts/Heatmap';
 import { XYChart } from '@frontend/toolbars/charts/XYChart';
 import React from 'react';
 
@@ -24,6 +25,7 @@ export const StatisticsPage = () => {
             alignItems: 'center',
             flexDirection: 'column',
             height: 'unset',
+            padding: '20px',
         }} className='page'>
             <h1>Cell Types</h1>
             <CellTypeChart />
@@ -32,6 +34,9 @@ export const StatisticsPage = () => {
             <h1>X & Y Coordinates</h1>
             <XYChart />
             <div style={{ height: '20px' }} />
+
+            <h1>Heatmap</h1>
+            <HeatmapMounter />
         </div>
     );
 };

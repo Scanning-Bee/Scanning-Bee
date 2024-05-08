@@ -288,6 +288,13 @@ a {
   background-size: 3em 3em;
 }
 
+.heatmap-grid{
+  background-image: linear-gradient(rgba(0, 255, 0, .7) .1em, transparent .1em), linear-gradient(90deg, rgba(0, 255, 0, .7) .1em, transparent .1em);
+  background-size: 80px 80px;
+  border-right: 1px solid rgba(0, 255, 0, .7);
+  border-bottom: 1px solid rgba(0, 255, 0, .7);
+}
+
 .floating-button{
   position: absolute;
   height:var(--buttonWidth);
