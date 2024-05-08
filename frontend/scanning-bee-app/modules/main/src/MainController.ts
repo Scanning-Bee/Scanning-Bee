@@ -324,7 +324,7 @@ class MainController {
 
             if (this.mainWindow.setTitleBarOverlay) {
                 this.mainWindow.setTitleBarOverlay({
-                    color: theme.secondaryBackground,
+                    color: '#00000000',
                     symbolColor:
                         theme.type === 'light' ? '#000' : '#fff',
                 });
