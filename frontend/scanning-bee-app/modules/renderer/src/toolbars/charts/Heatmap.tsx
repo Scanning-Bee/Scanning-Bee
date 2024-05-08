@@ -65,6 +65,9 @@ export const HeatmapMounter = () => {
         <div
             className='column-flex-center'
         >
+            <h3
+                style={{ margin: '-20px 0 20px 0', fontWeight: 'normal' }}
+            >for {shownCellType || 'all cells'}</h3>
             <div
                 style={{
                     width: '960px',
@@ -75,7 +78,6 @@ export const HeatmapMounter = () => {
             />
             <Popover
                 interactionKind='click'
-                position='left'
             >
                 <Button
                     icon={<Icon icon='tag' color={theme.secondaryForeground} />}
@@ -84,6 +86,7 @@ export const HeatmapMounter = () => {
                     </p>}
                     large
                     minimal
+                    style={{ marginTop: '10px' }}
                 />
                 <Menu>
                     {[...Object.keys(CellType), 'Show All'].map((cellType, index) => (
