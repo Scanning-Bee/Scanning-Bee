@@ -6769,6 +6769,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"heatmap.js@https://github.com/ionata/heatmap.js.git":
+  version: 2.0.5
+  resolution: "heatmap.js@https://github.com/ionata/heatmap.js.git#commit=1452fc74fb3442f5f74b43394fddd06057fc387b"
+  checksum: 42a4dea9e2f4eaf165d5dc7e9c9306a9102c02d60faa8f91df3cfbf8d2889a66ed6bb707a859125829f88370322434380a0321564769734e1c0e3ae168a0faf7
+  languageName: node
+  linkType: hard
+
 "hoist-non-react-statics@npm:^3.0.0, hoist-non-react-statics@npm:^3.3.0, hoist-non-react-statics@npm:^3.3.2":
   version: 3.3.2
   resolution: "hoist-non-react-statics@npm:3.3.2"
@@ -11123,6 +11130,7 @@ __metadata:
     eslint-plugin-react-hooks: ^4.3.0
     eslint-plugin-simple-import-sort: ^8.0.0
     eslint-plugin-unused-imports: ^2.0.0
+    heatmap.js: "https://github.com/ionata/heatmap.js.git"
     html-webpack-plugin: ^5.5.0
     husky: ^7.0.4
     ignore: ^5.2.4

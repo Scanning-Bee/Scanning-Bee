@@ -54,8 +54,7 @@ export const CellTypeChart = () => {
                     content={({ active, payload, label }) => {
                         console.log(payload, label); return <TooltipContent
                             active={active}
-                            payload={payload[0]?.value}
-                            label={payload[0]?.payload.cellType}
+                            labelPayloads={[{ label: payload[0]?.payload.cellType, payload: payload[0]?.value }]}
                         />;
                     }}
                 />

@@ -95,3 +95,14 @@ export const CellTypeColours: { [key in CellType]: string } = {
     [CellType.POLLEN]: 'rgba(0, 190, 98, 1)',
     [CellType.PUPA]: 'rgba(1, 150, 178, 1)',
 };
+
+export const StaticHomePageHexagonColours = [
+    '#00bf63',
+    '#c1ff72',
+    '#ffde59',
+    '#ff914d',
+    '#ff5757',
+    '#cb6ce6',
+    '#5271ff',
+    '#0097b2',
+];
