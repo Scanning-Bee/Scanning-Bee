@@ -658,4 +658,34 @@ a {
 
 .beehive-cell {
   position: absolute;
+  transition: scale 0.2s;
+  cursor: pointer;
+}
+
+.beehive-cell:hover {
+  scale: 1.1;
+}
+
+.occluding-bee{
+  position: absolute;
+  left: 6px;
+  top: 10px;
+}
+
+.cell-detail-dialog {
+  width: 50%;
+  height: 30%;
+}
+
+.cell-detail-dialog > .bp3-dialog-header {
+  width: 100%;
+}
+
+.cell-detail-dialog-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }

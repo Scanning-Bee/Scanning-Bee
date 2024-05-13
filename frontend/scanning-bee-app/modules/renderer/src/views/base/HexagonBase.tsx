@@ -5,17 +5,18 @@ export const HexagonBase = (props: {
     opacity?: number,
     width?: string | number,
     height?: string | number,
+    scale?: number,
 }) => {
-    const { color, opacity, width, height } = props;
+    const { color, opacity, width, height, scale } = props;
 
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"
-            width={width || 42}
+            width={width || 42 * (scale || 1)}
             zoomAndPan="magnify"
             viewBox="0 0 2598 2999.999989"
-            height={height || 48}
+            height={height || 48 * (scale || 1)}
             preserveAspectRatio="xMidYMid meet"
             version="1.0"
             fill={color}
