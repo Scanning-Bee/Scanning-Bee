@@ -79,7 +79,7 @@ def draw_parallel_grid(plot_img: np.ndarray, detected_circles: List[Tuple[int, i
     return plot_img
 
 
-def get_patches(img: np.ndarray, detected_circles: List[Tuple[int, int, int]], cell_space: float=0.15, error_margin: float=0.7, show_grid: bool = False) -> Tuple[List[Tuple[int, int, int, int]], List[Tuple[int, int, int, int]]]:
+def get_patches(img: np.ndarray, detected_circles: List[Tuple[int, int, int]], cell_space: float=0.15, error_margin: float=0.7, show_grid: bool = False, num_patches_from_anchor=float('inf')) -> Tuple[List[Tuple[int, int, int, int]], List[Tuple[int, int, int, int]]]:
     '''
     Takes an image for plotting, the list of circles detected in the first stage, cell space and error_margin parameters.
     Returns a tuple of two lists: The first one is the patch corners with the error margin added, the second one is patch corners without the error margin.
@@ -90,151 +90,172 @@ def get_patches(img: np.ndarray, detected_circles: List[Tuple[int, int, int]], c
 
     if len(detected_circles) == 0:
         return [], []
-
-    # get the most confidence circle
-    x, y, r = [int(i) for i in detected_circles[0]]
-
-    space_bw_two_rows = int(r * 3 * TWO_OVER_ROOT3 * (1 + cell_space))
-    space_bw_two_cols = int(r * 2 * (1 + cell_space))
-    
-    #### Create first grid, this is not slided, should surround anchor circle
-    horizontal_lines = []
-    vertical_lines = []
-
-    # traverse over rows down, start from the anchor circle level
-    line = y
-    while line < height:
-        up = int(line - r)
-        down = int(line + r)
-        if up < 0 or down > height:
-            break
-        horizontal_lines.append((up, down))
-        line += space_bw_two_rows
-
-    # traverse over rows up, start two rows above anchor circle
-    line = y - space_bw_two_rows
-    while line > 0:
-        up = int(line - r)
-        down = int(line + r)
-        if up < 0 or down > height:
-            break
-        horizontal_lines.append((up, down))
-        line -= space_bw_two_rows
-
-    # columns, go right by starting from anchor circle column
-    column = x
-    while column < width:
-        left = int(column - r)
-        right = int(column + r)
-        if left < 0 or right > width:
-            break
-        vertical_lines.append((left, right))
-        # vertical_lines.append((left,right)) 
-        column += space_bw_two_cols
-
-    # columns, go left starting from two level left of anchor circle
-    column = x - space_bw_two_cols
-    while column > 0:
-        left = int(column - r)
-        right = int(column + r)
-        if left < 0 or right > width:
-            break
-        vertical_lines.append((left, right))
-        column -= space_bw_two_cols
-
-    ### At every second row, slide the columns, calculate this grid
-    slided_horizontal_lines = []
-    slided_vertical_lines = []
-
-    # traverse over rows down, start from one level below the anchor circle
-    line = y + THREE_OVER_ROOT3 * r
-    while line < height:
-        up = int(line - r)
-        down = int(line + r)
-        if up < 0 or down > height:
-            break
-        slided_horizontal_lines.append((up, down))
-        line += space_bw_two_rows
-
-    # traverse over rows up, start from one level above the anchor circle
-    line = y + THREE_OVER_ROOT3 * r - space_bw_two_rows
-    while line > 0:
-        up = int(line - r)
-        down = int(line + r)
-        if up < 0 or down > height:
-            break
-        slided_horizontal_lines.append((up, down))
-        line -= space_bw_two_rows
-
-    # columns, go right by starting from one right column of anchor
-    column = x + r
-    while column < width:
-        left = int(column - r)
-        right = int(column + r)
-        if left < 0 or right > width:
-            break
-        slided_vertical_lines.append((left, right))
-        column += space_bw_two_cols
-
-    # columns, go left by starting from one right column of anchor
-    column = x + r - space_bw_two_cols
-    while column > 0:
-        left = int(column - r)
-        right = int(column + r)
-        if left < 0 or right > width:
-            break
-        slided_vertical_lines.append((left, right))
-        column -= space_bw_two_cols
-
-    first_grid = []
-    second_grid = []
-
-    first_tight = []
-    second_tight = []
-
-    # uncomment to visualize grid
     if show_grid:
         img_draw = img.copy()
-        img_draw = cv2.circle(img_draw, (x,y), r, (0,0,255), 2)
+        
+    grid_corners = []
+    tight_corners = []
 
-    # using calculates lines, find corners for patches in first grid
-    for row in horizontal_lines:
-        for column in vertical_lines:
-            up = int(row[0] - error_margin * r)
-            down = int(row[1] + error_margin * r)
-            left = int(column[0] - error_margin * r)
-            right = int(column[1] + error_margin * r)
+    # get the most confidence circle
+    for anchor in detected_circles:
+        x, y, r = [int(i) for i in anchor]
 
-            if up < 0 or down > height or left < 0 or right > width:
-                continue
+        space_bw_two_rows = int(r * 3 * TWO_OVER_ROOT3 * (1 + cell_space))
+        space_bw_two_cols = int(r * 2 * (1 + cell_space))
+        
+        #### Create first grid, this is not slided, should surround anchor circle
+        horizontal_lines = []
+        vertical_lines = []
 
-            if show_grid:
-                cv2.rectangle(img_draw, (left, up), (right, down), tuple(np.random.random(size=3) * 256), 2)
+        # traverse over rows down, start from the anchor circle level
+        line = y
+        times_traversed = 0
+        while line < height and times_traversed < num_patches_from_anchor:
+            up = int(line - r)
+            down = int(line + r)
+            if up < 0 or down > height:
+                break
+            horizontal_lines.append((up, down))
+            line += space_bw_two_rows
+            times_traversed += 1
 
-            first_grid.append((left, right, up, down))
-            first_tight.append((int(column[0]), int(column[1]), int(row[0]), int(row[1])))
+        # traverse over rows up, start two rows above anchor circle
+        line = y - space_bw_two_rows
+        times_traversed = 0
+        while line > 0 and times_traversed < num_patches_from_anchor:
+            up = int(line - r)
+            down = int(line + r)
+            if up < 0 or down > height:
+                break
+            horizontal_lines.append((up, down))
+            line -= space_bw_two_rows
+            times_traversed += 1
 
-    # using calculated and slided lines, find patch corners for second grid
-    for row in slided_horizontal_lines:
-        for column in slided_vertical_lines:
-            up = int(row[0] - error_margin * r)
-            down = int(row[1] + error_margin * r)
-            left = int(column[0] - error_margin * r)
-            right = int(column[1] + error_margin * r)
+        # columns, go right by starting from anchor circle column
+        column = x
+        times_traversed = 0
+        while column < width and times_traversed < num_patches_from_anchor:
+            left = int(column - r)
+            right = int(column + r)
+            if left < 0 or right > width:
+                break
+            vertical_lines.append((left, right))
+            # vertical_lines.append((left,right)) 
+            column += space_bw_two_cols
+            times_traversed += 1
 
-            if up < 0 or down > height or left < 0 or right > width:
-                continue
+        # columns, go left starting from two level left of anchor circle
+        column = x - space_bw_two_cols
+        times_traversed = 0
+        while column > 0 and times_traversed < num_patches_from_anchor:
+            left = int(column - r)
+            right = int(column + r)
+            if left < 0 or right > width:
+                break
+            vertical_lines.append((left, right))
+            column -= space_bw_two_cols
+            times_traversed += 1
 
-            if show_grid:
-                cv2.rectangle(img_draw, (left, up), (right, down), tuple(np.random.random(size=3) * 256), 2)
+        ### At every second row, slide the columns, calculate this grid
+        slided_horizontal_lines = []
+        slided_vertical_lines = []
 
-            second_grid.append((left, right, up, down))
-            second_tight.append((int(column[0]), int(column[1]), int(row[0]), int(row[1])))
+        # traverse over rows down, start from one level below the anchor circle
+        line = y + THREE_OVER_ROOT3 * r
+        times_traversed = 0
+        while line < height and times_traversed < num_patches_from_anchor:
+            up = int(line - r)
+            down = int(line + r)
+            if up < 0 or down > height:
+                break
+            slided_horizontal_lines.append((up, down))
+            line += space_bw_two_rows
+            times_traversed += 1
 
+        # traverse over rows up, start from one level above the anchor circle
+        line = y + THREE_OVER_ROOT3 * r - space_bw_two_rows
+        times_traversed = 0
+        while line > 0 and times_traversed < num_patches_from_anchor:
+            up = int(line - r)
+            down = int(line + r)
+            if up < 0 or down > height:
+                break
+            slided_horizontal_lines.append((up, down))
+            line -= space_bw_two_rows
+            times_traversed += 1
+
+        # columns, go right by starting from one right column of anchor
+        column = x + r
+        times_traversed = 0
+        while column < width and times_traversed < num_patches_from_anchor:
+            left = int(column - r)
+            right = int(column + r)
+            if left < 0 or right > width:
+                break
+            slided_vertical_lines.append((left, right))
+            column += space_bw_two_cols
+            times_traversed += 1
+
+        # columns, go left by starting from one right column of anchor
+        column = x + r - space_bw_two_cols
+        times_traversed = 0
+        while column > 0 and times_traversed < num_patches_from_anchor:
+            left = int(column - r)
+            right = int(column + r)
+            if left < 0 or right > width:
+                break
+            slided_vertical_lines.append((left, right))
+            column -= space_bw_two_cols
+            times_traversed += 1
+
+        first_grid = []
+        second_grid = []
+
+        first_tight = []
+        second_tight = []
+
+        # uncomment to visualize grid
+        if show_grid:
+            img_draw = cv2.circle(img_draw, (x,y), r, (0,0,255), 2)
+
+        # using calculates lines, find corners for patches in first grid
+        for row in horizontal_lines:
+            for column in vertical_lines:
+                up = int(row[0] - error_margin * r)
+                down = int(row[1] + error_margin * r)
+                left = int(column[0] - error_margin * r)
+                right = int(column[1] + error_margin * r)
+
+                if up < 0 or down > height or left < 0 or right > width:
+                    continue
+
+                if show_grid:
+                    cv2.rectangle(img_draw, (left, up), (right, down), tuple(np.random.random(size=3) * 256), 2)
+
+                first_grid.append((left, right, up, down))
+                first_tight.append((int(column[0]), int(column[1]), int(row[0]), int(row[1])))
+
+        # using calculated and slided lines, find patch corners for second grid
+        for row in slided_horizontal_lines:
+            for column in slided_vertical_lines:
+                up = int(row[0] - error_margin * r)
+                down = int(row[1] + error_margin * r)
+                left = int(column[0] - error_margin * r)
+                right = int(column[1] + error_margin * r)
+
+                if up < 0 or down > height or left < 0 or right > width:
+                    continue
+
+                if show_grid:
+                    cv2.rectangle(img_draw, (left, up), (right, down), tuple(np.random.random(size=3) * 256), 2)
+
+                second_grid.append((left, right, up, down))
+                second_tight.append((int(column[0]), int(column[1]), int(row[0]), int(row[1])))
+        grid_corners += first_grid + second_grid
+        tight_corners += first_tight + second_tight
     ## combine two grids on one list
-    grid_corners = first_grid + second_grid
-    tight_corners = first_tight + second_tight
-
+    # grid_corners = first_grid + second_grid
+    # tight_corners = first_tight + second_tight
     if show_grid:
         cv2.imshow('the_grids', img_draw)
         if cv2.waitKey(0) & 0xFF == ord('q'):
@@ -326,8 +347,10 @@ def tile_circles(img: np.ndarray, patch_corners: List[Tuple[int, int, int, int]]
 
     assumed_circles = []
 
-    ## make radius same as the anchor circle's radius
-    radius = int(found_circles[0][2])
+    ## make radius same as the average of the anchor circles' radius
+    found_circles = np.array(found_circles)
+    radius = int(np.mean(found_circles[:, 2]))
+    
 
     # check every patch
     for l, r, u, d in patch_corners:
