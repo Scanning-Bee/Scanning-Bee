@@ -23,9 +23,14 @@ export const BeehivePage = () => {
             display: 'flex',
         }} className="page">
             <BeehiveView />
-            <ZoomSlider debounced handleZoomChange={(zoom: number) => {
-                dispatch(setViewScale(zoom));
-            }} />
+            <ZoomSlider
+                debounced
+                handleZoomChange={(zoom: number) => {
+                    dispatch(setViewScale(zoom));
+                }}
+                lowerBound={0.1}
+                upperBound={2}
+            />
         </div>
     );
 };

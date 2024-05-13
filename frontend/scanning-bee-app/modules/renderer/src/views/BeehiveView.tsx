@@ -25,17 +25,14 @@ export const BeehiveView = () => {
     return (
         <div
             id='beehive-container'
-            style={{
-                scale: String(viewScale),
-            }}
         >
             {
                 cells.map(cell => <div
                     key={cell.id}
                     className='beehive-cell'
                     style={{
-                        left: cell.x,
-                        top: cell.y,
+                        left: `${cell.x * viewScale}px`,
+                        top: `${cell.y * viewScale}px`,
                     }}
                     onClick={() => {
                         setSelectedCell(cell);
@@ -44,10 +41,11 @@ export const BeehiveView = () => {
                 >
                     <HexagonView
                         color={CellTypeColours[cell.cellType]}
+                        scale={viewScale}
                     />
                     {
                         cell.cellType === CellType.BEE_OCCLUDED
-                            && <OccludingBeeBase color='white'/>
+                                && <OccludingBeeBase color='white' scale={viewScale} />
                     }
                 </div>)
             }

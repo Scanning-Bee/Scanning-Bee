@@ -654,6 +654,7 @@ a {
   left: 0;
   top: 0;
   transition: scale 0.2s;
+  transform-origin: top left;
 }
 
 .beehive-cell {
@@ -666,10 +667,15 @@ a {
   scale: 1.1;
 }
 
-.occluding-bee{
+.hexagon-svg {
+}
+
+.occluding-bee-svg{
   position: absolute;
-  left: 6px;
-  top: 10px;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
 }
 
 .cell-detail-dialog {

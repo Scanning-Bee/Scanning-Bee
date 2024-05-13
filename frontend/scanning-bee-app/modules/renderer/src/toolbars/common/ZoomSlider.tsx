@@ -4,15 +4,17 @@ import React, { useState } from 'react';
 
 export const ZoomSlider = (props: {
     handleZoomChange: (zoom: number) => void;
+    lowerBound?: number;
+    upperBound?: number;
     debounced?: boolean;
 }) => {
     const { handleZoomChange, debounced } = props;
 
     const theme = useTheme();
 
-    const [zoom, setZoom] = useState<number>(1);
+    const [lowerBound, upperBound] = [props.lowerBound || 0.1, props.upperBound || 2];
 
-    const [lowerBound, upperBound] = [0, 2];
+    const [zoom, setZoom] = useState<number>((lowerBound + upperBound) / 2);
 
     const handleZoom = (value: number, ignoreDebounce?: boolean) => {
         if (value < lowerBound) {

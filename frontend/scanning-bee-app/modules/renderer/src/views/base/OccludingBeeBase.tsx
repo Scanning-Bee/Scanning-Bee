@@ -4,22 +4,23 @@ import React from 'react';
 export const OccludingBeeBase = (props: {
     color: string,
     opacity?: number,
+    scale?: number,
     width?: string | number,
     height?: string | number,
 }) => {
-    const { color, opacity, width, height } = props;
+    const { color, opacity, width, height, scale } = props;
 
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"
-            width={width || 30}
+            width={width || (30 * (scale || 1))}
             zoomAndPan="magnify"
             viewBox="0 0 375 374.999991"
-            height={height || 30}
+            height={height || (30 * (scale || 1))}
             preserveAspectRatio="xMidYMid meet"
             version="1.0"
-            className='occluding-bee'
+            className='occluding-bee-svg'
         >
             <path
                 fill={color || '#FFFFFF'}

@@ -23,6 +23,7 @@ export const HexagonBase = (props: {
             color={color}
             fillOpacity={opacity || 1}
             stroke="none"
+            className='hexagon-svg'
         >
             <defs>
                 <clipPath
