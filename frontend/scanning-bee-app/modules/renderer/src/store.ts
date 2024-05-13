@@ -4,6 +4,7 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 import annotationReducer from './slices/annotationSlice';
 import backendStatusReducer from './slices/backendStatusSlice';
 import cellSlice from './slices/cellSlice';
+import permissionReducer from './slices/permissionSlice';
 import themeReducer from './slices/themeSlice';
 import viewScaleReducer from './slices/viewScaleSlice';
 import zoomReducer from './slices/zoomSlice';
@@ -16,6 +17,7 @@ const store = configureStore({
         backendStatus: backendStatusReducer,
         cell: cellSlice,
         viewScale: viewScaleReducer,
+        permission: permissionReducer,
     }),
 });
 
