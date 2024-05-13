@@ -112,7 +112,7 @@ def test_lines(image_path: str, occlude:bool = False, detection_model_path:str =
 
             ## mark where bees are on binary mask
             for score,bbox in zip(scores,bboxes):
-                if score < 0.4:
+                if score < 0.3:
                     continue
                 x1,y1,x2,y2 = list(map(int,bbox))
                 cv2.rectangle(mask,(x1,y1),(x2,y2),color = (0,0,0), thickness = -1)
@@ -209,7 +209,7 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
             print("Bee detection model could not be loaded, please fix the above error and try again")
 
     ## first stage of detection, uses hough transform to detect circles, see function for preprocessing and detection
-    first_stage_circles = detect_circles_using_hough_transform(sample_image,use_dark=True,use_light=False)
+    first_stage_circles = detect_circles_using_hough_transform(sample_image, use_dark=True, use_light=False)
     
     ## filter out the circles from first stage that are occluded by bees
     filtered_first_stage_circles = filter_intersecting_circles(first_stage_circles, mask)
@@ -221,14 +221,14 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
 
     anchor_patches = get_anchor_row(sample_image, filtered_first_stage_circles, cell_space = 0.03, error_margin = 0.15)
 
-
     # Search for circles in images patches
     second_stage_circles = detect_second_stage(sample_image, anchor_patches, first_stage_circles, show_patches=False)
 
     filtered_second_stage_circles = filter_intersecting_circles(second_stage_circles,mask,intersection_threshold=intersect_threshold)   
 
     ## using circles from second stage and anchor circle, find the rotation angle 
-    rotation_angle = find_slope(filtered_second_stage_circles + [filtered_first_stage_circles[0]],plot_img,is_show=False)
+    # rotation_angle = find_slope(filtered_second_stage_circles + [filtered_first_stage_circles[0]], plot_img, is_show=False)
+    rotation_angle = 0
 
     ## rotate the image and circles, get rotated image and rotation matrix
     rotated_image, rotation_matrix = rotate_image(sample_image,rotation_angle)
@@ -238,13 +238,13 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
     anchor_row_detections_rotated_xy = (anchor_row_detections @ rotation_matrix).astype(int)
     anchor_row_detections_rotated = np.array(filtered_second_stage_circles.copy())
     anchor_row_detections_rotated[:, :2] = anchor_row_detections_rotated_xy[:, :2]
-    optimum_cell_space = find_optimal_cellspace(anchor_row_detections_rotated)
+    # optimum_cell_space = find_optimal_cellspace(anchor_row_detections_rotated)
 
     ## rotate the mask
     mask = cv2.warpAffine(mask,rotation_matrix,(width,height))
 
     ## do the same process on rotated image
-    first_stage_circles_rotated = detect_circles_using_hough_transform(rotated_image,use_dark=True,use_light=False) 
+    first_stage_circles_rotated = detect_circles_using_hough_transform(rotated_image, use_dark=True, use_light=True) 
     print(len(first_stage_circles_rotated))
     
     filtered_first_stage_circles_rotated = filter_intersecting_circles(first_stage_circles_rotated, mask)   
@@ -253,21 +253,38 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
         return []
         
     # Calculate the grid and patch corners using anchor circles
-    patch_corners_rotated, tight_patch_corners_rotated = get_patches(plot_img, filtered_first_stage_circles_rotated,cell_space=cell_space, error_margin=error_margin, show_grid=False)
+    patch_corners_rotated, tight_patch_corners_rotated = get_patches(plot_img, filtered_first_stage_circles_rotated, cell_space=cell_space, 
+                                                                     error_margin=error_margin, show_grid=False, num_patches_from_anchor=3)
+
+    print(f"Anchor cell candidates: {first_stage_circles_rotated}")
 
     # Search for circles in images patches
     second_stage_circles_rotated = detect_second_stage(rotated_image, patch_corners_rotated,filtered_first_stage_circles_rotated, show_patches=False)
 
     # Filter out second stage circles intersecting with bees
-    filtered_second_stage_circles_rotated = filter_intersecting_circles(second_stage_circles_rotated,mask,intersection_threshold=intersect_threshold)
+    filtered_second_stage_circles_rotated = filter_intersecting_circles(second_stage_circles_rotated, mask, intersection_threshold=intersect_threshold)
 
     # Compare circle distances, filter out if the distance is smaller than sum of radii.
-    merged_second_stage_circles_rotated = filter_and_add_circles(filtered_first_stage_circles_rotated,filtered_second_stage_circles_rotated)
+    merged_second_stage_circles_rotated = filter_and_add_circles(filtered_first_stage_circles_rotated, filtered_second_stage_circles_rotated)
 
     color_rotated_image = cv2.cvtColor(rotated_image,cv2.COLOR_GRAY2RGB)
+    
+    '''
+    color_copy = color_rotated_image.copy()
+    for circle in merged_second_stage_circles_rotated:
+        x, y, r = circle
+        cv2.circle(color_copy, (x,y), r, (255, 0, 255), 3)
+    
+    cv2.namedWindow("second stage detections",cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("second stage detections", 800, 800)
+    cv2.imshow("second stage detections", color_copy)
+    
+    cv2.waitKey(0)
+    '''
+    
 
     # In the patches that we cannot find a circle,assume there is one
-    tiled_circles_rotated = tile_circles(rotated_image,tight_patch_corners_rotated, merged_second_stage_circles_rotated)
+    tiled_circles_rotated = tile_circles(rotated_image, tight_patch_corners_rotated, filtered_first_stage_circles_rotated)
 
     # Of those assumed circles, remove the ones occluded by bees
     filtered_tiled_circles_rotated = filter_intersecting_circles(tiled_circles_rotated, mask, intersection_threshold=intersect_threshold)
@@ -283,8 +300,8 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
         cv2.circle(color_rotated_image,(x,y),r ,(0,255,255),3)
     
     ## I think tiled circles do not need to be tested for intersection, so just concatenate them
-    # merged_final_circles_rotated = filter_and_add_circles(merged_second_stage_circles_rotated, filtered_tiled_circles_rotated)
-    merged_final_circles_rotated = np.concatenate([merged_second_stage_circles_rotated,np.array(filtered_tiled_circles_rotated)])
+    merged_final_circles_rotated = filter_and_add_circles(merged_second_stage_circles_rotated, filtered_tiled_circles_rotated)
+    # merged_final_circles_rotated = np.concatenate([merged_second_stage_circles_rotated,np.array(filtered_tiled_circles_rotated)])
 
     # for circle in merged_final_circles_rotated:
     #     x,y,r = circle
@@ -315,20 +332,71 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
     #cv2.imshow("All",all_image)
 
     # print("Here")
-    cv2.namedWindow("plot img",cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("plot img", 800, 800)
-    cv2.imshow("plot img", plot_img)
+    # cv2.namedWindow("plot img",cv2.WINDOW_NORMAL)
+    # cv2.resizeWindow("plot img", 800, 800)
+    # cv2.imshow("plot img", plot_img)
     
-    cv2.waitKey(0)
+    # cv2.waitKey(0)
 
     # Convert the NumPy array to a list of tuples, for the return
     return_list = [tuple(row) for row in merged_final_circles]
 
     return return_list
+
+
+def classify_cell_states(image_path :str, model_path: str = "AI/models/cell_classifiers/cell_classifier_3_may.pt",error_margin = 0.15):
+    '''
+    Runs the classifier model on detected circles, returns a dictionary of (x,y,r) tuples as key and labels as value
+    '''
     
+    circle_list = rotation_robust_method(image, occlude=True, detection_model_path="AI/models/bee_detect_models/epoch-150.pt")
+    
+    original_image = cv2.imread(image_path)
+    image_height, image_width, _ = original_image.shape
+
+    classfier_model = YOLO(model_path)
+
+    cell_states = dict()
+    for circle in circle_list:
+        x,y,r = circle
+        new_radius = r * (1 + error_margin)
+    
+        x_min = int(max(0, x - new_radius))
+        y_min = int(max(0, y - new_radius))
+        x_max = int(min(image_width - 1, x + new_radius))
+        y_max = int(min(image_height - 1, y + new_radius))
+
+        if x_min < x_max and y_min < y_max:
+            cropped_image = original_image[y_min:y_max, x_min:x_max]
+            # cell_patches.append(cropped_image)
+            cell_states[circle] = cropped_image
+
+    for key, patch in cell_states.items():
+        result = classfier_model(patch,verbose = False)[0]
+        label_index = result.probs.top1
+        label = result.names[label_index]
+        cell_states[key] = label
+
+    for circle, label in cell_states.items():
+        x, y, r = circle
+        # Draw the circle
+        cv2.circle(original_image, (x, y), r, (0, 255, 0), 2)  # Green circle with thickness 2
+        # Draw the label
+        cv2.putText(original_image, label, (x -20 , y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+
+    cv2.namedWindow("Classified cells",cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("Classified cells", 800, 800)
+    cv2.imshow("Classified cells",original_image)
+    cv2.waitKey(0)
+
+    return cell_states
 
 
 if __name__ == "__main__":
     # test_lines("AI/test_images/image_759.jpg")
-    print(rotation_robust_method("AI/test_images/image_759.jpg",occlude=True, detection_model_path="AI/models/bee_detect_models/epoch-150.pt"))
+    image = "AI/test_images/image_2397.jpg"
     
+    print(classify_cell_states(image))
+
+    image2 = "AI/test_images/image_2792.jpg"
+    print(classify_cell_states(image2))
