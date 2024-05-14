@@ -90,7 +90,7 @@ export const ManualAnnotatorPage = () => {
                     shownImageUrl={images.find(image => image === shownImageUrl)}
                 />
 
-                <ButtonGroup className='image-navigator-buttons shadowed' style={{ backgroundColor: `${theme.secondaryBackground}88` }}>
+                <ButtonGroup className='image-navigator-buttons shadowed' style={{ backgroundColor: `${theme.primaryBackground}88` }}>
                     <Button
                         icon={<Icon icon="chevron-left" style={{ color: theme.primaryForeground }} />}
                         disabled={shownImageIndex === 0}

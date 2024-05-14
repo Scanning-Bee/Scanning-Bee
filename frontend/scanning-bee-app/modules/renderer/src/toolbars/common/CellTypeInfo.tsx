@@ -23,11 +23,11 @@ export const CellTypeInfo = () => {
                 onClick={() => setShowLegend(!showLegend)}
                 minimal
                 large
-                style={{ backgroundColor: `${theme.secondaryBackground}88` }}
+                style={{ backgroundColor: `${theme.primaryBackground}88` }}
             />
 
             {
-                showLegend && <div className='cell-type-info shadowed' style={{ backgroundColor: `${theme.secondaryBackground}88` }}>
+                showLegend && <div className='cell-type-info shadowed' style={{ backgroundColor: `${theme.primaryBackground}88` }}>
                     {Object.values(CellType).map(cellType => (
                         <div key={cellType} className='cell-type-info-row row-flex-center'>
                             <HexagonBase

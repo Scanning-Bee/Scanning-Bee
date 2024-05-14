@@ -479,6 +479,7 @@ a {
   padding: 5px;
   border-radius: 5px;
   margin: 5px;
+  backdrop-filter: blur(10px);
 }
 
 .manual-annotator-mode-button{
@@ -489,6 +490,7 @@ a {
   border-radius: 5px;
   margin: 5px;
   height: 40px;
+  backdrop-filter: blur(10px);
 }
 
 .custom-tooltip {
