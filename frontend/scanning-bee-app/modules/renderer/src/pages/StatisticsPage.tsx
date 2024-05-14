@@ -3,6 +3,7 @@ import { useTheme } from '@frontend/slices/themeSlice';
 import { CellTypeChart } from '@frontend/toolbars/charts/CellTypeChart';
 import { HeatmapMounter } from '@frontend/toolbars/charts/Heatmap';
 import { XYChart } from '@frontend/toolbars/charts/XYChart';
+import { CellTypeInfo } from '@frontend/toolbars/common/CellTypeInfo';
 import React from 'react';
 
 import { PickFolderPage } from './PickFolderPage';
@@ -37,6 +38,8 @@ export const StatisticsPage = () => {
 
             <h1>Heatmap</h1>
             <HeatmapMounter />
+
+            <CellTypeInfo />
         </div>
     );
 };
