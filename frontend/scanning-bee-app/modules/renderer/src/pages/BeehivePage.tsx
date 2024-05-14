@@ -1,5 +1,6 @@
 import { useTheme } from '@frontend/slices/themeSlice';
 import { setViewScale } from '@frontend/slices/viewScaleSlice';
+import { CellTypeInfo } from '@frontend/toolbars/common/CellTypeInfo';
 import { ZoomSlider } from '@frontend/toolbars/common/ZoomSlider';
 import { BeehiveView } from '@frontend/views/BeehiveView';
 import React from 'react';
@@ -31,6 +32,7 @@ export const BeehivePage = () => {
                 lowerBound={0.1}
                 upperBound={2}
             />
+            <CellTypeInfo />
         </div>
     );
 };

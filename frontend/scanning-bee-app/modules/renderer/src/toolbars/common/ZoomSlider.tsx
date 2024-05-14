@@ -1,6 +1,6 @@
 import { Button, Icon, Slider } from '@blueprintjs/core';
 import { useTheme } from '@frontend/slices/themeSlice';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export const ZoomSlider = (props: {
     handleZoomChange: (zoom: number) => void;
@@ -27,8 +27,12 @@ export const ZoomSlider = (props: {
         }
     };
 
+    useEffect(() => {
+        handleZoomChange(zoom);
+    }, []);
+
     return (
-        <div className='zoom-slider column-flex-center shadowed'>
+        <div className='zoom-slider column-flex-center shadowed' style={{ backgroundColor: `${theme.secondaryBackground}88` }}>
             <Button
                 icon={<Icon icon='plus' color={theme.primaryForeground} />}
                 onClick={() => handleZoom(zoom + 0.1, true)}

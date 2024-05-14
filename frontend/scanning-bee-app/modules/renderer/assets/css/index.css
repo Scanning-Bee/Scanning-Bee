@@ -483,7 +483,7 @@ a {
 
 .manual-annotator-mode-button{
   position:fixed;
-  bottom: 30px;
+  bottom: 25px;
   right: 20px;
   padding: 5px;
   border-radius: 5px;
@@ -584,7 +584,7 @@ a {
 
 .zoom-slider {
   position: fixed;
-  bottom: 85px;
+  bottom: 80px;
   right: 20px;
   margin: 5px;
   backdrop-filter: blur(10px);
@@ -602,8 +602,45 @@ a {
   background-color: #ddd;
 }
 
+.cell-type-info-toggle-button {
+  position: fixed;
+  bottom: 25px;
+  right: 20px;
+  margin: 5px;
+  backdrop-filter: blur(10px);
+  padding: 6px 1px;
+  border-radius: 6px;
+  min-width: 44px !important;
+  min-height: 44px !important;
+}
+
+.cell-type-info {
+  position: fixed;
+  bottom: 25px;
+  right: 80px;
+  margin: 5px;
+  backdrop-filter: blur(10px);
+  padding: 6px 1px;
+  border-radius: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 10px;
+}
+
+.cell-type-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.cell-type-info-row > p {
+  margin: 0 0 0 5px;
+  width: 100%;
+}
+
 .image-navigator-buttons {
-  height: 50px;
+  height: 40px;
   position: fixed;
   bottom: 30px;
   border-radius: 6px;
@@ -611,6 +648,11 @@ a {
   backdrop-filter: blur(10px);
   left: 0;
   width: fit-content;
+}
+
+.image-navigator-buttons > .bp3-small {
+  max-height: 20px !important;
+  min-height: unset !important;
 }
 
 .recently-opened-folders {
@@ -673,7 +715,7 @@ a {
 .occluding-bee-svg{
   position: absolute;
   left: 0;
-  top: 0;
+  top: -3px;
   bottom: 0;
   right: 0;
 }
