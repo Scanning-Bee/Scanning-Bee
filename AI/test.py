@@ -343,9 +343,55 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
 
     return return_list
     
+def classify_cell_states(image_path :str, model_path: str = "AI/models/cell_classifiers/cell_classifier_3_may.pt",error_margin = 0.15):
+    '''
+    Runs the classifier model on detected circles, returns a dictionary of (x,y,r) tuples as key and labels as value
+    '''
+    
+    circle_list = rotation_robust_method(image_path, occlude=True, detection_model_path="AI/models/bee_detect_models/epoch-150.pt")
+    
+    original_image = cv2.imread(image_path)
+    image_height, image_width, _ = original_image.shape
+
+    classfier_model = YOLO(model_path)
+
+    cell_states = dict()
+    for circle in circle_list:
+        x,y,r = circle
+        new_radius = r * (1 + error_margin)
+    
+        x_min = int(max(0, x - new_radius))
+        y_min = int(max(0, y - new_radius))
+        x_max = int(min(image_width - 1, x + new_radius))
+        y_max = int(min(image_height - 1, y + new_radius))
+
+        if x_min < x_max and y_min < y_max:
+            cropped_image = original_image[y_min:y_max, x_min:x_max]
+            # cell_patches.append(cropped_image)
+            cell_states[circle] = cropped_image
+
+    for key, patch in cell_states.items():
+        result = classfier_model(patch,verbose = False)[0]
+        label_index = result.probs.top1
+        label = result.names[label_index]
+        cell_states[key] = label
+
+    for circle, label in cell_states.items():
+        x, y, r = circle
+        # Draw the circle
+        cv2.circle(original_image, (x, y), r, (0, 255, 0), 2)  # Green circle with thickness 2
+        # Draw the label
+        cv2.putText(original_image, label, (x -20 , y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+
+    cv2.namedWindow("Classified cells",cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("Classified cells", 800, 800)
+    cv2.imshow("Classified cells",original_image)
+    cv2.waitKey(0)
+
+    return cell_states
 
 
 if __name__ == "__main__":
     # test_lines("AI/test_images/image_759.jpg")
-    print(rotation_robust_method("AI/test_images/image_2162.jpg", occlude=True, detection_model_path="AI/models/bee_detect_models/epoch-150.pt"))
+    print(classify_cell_states(r"AI\test_images\image_759.jpg"))
     
