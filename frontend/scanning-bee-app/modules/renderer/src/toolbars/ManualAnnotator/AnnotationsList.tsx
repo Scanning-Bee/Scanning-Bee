@@ -67,7 +67,7 @@ export const AnnotationsList = () => {
                                         {annotation.cell_type}
                                     </p>
                                     <p style={{ margin: 0, color: theme.primaryForeground, fontWeight: '200', fontSize: 'smaller' }}>
-                                    at x:{annotation.center[0]}, y:{annotation.center[1]}
+                                    at x:{annotation.center[0].toFixed(2)}, y:{annotation.center[1].toFixed(2)}
                                     </p>
                                 </span>
                                 }
