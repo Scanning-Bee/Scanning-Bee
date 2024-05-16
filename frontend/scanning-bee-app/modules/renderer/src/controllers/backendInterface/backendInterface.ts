@@ -311,11 +311,9 @@ export class BackendInterface {
     public getBeehiveData = (): BeehiveCell[] => {
         // DUMMY FOR NOW. TODO:
 
-        const maxCellCount = 1000;
-        const minCellCount = 100;
-        const cellCount = Math.floor(Math.random() * (maxCellCount - minCellCount + 1) + minCellCount);
+        const cellCount = 5000;
 
-        const cellCountPerRow = Math.floor(cellCount ** 0.51);
+        const cellCountPerRow = 100;
 
         const cells: BeehiveCell[] = [];
 

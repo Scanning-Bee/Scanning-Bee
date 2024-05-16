@@ -6,10 +6,10 @@ import { CellDetailDialog } from '@frontend/toolbars/beehive/CellDetailDialog';
 import { CellTypeColours } from '@frontend/utils/colours';
 import React, { useEffect, useState } from 'react';
 
-import { OccludingBeeBase } from './base/OccludingBeeBase';
-import { HexagonView } from './HexagonView';
+import { OccludingBeeBase } from '../../views/base/OccludingBeeBase';
+import { HexagonView } from '../../views/HexagonView';
 
-export const BeehiveView = () => {
+export const BeehivePageContents = () => {
     const viewScale = useViewScale();
 
     const [cells, setCells] = useState<BeehiveCell[]>([]);
