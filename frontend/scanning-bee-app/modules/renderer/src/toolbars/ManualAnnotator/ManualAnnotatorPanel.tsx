@@ -14,17 +14,16 @@ export const ManualAnnotatorPanel = (props:{
 
     const theme = useTheme();
 
-    const panelBackground = theme.type === 'dark' ? theme.tertiaryBackground : theme.secondaryBackground;
-
     return (
         // @ts-ignore
         <SplitPane
+            className='manual-annotator-panel shadowed'
             split="horizontal"
             minSize={200}
             defaultSize={'270px'}
             maxSize={400}
             style={{
-                backgroundColor: panelBackground,
+                backgroundColor: `${theme.primaryBackground}AA`,
                 opacity: leftPanelOpen ? 1 : 0,
                 width: !leftPanelOpen && '0px',
                 transition: 'opacity 0.1s',

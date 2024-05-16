@@ -95,7 +95,6 @@ a {
 
 #left-panel {
   max-width: 50%;
-  left: 0 !important;
   width: var(--leftPanelWidth);
   height: calc(100% - (var(--footerSpace) + var(--headerSpace)));
 }
@@ -326,6 +325,7 @@ a {
   overflow-x: hidden;
   height: 200px;
   justify-content: flex-start;
+  margin: 10px 5px;
 }
 
 .annotation-button-in-panel {
@@ -431,17 +431,17 @@ a {
 
 .open-margin-left {
   /* position: relative !important; */
-  right:var(--buttonOffset);
-  right: 0px;
-  margin: -20px;
+  right: -70px;
+  margin: 0px;
+  top: 10px !important;
   /* top: 4px !important;    */
 }
 .closed-margin-left {
   /* left:var(--buttonOffset); */
   /* position: relative !important; */
-  right: -60px;
+  right: -55px;
    /* left: 4px; */
-  top: 15px !important;
+  top: 10px !important;
 }
 
 .button-animation{
@@ -474,8 +474,8 @@ a {
 
 .manual-annotator-toolbar{
   position:fixed;
-  top: calc(var(--headerSpace) + 10px);
-  right: 20px;
+  top: calc(var(--headerSpace) + 5px);
+  right: 10px;
   padding: 5px;
   border-radius: 5px;
   margin: 5px;
@@ -485,12 +485,20 @@ a {
 .manual-annotator-mode-button{
   position:fixed;
   bottom: 25px;
-  right: 20px;
+  right: 10px;
   padding: 5px;
   border-radius: 5px;
   margin: 5px;
   height: 40px;
   backdrop-filter: blur(10px);
+}
+
+.manual-annotator-panel {
+  min-height: unset !important;
+  height: calc(100% - 20px) !important;
+  backdrop-filter: blur(10px);
+  left: 15px;
+  border-radius: 10px;
 }
 
 .custom-tooltip {
@@ -586,8 +594,8 @@ a {
 
 .zoom-slider {
   position: fixed;
-  bottom: 80px;
-  right: 20px;
+  bottom: 75px;
+  right: 10px;
   margin: 5px;
   backdrop-filter: blur(10px);
   padding: 6px 1px;
@@ -606,8 +614,8 @@ a {
 
 .cell-type-info-toggle-button {
   position: fixed;
-  bottom: 25px;
-  right: 20px;
+  bottom: 22.5px;
+  right: 10px;
   margin: 5px;
   backdrop-filter: blur(10px);
   padding: 6px 1px;
