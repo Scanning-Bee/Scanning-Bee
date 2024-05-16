@@ -20,8 +20,9 @@ const App = (props: {
     goForward: any
     getPreviousPage: any,
     getNextPage: any,
+    fullScreen: boolean,
 }) => {
-    const { page, setPage, goBack, goForward, getNextPage, getPreviousPage } = props;
+    const { page, setPage, goBack, goForward, getNextPage, getPreviousPage, fullScreen } = props;
 
     return (
         <Provider store={store}>
@@ -35,6 +36,7 @@ const App = (props: {
                     goForward={goForward}
                     getPreviousPage={getPreviousPage}
                     getNextPage={getNextPage}
+                    fullScreen={fullScreen}
                 />
 
                 {
