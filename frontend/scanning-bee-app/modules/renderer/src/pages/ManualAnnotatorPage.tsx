@@ -67,7 +67,7 @@ export const ManualAnnotatorPage = () => {
             <div id="left-panel" className='panel'>
                 <Button
                     icon={<Icon icon={'menu'} style={{ color: theme.primaryForeground }} />}
-                    className='panel-button button-animation closed-margin-left'
+                    className={`panel-button button-animation ${leftPanelOpen ? 'open' : 'closed'}-margin-left`}
                     onClick={
                         (e) => {
                             // ? this section prevents button spamming with spacebar.
