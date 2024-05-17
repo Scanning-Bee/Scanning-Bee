@@ -1,6 +1,7 @@
 @import "~normalize.css";
 @import "~@blueprintjs/core/lib/css/blueprint.css";
 @import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
+@import "~@blueprintjs/datetime/lib/css/blueprint-datetime.css";
 @import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 
 
@@ -334,7 +335,7 @@ a {
   overflow-x: hidden;
   height: 200px;
   justify-content: flex-start;
-  margin: 10px 0px;
+  margin: 10px 0 5px 0px;
 }
 
 .annotation-button-in-panel {
@@ -755,4 +756,37 @@ a {
   align-items: center;
   width: 100%;
   height: 100%;
+}
+
+.time-adjuster {
+  position:fixed;
+  width: 500px;
+  bottom: 25px;
+  right: 20px;
+  padding: 5px;
+  border-radius: 6px;
+  margin: 5px;
+  right: calc(50% - 250px);
+  margin: 5px;
+  backdrop-filter: blur(10px);
+  padding: 6px 1px;
+  display: flex;
+}
+
+.time-adjuster-from-to {
+  margin: 0 5px 0 0;
+  width: 50px;
+  text-align: right;
+}
+
+.timestamp-display {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: 175px;
+}
+
+.timestamp-display > p {
+  margin: 5px 0 5px 10px;
 }

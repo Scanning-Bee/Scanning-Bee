@@ -3,6 +3,7 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 
 import annotationReducer from './slices/annotationSlice';
 import backendStatusReducer from './slices/backendStatusSlice';
+import beehiveReducer from './slices/beehiveSlice';
 import cellSlice from './slices/cellSlice';
 import permissionReducer from './slices/permissionSlice';
 import themeReducer from './slices/themeSlice';
@@ -20,6 +21,7 @@ const store = configureStore({
         cell: cellSlice,
         viewScale: viewScaleReducer,
         permission: permissionReducer,
+        beehive: beehiveReducer,
     }),
 });
 

@@ -32,7 +32,6 @@ const RecentlyOpenedFolders = ({ folders }: { folders: string[] }) => {
                         minimal
                         fill
                         onClick={() => {
-                            console.log('Opening folder:', folder);
                             BackendInterface.getInstance().openFolderAtLocation(folder);
                         }}
                         style={{

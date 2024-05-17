@@ -23,8 +23,6 @@ export default function Header(props: {
 
     const headerBackground = theme.type === 'dark' ? theme.secondaryBackground : theme.tertiaryBackground;
 
-    console.log(props.fullScreen);
-
     return (
         <div id="header"
             // eslint-disable-next-line no-useless-concat

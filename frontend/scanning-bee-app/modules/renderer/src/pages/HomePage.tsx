@@ -139,8 +139,6 @@ export const HomePage = (props: {
         const resize = () => {
             const width = window.innerWidth;
 
-            console.log(width);
-
             setXAxisOverflow(width < 1050);
         };
 

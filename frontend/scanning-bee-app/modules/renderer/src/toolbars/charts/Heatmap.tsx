@@ -57,8 +57,6 @@ export const HeatmapMounter = () => {
 
         heatmapInstance.setData(data);
         heatmapInstance.repaint();
-
-        console.log(heatmapInstance.getData());
     }, [shownCellType, annotations]);
 
     return (
