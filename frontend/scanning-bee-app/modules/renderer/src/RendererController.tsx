@@ -133,7 +133,7 @@ export class RendererController extends React.Component {
     }
 
     initialize(): void {
-        const startPage = 'home';
+        const startPage = 'login';
 
         this.historyService = new HistoryService();
 

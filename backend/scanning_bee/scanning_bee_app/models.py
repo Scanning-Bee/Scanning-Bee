@@ -1,8 +1,27 @@
 from django.db import models
-#from django.contrib.gis.db import models as geo_models
+from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
+from django.utils.translation import gettext_lazy as _
+
+from .managers import CustomUserManager
 from .real_world_coordiantes import convert_to_world_coordinates
 
 CELL_LOC_THRESHOLD = 0.01
+
+
+class CustomUser(AbstractUser):
+    username = models.CharField(max_length=100, unique=True)
+    email = models.EmailField(_("email address"), unique=True)
+    user_type = models.ForeignKey("UserType", on_delete=models.PROTECT, null=True)
+    annotation_count = models.IntegerField(default=0) # count of annotations made by the user
+    
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return self.username
 
 
 class UserType(models.Model):
@@ -10,14 +29,6 @@ class UserType(models.Model):
 
     def __str__(self):
         return self.type
-
-
-class User(models.Model):
-    name = models.CharField(max_length=100)
-    user_type = models.ForeignKey(UserType, on_delete=models.PROTECT, null=True)
-
-    def __str__(self):
-        return str(self.pk) + " - " + self.user_type.description
 
 
 class Frame(models.Model):
@@ -46,8 +57,10 @@ class Content(models.Model):
     def __str__(self):
         return self.name
 
+
 class Bag(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True, unique=True)
+
 
 class Image(models.Model):
     image_name = models.CharField(max_length=100)
@@ -65,7 +78,7 @@ class CellContent(models.Model):
     frame = models.ForeignKey(Frame, on_delete=models.PROTECT, default=1)
     timestamp = models.DateTimeField(blank=True)
     content = models.ForeignKey(Content, on_delete=models.PROTECT)
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    user = models.ForeignKey(CustomUser, on_delete=models.PROTECT)
     center_x = models.IntegerField()
     center_y = models.IntegerField()
     image = models.ForeignKey(Image, on_delete=models.CASCADE)
@@ -78,6 +91,12 @@ class CellContent(models.Model):
         return str(self.pk) + " - " + self.content.name + " - " + str(self.cell)
 
     def save(self, *args, **kwargs):
+        created = not self.pk
+
+        if created and self.user:
+            self.user.annotation_count += 1
+            self.user.save()
+
         my_image = Image.objects.get(pk=self.image.pk)
         x_pos = my_image.x_pos
         y_pos = my_image.y_pos
