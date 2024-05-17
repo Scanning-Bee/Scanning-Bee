@@ -51,7 +51,7 @@ export const CellTypeChart = () => {
             >
                 <Tooltip
                     contentStyle={{ color: 'black' }}
-                    content={({ active, payload, _label }) => <TooltipContent
+                    content={({ active, payload }) => <TooltipContent
                         active={active}
                         labelPayloads={[{ label: payload[0]?.payload.cellType, payload: payload[0]?.value }]}
                     />}

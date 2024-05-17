@@ -107,7 +107,7 @@ export const TimeAdjuster = (props: {
                             <MenuItem
                                 key={index}
                                 onClick={() => dispatch(setAnimationSpeed(speed))}
-                                text={speed.toString()}
+                                text={`${speed.toString()}x`}
                                 active={speed === animationSpeed}
                             />
                         ))}
@@ -124,7 +124,7 @@ export const TimeAdjuster = (props: {
                     <Button
                         text={shownDataDate.toLocaleString()}
                         minimal
-                        style={{ color: theme.secondaryForeground, fontWeight: 'lighter', marginLeft: '-20px' }}
+                        style={{ color: theme.secondaryForeground, fontWeight: 'lighter', marginLeft: '-25px' }}
                     />
                     <DatePicker
                         onChange={(date: Date) => {
