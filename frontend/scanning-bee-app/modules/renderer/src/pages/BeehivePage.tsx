@@ -1,3 +1,4 @@
+import { useBeehiveName } from '@frontend/slices/beehiveSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { setViewScale } from '@frontend/slices/viewScaleSlice';
 import { BeehivePageContents } from '@frontend/toolbars/beehive/BeehivePageContents';
@@ -6,16 +7,24 @@ import { ZoomSlider } from '@frontend/toolbars/common/ZoomSlider';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
+import { PickBeehivePage } from './PickBeehivePage';
+
 export const BeehivePage = () => {
     const theme = useTheme();
 
     const dispatch = useDispatch();
+
+    const beehiveName = useBeehiveName();
 
     /* useEffect(() => {
         const cells = BackendInterface.getInstance().getBeehiveData();
 
         dispatch(setBeehiveCells(cells));
     }, []); */
+
+    if (!beehiveName) {
+        return <PickBeehivePage />;
+    }
 
     return (
         <div style={{

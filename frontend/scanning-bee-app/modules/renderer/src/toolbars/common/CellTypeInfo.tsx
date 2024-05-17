@@ -15,7 +15,10 @@ export const CellTypeInfo = () => {
 
     return (
         <div
-            className='column-flex-center shadowed'
+            className='shadowed'
+            style={{
+                position: 'absolute',
+            }}
         >
             <Button
                 className='cell-type-info-toggle-button shadowed'

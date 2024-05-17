@@ -75,8 +75,6 @@ export class RendererController extends React.Component {
     }) {
         const { dispatch } = (window as any).store;
 
-        console.log('HERE', payload);
-
         const annotations = generateAnnotationsFromYaml(payload.annotations);
 
         dispatch(openFolder({
@@ -118,7 +116,6 @@ export class RendererController extends React.Component {
     }
 
     renderAgain() {
-        console.log('2STAEY', this.state.fullScreen);
         render(
             <StrictMode>
                 <App

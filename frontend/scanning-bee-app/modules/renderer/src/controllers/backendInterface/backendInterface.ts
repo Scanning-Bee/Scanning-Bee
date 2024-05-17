@@ -308,12 +308,25 @@ export class BackendInterface {
         }
     };
 
-    public getBeehiveData = (): BeehiveCell[] => {
+    /**
+     * Returns the beehive data closest to the given time.
+     */
+    public getBeehiveData = (
+        beehiveName: string,
+        timestampToLookFor?: number,
+    ): BeehiveCell[] => {
         // DUMMY FOR NOW. TODO:
 
-        const cellCount = 5000;
+        console.log(
+            'Getting beehive data from',
+            beehiveName,
+            'closest to:',
+            timestampToLookFor || 'CURRENT',
+        );
 
-        const cellCountPerRow = 100;
+        const cellCount = 450;
+
+        const cellCountPerRow = 30;
 
         const cells: BeehiveCell[] = [];
 
@@ -342,5 +355,14 @@ export class BackendInterface {
         }
 
         return cells;
+    };
+
+    public getBeehiveTimestamps = (beehiveName: string): number[] => {
+        console.log('Getting beehive timestamps for', beehiveName);
+
+        return [
+            '2021-01-01T00:00:00.000Z',
+            '2021-01-28T00:00:00.000Z',
+        ].map(ts => new Date(ts).getTime());
     };
 }
