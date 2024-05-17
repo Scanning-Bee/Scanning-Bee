@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY requirements.txt .
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements2.txt
+    pip install --no-cache-dir -r requirements.txt
 
 # Set the working directory to the location of manage.py
 WORKDIR /scanning_bee/backend/scanning_bee
