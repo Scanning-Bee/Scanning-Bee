@@ -326,7 +326,7 @@ a {
   overflow-x: hidden;
   height: 200px;
   justify-content: flex-start;
-  margin: 10px 0px;
+  margin: 10px 0 5px 0px;
 }
 
 .annotation-button-in-panel {

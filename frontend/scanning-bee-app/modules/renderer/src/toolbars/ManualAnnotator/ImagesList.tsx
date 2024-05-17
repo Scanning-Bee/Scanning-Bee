@@ -18,7 +18,7 @@ export const ImagesList = () => {
 
     return (
         <div className='annotated-images-panel'>
-            <h3 style={{ margin: '0 30px 10px ' }}>Images</h3>
+            <h3 style={{ margin: '5px 30px 10px ' }}>Images</h3>
             {images.map(image => (
                 <Button
                     key={image}
