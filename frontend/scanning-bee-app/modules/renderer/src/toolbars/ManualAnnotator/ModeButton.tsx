@@ -71,7 +71,7 @@ export const ModeButton = () => {
         <div
             className='column-flex-center manual-annotator-mode-button shadowed'
             style={{
-                backgroundColor: theme.secondaryBackground,
+                backgroundColor: `${theme.primaryBackground}88`,
                 color: theme.secondaryForeground,
             }}
         >

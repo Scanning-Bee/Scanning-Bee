@@ -11,6 +11,7 @@ import { useBackendStatus } from '@frontend/slices/backendStatusSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { CellTypeColours } from '@frontend/utils/colours';
 import { getFileName } from '@frontend/utils/fileNameUtils';
+import { HexagonBase } from '@frontend/views/base/HexagonBase';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -66,16 +67,18 @@ export const AnnotationsList = () => {
                                         {annotation.cell_type}
                                     </p>
                                     <p style={{ margin: 0, color: theme.primaryForeground, fontWeight: '200', fontSize: 'smaller' }}>
-                                    at x:{annotation.center[0]}, y:{annotation.center[1]}
+                                    at x:{annotation.center[0].toFixed(2)}, y:{annotation.center[1].toFixed(2)}
                                     </p>
                                 </span>
                                 }
                                 minimal
-                                icon={<Icon
-                                    icon='full-circle'
-                                    color={CellTypeColours[annotation.cell_type]}
-                                    style={{ margin: '0 5px 0 0' }}
-                                />}
+                                icon={<div style={{ margin: '0 5px 0 0' }}>
+                                    <HexagonBase
+                                        color={CellTypeColours[annotation.cell_type]}
+                                        height={16}
+                                        width={16}
+                                    />
+                                </div>}
                                 onClick={() => {
                                     dispatch(setActiveAnnotations([annotation.id]));
                                 }}

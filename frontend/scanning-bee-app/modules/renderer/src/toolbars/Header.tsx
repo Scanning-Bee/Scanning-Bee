@@ -15,12 +15,15 @@ export default function Header(props: {
     goForward: () => void,
     getPreviousPage: () => PageType,
     getNextPage: () => PageType,
+    fullScreen: boolean,
 }) {
     const theme: Theme = useTheme();
 
     const zoom = useZoom();
 
     const headerBackground = theme.type === 'dark' ? theme.secondaryBackground : theme.tertiaryBackground;
+
+    console.log(props.fullScreen);
 
     return (
         <div id="header"
@@ -32,7 +35,7 @@ export default function Header(props: {
                     ? `1px solid ${theme.primaryBorder}` : 'none',
                 color: theme.secondaryForeground,
                 padding: isMac()
-                    ? `0 0 0 ${Math.ceil(60 - (zoom * 10))}px`
+                    ? `0 0 0 ${props.fullScreen ? '0' : Math.ceil(60 - (zoom * 10))}px`
                     : `0 ${Math.ceil(120 - (zoom * 23))}px 0 0`,
             }}
         >

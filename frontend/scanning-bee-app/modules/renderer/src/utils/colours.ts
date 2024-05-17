@@ -85,7 +85,7 @@ export const Themes: Theme[] = [
 ];
 
 export const CellTypeColours: { [key in CellType]: string } = {
-    [CellType.BEE_OCCLUDED]: 'rgb(0, 0, 0)',
+    [CellType.BEE_OCCLUDED]: 'rgb(55, 12, 52)',
     [CellType.EGG]: 'rgb(200, 200, 200)',
     [CellType.EMPTY]: 'rgba(255, 102, 195, 1)',
     [CellType.HONEY_CLOSED]: 'rgba(129, 77, 1, 1)',
@@ -95,3 +95,14 @@ export const CellTypeColours: { [key in CellType]: string } = {
     [CellType.POLLEN]: 'rgba(0, 190, 98, 1)',
     [CellType.PUPA]: 'rgba(1, 150, 178, 1)',
 };
+
+export const StaticHomePageHexagonColours = [
+    '#00bf63',
+    '#c1ff72',
+    '#ffde59',
+    '#ff914d',
+    '#ff5757',
+    '#cb6ce6',
+    '#5271ff',
+    '#0097b2',
+];

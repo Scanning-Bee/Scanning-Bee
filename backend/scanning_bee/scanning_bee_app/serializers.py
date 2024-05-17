@@ -8,12 +8,16 @@ class UserTypeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class UserSerializer(serializers.ModelSerializer):
+
+class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = '__all__'
+        model = CustomUser
+        fields = ['username', 'email', 'password', 'user_type', 'annotation_count']
+        extra_kwargs = {'password': {'write_only': True}}
 
-
+    def create(self, validated_data):
+        return CustomUser.objects.create_user(**validated_data)
+    
 class FrameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Frame

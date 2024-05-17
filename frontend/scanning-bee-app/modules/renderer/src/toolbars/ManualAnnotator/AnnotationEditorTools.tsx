@@ -32,7 +32,7 @@ const RadiusSlider = (props: {
             disabled={disabled}
         >
             <Button
-                icon={<Icon icon='circle' color={`${theme.secondaryForeground}${disabled ? '80' : ''}`} />}
+                icon={<Icon icon='circle' color={`${theme.primaryForeground}${disabled ? '80' : ''}`} />}
                 minimal
                 disabled={disabled}
             />
@@ -79,7 +79,7 @@ const CellTypePicker = (props: {
             disabled={disabled}
         >
             <Button
-                icon={<Icon icon='tag' color={`${theme.secondaryForeground}${disabled ? '80' : ''}`} />}
+                icon={<Icon icon='tag' color={`${theme.primaryForeground}${disabled ? '80' : ''}`} />}
                 minimal
                 disabled={disabled}
             />
@@ -136,7 +136,7 @@ const CreateAnnotationButton = () => {
 
 const GridButton = (props: { onClick: () => void }) => (
     <Button
-        icon={<Icon icon='grid' color={useTheme().secondaryForeground} />}
+        icon={<Icon icon='grid' color={useTheme().primaryForeground} />}
         minimal
         onClick={props.onClick}
     />
@@ -166,8 +166,8 @@ export const AnnotationEditorTools = (props: {
         <div
             className='column-flex-center manual-annotator-toolbar shadowed'
             style={{
-                backgroundColor: theme.secondaryBackground,
-                color: theme.secondaryForeground,
+                backgroundColor: `${theme.primaryBackground}88`,
+                color: theme.primaryForeground,
             }}
         >
             <EditorButtonPopover>
@@ -180,7 +180,7 @@ export const AnnotationEditorTools = (props: {
                 <div style={{ padding: '10px' }}>Delete</div>
             </EditorButtonPopover>
 
-            <Divider style={{ width: '100%', backgroundColor: theme.secondaryForeground }} />
+            <Divider style={{ width: '100%', backgroundColor: theme.primaryForeground }} />
 
             <EditorButtonPopover disabled={activeAnnotations.length === 0}>
                 <RadiusSlider activeAnnotations={activeAnnotations} />

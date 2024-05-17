@@ -1,7 +1,8 @@
 import { useAnnotations } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
+import { CellTypeColours } from '@frontend/utils/colours';
 import React from 'react';
-import { CartesianGrid, Scatter, ScatterChart, Tooltip, XAxis, YAxis } from 'recharts';
+import { CartesianGrid, Cell, Scatter, ScatterChart, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { TooltipContent } from './TooltipContent';
 
@@ -12,6 +13,7 @@ export const XYChart = () => {
     const data = annotations.map(annotation => ({
         x: annotation.center[0],
         y: annotation.center[1],
+        cell_type: annotation.cell_type,
     }));
 
     return (
@@ -34,11 +36,25 @@ export const XYChart = () => {
                     cursor={{ strokeDasharray: '3 3' }}
                     content={({ active, payload }) => <TooltipContent
                         active={active}
-                        payload={`${payload[0]?.value}, ${payload[1]?.value}`}
-                        label={'x, y'}
+                        labelPayloads={
+                            [
+                                {
+                                    label: 'Cell Type',
+                                    payload: payload[0]?.payload.cell_type,
+                                },
+                                {
+                                    label: 'x, y',
+                                    payload: `${payload[0]?.value}, ${payload[1]?.value}`,
+                                },
+                            ]
+                        }
                     />}
                 />
-                <Scatter data={data} fill="#8884d8" />
+                <Scatter data={data} fill="#8884d8" >
+                    {data.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={CellTypeColours[entry.cell_type]} />
+                    ))}
+                </Scatter>
             </ScatterChart>
         </div>
     );

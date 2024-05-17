@@ -10,6 +10,7 @@ import { StatisticsPage } from './pages/StatisticsPage';
 import store from './store';
 import Footer from './toolbars/Footer';
 import Header from './toolbars/Header';
+import { LoginPage } from './pages/LoginPage';
 
 require('@assets/css/index.css');
 
@@ -20,8 +21,9 @@ const App = (props: {
     goForward: any
     getPreviousPage: any,
     getNextPage: any,
+    fullScreen: boolean,
 }) => {
-    const { page, setPage, goBack, goForward, getNextPage, getPreviousPage } = props;
+    const { page, setPage, goBack, goForward, getNextPage, getPreviousPage, fullScreen } = props;
 
     return (
         <Provider store={store}>
@@ -35,6 +37,7 @@ const App = (props: {
                     goForward={goForward}
                     getPreviousPage={getPreviousPage}
                     getNextPage={getNextPage}
+                    fullScreen={fullScreen}
                 />
 
                 {
@@ -48,6 +51,8 @@ const App = (props: {
                             return <SettingsPage />;
                         case 'statistics':
                             return <StatisticsPage />;
+                        case 'login':
+                            return <LoginPage setPage={setPage} />;
                         case 'beehive':
                             return <BeehivePage />;
                         default:

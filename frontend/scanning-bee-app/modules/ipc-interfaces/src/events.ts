@@ -20,6 +20,7 @@ export enum MAIN_EVENTS {
     ANNOTATIONS_PARSED = 'ANNOTATIONS_PARSED',
     SAVE_ANNOTATIONS_SUCCESS = 'SAVE_ANNOTATIONS_SUCCESS',
     SAVE_ANNOTATIONS_ERROR = 'SAVE_ANNOTATIONS_ERROR',
+    FULL_SCREEN = 'FULL_SCREEN',
 }
 
 /* ----------------------------------- */
@@ -41,4 +42,5 @@ export type MAIN_EVENT_PAYLOADS = {
     },
     [MAIN_EVENTS.SAVE_ANNOTATIONS_SUCCESS]: { targetFolder: string },
     [MAIN_EVENTS.SAVE_ANNOTATIONS_ERROR]: { targetFolder: string, error: any },
+    [MAIN_EVENTS.FULL_SCREEN]: boolean,
 };

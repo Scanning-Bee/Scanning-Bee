@@ -1,12 +1,16 @@
 from django.forms import ValidationError
 from django.db import transaction
 from django.http import JsonResponse
+from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.decorators import api_view  # Import the api_view decorator
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import AllowAny
+from django.contrib.auth import authenticate
 
 from .models import *
 from .serializers import *
@@ -24,9 +28,36 @@ logger = logging.getLogger(__name__)
 sys.path.insert(0, '../../')
 
 from AI.test import test_lines
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
 
+
+class HomeView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        content = {'message': 'Welcome to Scanning Bee App :)'}
+        return Response(content)
+
+
+class LogoutView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh_token"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            print(e)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 ##################### USER TYPE #####################
+
+
 class UserTypeList(ListCreateAPIView):
     serializer_class = UserTypeSerializer
 
@@ -45,26 +76,72 @@ class UserTypeDetail(RetrieveUpdateDestroyAPIView):
 
 
 ##################### USER #####################
-class UserList(ListCreateAPIView):
-    serializer_class = UserSerializer
+class UserRegistrationView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = CustomUserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = get_user_model().objects.create_user(
+                username=serializer.validated_data['username'],
+                password=serializer.validated_data['password'],
+                email=serializer.validated_data['email'],
+                user_type=serializer.validated_data.get('user_type') 
+            )
+            refresh = RefreshToken.for_user(user)
+            return Response({'refresh': str(refresh),
+                             'access': str(refresh.access_token), "message": "User registered successfully.",
+                             "user": str(user)}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get_queryset(self, *args, **kwargs):
-        queryset = User.objects.all()
-        pk = self.kwargs.get('id')
-        if pk:
-            queryset = queryset.filter(id=pk)
+
+class UserLoginView(APIView):
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            refresh = RefreshToken.for_user(user)
+
+            return Response({
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh),
+            }, status=status.HTTP_200_OK)
+        else:
+            # Authentication failed
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class UserList(ListCreateAPIView):
+    serializer_class = CustomUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = None
+        user = self.request.user
+        if user.user_type.type == "Biolog":
+            queryset = CustomUser.objects.all()
         return queryset
 
 
 class UserDetail(RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = CustomUserSerializer
+    permission_classes = [IsAuthenticated]
     lookup_field = 'id'
+
+    def get_queryset(self):
+        queryset = None
+        user = self.request.user
+        if user.user_type.type == "Biolog":
+            queryset = CustomUser.objects.all()
+        return queryset
 
 
 ##################### FRAME #####################
+
 class FrameList(ListCreateAPIView):
     serializer_class = FrameSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self, *args, **kwargs):
         queryset = Frame.objects.all()
@@ -75,6 +152,7 @@ class FrameList(ListCreateAPIView):
 
 
 class FrameDetail(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Frame.objects.all()
     serializer_class = FrameSerializer
     lookup_field = 'id'
@@ -82,6 +160,7 @@ class FrameDetail(RetrieveUpdateDestroyAPIView):
 
 ##################### CELL #####################
 class CellList(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = CellSerializer
 
     def get_queryset(self, *args, **kwargs):
@@ -122,6 +201,7 @@ class CellList(ListCreateAPIView):
 
 
 class CellDetail(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Cell.objects.all()
     serializer_class = CellSerializer
     lookup_field = 'id'
@@ -129,6 +209,7 @@ class CellDetail(RetrieveUpdateDestroyAPIView):
 
 ##################### CONTENT #####################
 class ContentList(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = ContentSerializer
 
     def get_queryset(self, *args, **kwargs):
@@ -140,6 +221,7 @@ class ContentList(ListCreateAPIView):
 
 
 class ContentDetail(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Content.objects.all()
     serializer_class = ContentSerializer
     lookup_field = 'id'
@@ -147,6 +229,7 @@ class ContentDetail(RetrieveUpdateDestroyAPIView):
 
 ##################### CELL CONTENT #####################
 class CellContentList(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = CellContentSerializer
 
     def get_queryset(self, *args, **kwargs):
@@ -215,7 +298,14 @@ class CellContentList(ListCreateAPIView):
 
             with transaction.atomic():  # Ensure the operation is atomic
                 for item_data in request.data:
+                    # if there is a user field update it, if not then add it
+                    if 'user' not in item_data:
+                        item_data['user'] = request.user.id
+                    else:
+                        item_data.update({'user': request.user.pk})
+                    
                     serializer = self.get_serializer(data=item_data)
+                    print('serializer', serializer)
                     if serializer.is_valid():
                         # Create CellContent instance and link with Cell
                         cell_content_instance = serializer.save()  # Calls the custom save method
@@ -235,13 +325,15 @@ class CellContentList(ListCreateAPIView):
 
 
 class CellContentDetail(RetrieveUpdateDestroyAPIView):
-        queryset = CellContent.objects.all()
-        serializer_class = CellContentSerializer
-        lookup_field = 'id'
+    permission_classes = [IsAuthenticated]
+    queryset = CellContent.objects.all()
+    serializer_class = CellContentSerializer
+    lookup_field = 'id'
 
 
 class CellContentsByAI(ListCreateAPIView):
     serializer_class = CellContentSerializer
+    permission_classes = [IsAuthenticated]
 
     def get(self, request,  x_pos, y_pos, timestamp=None, format=None):
         queryset = Image.objects.filter(x_pos=x_pos, y_pos=y_pos)
@@ -258,7 +350,7 @@ class CellContentsByAI(ListCreateAPIView):
             all_detected_circles = test_lines("../../AnnotationFiles/" + image.image_path)
 
             frame = Frame.objects.get(pk=1)
-            user = User.objects.get(pk=1)
+            user = CustomUser.objects.get(pk=1)
             content = Content.objects.get(pk=9)
 
             for circle in all_detected_circles:
@@ -281,6 +373,7 @@ class CellContentsByAI(ListCreateAPIView):
 
 ######################## IMAGE ##################################
 class ImageList(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = ImageSerializer
 
     def get_queryset(self, *args, **kwargs):
@@ -319,6 +412,7 @@ class ImageList(ListCreateAPIView):
 
 
 class ImageDetail(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
     lookup_field = 'id'
@@ -333,6 +427,7 @@ class ImageDetail(RetrieveUpdateDestroyAPIView):
 
 
 class ImageScraper(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = ImageSerializer
 
     def post(self, request, *args, **kwargs):
@@ -417,6 +512,7 @@ class ImageScraper(ListCreateAPIView):
 
 ######################## BAG ##################################
 class BagList(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = BagSerializer
 
     def get_queryset(self, *args, **kwargs):
@@ -430,6 +526,7 @@ class BagList(ListCreateAPIView):
 
 
 class BagDetail(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Bag.objects.all()
     serializer_class = BagSerializer
     lookup_field = 'id'

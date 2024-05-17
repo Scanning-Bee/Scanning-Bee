@@ -67,7 +67,7 @@ export const ManualAnnotatorPage = () => {
             <div id="left-panel" className='panel'>
                 <Button
                     icon={<Icon icon={'menu'} style={{ color: theme.primaryForeground }} />}
-                    className='panel-button button-animation closed-margin-left'
+                    className={`panel-button button-animation ${leftPanelOpen ? 'open' : 'closed'}-margin-left`}
                     onClick={
                         (e) => {
                             // ? this section prevents button spamming with spacebar.
@@ -90,7 +90,7 @@ export const ManualAnnotatorPage = () => {
                     shownImageUrl={images.find(image => image === shownImageUrl)}
                 />
 
-                <ButtonGroup className='image-navigator-buttons shadowed'>
+                <ButtonGroup className='image-navigator-buttons shadowed' style={{ backgroundColor: `${theme.primaryBackground}88` }}>
                     <Button
                         icon={<Icon icon="chevron-left" style={{ color: theme.primaryForeground }} />}
                         disabled={shownImageIndex === 0}
@@ -100,9 +100,10 @@ export const ManualAnnotatorPage = () => {
                         }}
                         style={{ background: theme.secondaryBackground, margin: '10px' }}
                         minimal
+                        small
                     />
                     <p
-                        style={{ color: 'black' }}
+                        style={{ color: theme.primaryForeground }}
                         className='ellipsis-overflow image-navigator-image-name'
                     >{getFileName(shownImageUrl)}</p>
                     <Button
@@ -114,6 +115,7 @@ export const ManualAnnotatorPage = () => {
                         }}
                         style={{ background: theme.secondaryBackground, margin: '10px' }}
                         minimal
+                        small
                     />
                 </ButtonGroup>
                 <AnnotationEditorTools

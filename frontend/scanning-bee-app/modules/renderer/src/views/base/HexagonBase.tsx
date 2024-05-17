@@ -2,23 +2,28 @@ import React from 'react';
 
 export const HexagonBase = (props: {
     color: string,
+    opacity?: number,
+    width?: string | number,
+    height?: string | number,
+    scale?: number,
 }) => {
-    const { color } = props;
+    const { color, opacity, width, height, scale } = props;
 
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"
-            width="42"
+            width={width || 42 * (scale || 1)}
             zoomAndPan="magnify"
             viewBox="0 0 2598 2999.999989"
-            height="48"
+            height={height || 48 * (scale || 1)}
             preserveAspectRatio="xMidYMid meet"
             version="1.0"
             fill={color}
             color={color}
-            fillOpacity="1"
+            fillOpacity={opacity || 1}
             stroke="none"
+            className='hexagon-svg'
         >
             <defs>
                 <clipPath

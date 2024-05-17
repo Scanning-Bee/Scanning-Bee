@@ -4,11 +4,13 @@ import { HexagonBase } from './base/HexagonBase';
 
 export const HexagonView = (props: {
     color: string,
+    scale?: number,
 }) => {
-    const { color } = props;
+    const { color, scale } = props;
 
     return (
         <HexagonBase
+            scale={scale}
             color={color}
         />
     );

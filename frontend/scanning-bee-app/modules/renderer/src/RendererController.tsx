@@ -11,16 +11,32 @@ import StorageService from './services/StorageService';
 import { generateAnnotationsFromYaml, openFolder } from './slices/annotationSlice';
 import { AppToaster } from './Toaster';
 
-export class RendererController {
+type RendererControllerState = {
+    fullScreen: boolean;
+};
+
+export class RendererController extends React.Component {
     historyService: HistoryService = null;
+
+    state: RendererControllerState = null;
 
     static getInstance(): RendererController {
         return (window as any).RendererController;
     }
 
     constructor() {
+        super({});
+
+        this.state = {
+            fullScreen: false,
+        };
+
         this.setPage = this.setPage.bind(this);
         this.handleParsedAnnotations = this.handleParsedAnnotations.bind(this);
+        this.goBack = this.goBack.bind(this);
+        this.goForward = this.goForward.bind(this);
+        this.renderAgain = this.renderAgain.bind(this);
+        this.handleFullScreenChange = this.handleFullScreenChange.bind(this);
 
         // { folder: folderPath, annotations, images: imageUrls }
         ipcRenderer.on(MAIN_EVENTS.ANNOTATIONS_PARSED, this.handleParsedAnnotations);
@@ -38,8 +54,17 @@ export class RendererController {
                 timeout: 3000,
             });
         });
+        ipcRenderer.on(MAIN_EVENTS.FULL_SCREEN, this.handleFullScreenChange);
 
         this.initialize();
+    }
+
+    private handleFullScreenChange(_event, payload: boolean) {
+        this.state = {
+            fullScreen: payload,
+        };
+
+        this.renderAgain();
     }
 
     private handleParsedAnnotations(_event, payload: {
@@ -93,6 +118,7 @@ export class RendererController {
     }
 
     renderAgain() {
+        console.log('2STAEY', this.state.fullScreen);
         render(
             <StrictMode>
                 <App
@@ -102,6 +128,7 @@ export class RendererController {
                     goForward = {() => this.goForward()}
                     getPreviousPage = {() => this.historyService.getPreviousPage()}
                     getNextPage = {() => this.historyService.getNextPage()}
+                    fullScreen = {this.state.fullScreen}
                 />
             </StrictMode>,
             document.getElementById('root'),
@@ -109,10 +136,17 @@ export class RendererController {
     }
 
     initialize(): void {
-        const startPage = 'home';
+        const startPage = 'login';
 
         this.historyService = new HistoryService();
 
         this.setPage(startPage);
+    }
+
+    componentWillUnmount() {
+        ipcRenderer.removeListener(
+            MAIN_EVENTS.FULL_SCREEN,
+            this.handleFullScreenChange,
+        );
     }
 }
