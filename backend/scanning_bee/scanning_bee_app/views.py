@@ -277,9 +277,21 @@ class CellContentList(ListCreateAPIView):
             image_list = list(image_queryset)
             queryset = queryset.filter(image__in=image_list)
 
+        elif filter_type == "time_range":
+            start_time = self.kwargs.get('start_time')
+            end_time = self.kwargs.get('end_time', None)
+            if end_time is None:
+                end_time = datetime.now(timezone.utc)
+
+            queryset = queryset.filter(timestamp__gte=start_time, timestamp__lte=end_time)
+
         return queryset
 
     def create(self, request, *args, **kwargs):
+        if not isinstance(request.data, list):  # Check if request is a list for bulk creation
+            request.data = [request.data]
+
+
         if isinstance(request.data, list):  # Check if request is a list for bulk creation
             created_instances = []  # To store the response data of created instances
             errors = []  # To accumulate any errors during creation
@@ -328,7 +340,7 @@ class CellContentsByAI(ListCreateAPIView):
         print('queryset', queryset)
         if timestamp is not None:
             queryset = queryset.objects.filter(timestamp=timestamp)
-            print('timestampli queryset', queryset)
+            print('timestamplii queryset', queryset)
 
         image_list = list(queryset)
         print('image_list', image_list)

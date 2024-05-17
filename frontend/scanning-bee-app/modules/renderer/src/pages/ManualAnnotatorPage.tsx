@@ -7,6 +7,8 @@ import {
     useShownImageUrl,
 } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
+import { setViewScale } from '@frontend/slices/viewScaleSlice';
+import { ZoomSlider } from '@frontend/toolbars/common/ZoomSlider';
 import { AnnotatedImage } from '@frontend/toolbars/ManualAnnotator/AnnotatedImage';
 import { AnnotationEditorTools } from '@frontend/toolbars/ManualAnnotator/AnnotationEditorTools';
 import { ManualAnnotatorPanel } from '@frontend/toolbars/ManualAnnotator/ManualAnnotatorPanel';
@@ -65,7 +67,7 @@ export const ManualAnnotatorPage = () => {
             <div id="left-panel" className='panel'>
                 <Button
                     icon={<Icon icon={'menu'} style={{ color: theme.primaryForeground }} />}
-                    className='panel-button button-animation closed-margin-left'
+                    className={`panel-button button-animation ${leftPanelOpen ? 'open' : 'closed'}-margin-left`}
                     onClick={
                         (e) => {
                             // ? this section prevents button spamming with spacebar.
@@ -88,7 +90,7 @@ export const ManualAnnotatorPage = () => {
                     shownImageUrl={images.find(image => image === shownImageUrl)}
                 />
 
-                <ButtonGroup style={{ height: '60px' }}>
+                <ButtonGroup className='image-navigator-buttons shadowed' style={{ backgroundColor: `${theme.primaryBackground}88` }}>
                     <Button
                         icon={<Icon icon="chevron-left" style={{ color: theme.primaryForeground }} />}
                         disabled={shownImageIndex === 0}
@@ -98,10 +100,10 @@ export const ManualAnnotatorPage = () => {
                         }}
                         style={{ background: theme.secondaryBackground, margin: '10px' }}
                         minimal
-                        large
+                        small
                     />
                     <p
-                        style={{ color: 'black' }}
+                        style={{ color: theme.primaryForeground }}
                         className='ellipsis-overflow image-navigator-image-name'
                     >{getFileName(shownImageUrl)}</p>
                     <Button
@@ -113,7 +115,7 @@ export const ManualAnnotatorPage = () => {
                         }}
                         style={{ background: theme.secondaryBackground, margin: '10px' }}
                         minimal
-                        large
+                        small
                     />
                 </ButtonGroup>
                 <AnnotationEditorTools
@@ -122,6 +124,9 @@ export const ManualAnnotatorPage = () => {
                         setGridOpen(!gridOpen);
                     }}
                 />
+                <ZoomSlider handleZoomChange={(zoom: number) => {
+                    dispatch(setViewScale(zoom));
+                }} />
                 <ModeButton />
             </div>
         </div>

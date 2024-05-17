@@ -2,6 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 
 import { HotkeyHandler } from './Hotkeys';
+import { BeehivePage } from './pages/BeehivePage';
 import { HomePage } from './pages/HomePage';
 import { ManualAnnotatorPage } from './pages/ManualAnnotatorPage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -20,8 +21,9 @@ const App = (props: {
     goForward: any
     getPreviousPage: any,
     getNextPage: any,
+    fullScreen: boolean,
 }) => {
-    const { page, setPage, goBack, goForward, getNextPage, getPreviousPage } = props;
+    const { page, setPage, goBack, goForward, getNextPage, getPreviousPage, fullScreen } = props;
 
     return (
         <Provider store={store}>
@@ -35,6 +37,7 @@ const App = (props: {
                     goForward={goForward}
                     getPreviousPage={getPreviousPage}
                     getNextPage={getNextPage}
+                    fullScreen={fullScreen}
                 />
 
                 {
@@ -50,6 +53,8 @@ const App = (props: {
                             return <StatisticsPage />;
                         case 'login':
                             return <LoginPage setPage={setPage} />;
+                        case 'beehive':
+                            return <BeehivePage />;
                         default:
                             return <div>Page not found</div>;
                         }

@@ -3,6 +3,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { ipcRenderer, shell } from 'electron';
 import Annotation from '@frontend/models/annotation';
+import { BeehiveCell } from '@frontend/models/beehive';
 import CellType from '@frontend/models/cellType';
 import { addAnnotation, getAnnotationsMetadata, saveChanges } from '@frontend/slices/annotationSlice';
 import { resetBackendStatus } from '@frontend/slices/backendStatusSlice';
@@ -64,6 +65,10 @@ export class BackendInterface {
         return this._instance;
     }
 
+    public openFolderAtLocation = (folder: string) => {
+        ipcRenderer.send(RENDERER_QUERIES.OPEN_FOLDER_AT_LOCATION, folder);
+    };
+
     // Function to request opening the dialog
     public openFolderDialog = () => {
         ipcRenderer.send(RENDERER_QUERIES.SELECT_FOLDER);
@@ -79,7 +84,7 @@ export class BackendInterface {
         dispatch(saveChanges());
     };
 
-    public openFolderAtLocation = (folder: string) => {
+    public showFolder = (folder: string) => {
         shell.openPath(folder);
     };
 
@@ -366,5 +371,41 @@ export class BackendInterface {
                 intent: 'danger',
             });
         }
+    };
+
+    public getBeehiveData = (): BeehiveCell[] => {
+        // DUMMY FOR NOW. TODO:
+
+        const cellCount = 5000;
+
+        const cellCountPerRow = 100;
+
+        const cells: BeehiveCell[] = [];
+
+        const cellWidth = 48;
+        const cellHeight = 42;
+
+        let rowNumber = -1;
+
+        const cellTypes = Object.keys(CellType);
+
+        for (let i = 0; i < cellCount; i += 1) {
+            if (i % cellCountPerRow === 0) {
+                rowNumber += 1;
+            }
+
+            const cellTypeIdx = Math.floor(Math.random() * 16) + 1;
+
+            const cellType = cellTypeIdx <= 8 ? cellTypes[cellTypeIdx] : 'NOT_CLASSIFIED';
+
+            cells.push({
+                cellType: CellType[cellType],
+                id: i,
+                x: (i % cellCountPerRow) * cellWidth + (rowNumber % 2 === 0 ? 0 : cellWidth / 2),
+                y: rowNumber * cellHeight,
+            });
+        }
+
+        return cells;
     };
 }

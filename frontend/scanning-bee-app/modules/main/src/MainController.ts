@@ -275,7 +275,7 @@ class MainController {
         this.mainWindow = new BrowserWindow({
             width: 1600, // width of the window
             height: 1200, // height of the window
-            minWidth: 600,
+            minWidth: 1180,
             minHeight: 800,
             show: false, // don't show until window is ready
             icon: path.join(BUILD_ASSETS_PATH, 'scanning_bee.png'),
@@ -312,8 +312,6 @@ class MainController {
             }
         };
 
-        ipcMain.on(RENDERER_EVENTS.FULL_SCREEN, setFullScreen);
-
         const themeChangeHandler = async () => {
             const DEFAULT_THEME = {
                 themeType: 'light',
@@ -324,7 +322,7 @@ class MainController {
 
             if (this.mainWindow.setTitleBarOverlay) {
                 this.mainWindow.setTitleBarOverlay({
-                    color: theme.secondaryBackground,
+                    color: '#00000000',
                     symbolColor:
                         theme.type === 'light' ? '#000' : '#fff',
                 });
@@ -348,24 +346,35 @@ class MainController {
             }
         };
 
+        const openFolderAtLocation = async (folderPath: string) => {
+            const annotationsFilePath = path.join(folderPath, 'annotations', 'annotations.yaml');
+
+            if (!fs.pathExistsSync(annotationsFilePath)) {
+                fs.ensureDirSync(path.join(folderPath, 'annotations'));
+                saveAnnotations([], folderPath);
+            }
+
+            const annotations = loadAnnotations(annotationsFilePath);
+            const imageUrls = loadImages(folderPath);
+            const metadata = loadMetadata(folderPath);
+
+            this.send(MAIN_EVENTS.ANNOTATIONS_PARSED, { folder: folderPath, annotations, images: imageUrls, metadata });
+        };
+
+        ipcMain.on(RENDERER_EVENTS.FULL_SCREEN, setFullScreen);
+
+        ipcMain.on(RENDERER_QUERIES.OPEN_FOLDER_AT_LOCATION, (_event, folderPath: string) => {
+            openFolderAtLocation(folderPath);
+        });
+
         ipcMain.on(RENDERER_QUERIES.SELECT_FOLDER, (_event) => {
             dialog.showOpenDialog({
                 properties: ['openDirectory'],
             }).then((result) => {
                 if (!result.canceled) {
                     const folderPath = result.filePaths[0];
-                    const annotationsFilePath = path.join(folderPath, 'annotations', 'annotations.yaml');
 
-                    if (!fs.pathExistsSync(annotationsFilePath)) {
-                        fs.ensureDirSync(path.join(folderPath, 'annotations'));
-                        saveAnnotations([], folderPath);
-                    }
-
-                    const annotations = loadAnnotations(annotationsFilePath);
-                    const imageUrls = loadImages(folderPath);
-                    const metadata = loadMetadata(folderPath);
-
-                    this.send(MAIN_EVENTS.ANNOTATIONS_PARSED, { folder: folderPath, annotations, images: imageUrls, metadata });
+                    openFolderAtLocation(folderPath);
                 }
             }).catch((err) => {
                 console.log(err);
@@ -400,6 +409,10 @@ class MainController {
             // when you should delete the corresponding element.
             this.mainWindow = null;
         });
+
+        this.mainWindow.on('enter-full-screen', () => this.send(MAIN_EVENTS.FULL_SCREEN, true));
+
+        this.mainWindow.on('leave-full-screen', () => this.send(MAIN_EVENTS.FULL_SCREEN, false));
 
         // --use-built-frontend tells electron to use the frontend files from the build folder
         // this flag is necessary while using with `yarn prod` command, since it will not
