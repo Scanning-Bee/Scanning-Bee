@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     libsm6 \
     libxext6
 
-COPY requirements2.txt .
+COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements2.txt
 
