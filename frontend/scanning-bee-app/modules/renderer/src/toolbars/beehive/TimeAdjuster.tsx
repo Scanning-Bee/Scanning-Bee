@@ -33,7 +33,7 @@ export const TimeAdjuster = (props: {
     const shownDataDate = new Date(shownDataTimestamp);
 
     return (
-        <div className="time-adjuster" style={{ backgroundColor: `${theme.primaryBackground}AA` }}>
+        <div className="time-adjuster shadowed" style={{ backgroundColor: `${theme.primaryBackground}AA` }}>
             <div className="column-flex-center" style={{ width: '220px' }}>
                 <div className='flex-center'>
                     <p className='time-adjuster-from-to'>From: </p>
