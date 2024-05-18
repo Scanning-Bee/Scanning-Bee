@@ -20,6 +20,7 @@ export type RawMetadataYaml = {
     sec: number;
     x_pos: number;
     y_pos: number;
+    bag_name: string;
 };
 
 export type MetadataWrapperYaml = {
@@ -28,6 +29,7 @@ export type MetadataWrapperYaml = {
 };
 
 export type MetadataYaml = {
+    bag_name: string;
     image_name: string;
     sec: number;
     x_pos: number;

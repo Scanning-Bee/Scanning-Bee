@@ -265,7 +265,6 @@ class CellContentList(ListCreateAPIView):
 
             if cells.exists():
                 queryset = queryset.filter(cell__in=cells)
-
             else:
                 queryset = queryset.none()
 
@@ -292,40 +291,45 @@ class CellContentList(ListCreateAPIView):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        if not isinstance(request.data, list):  # Check if request is a list for bulk creation
-            request.data = [request.data]
+        data = request.data
 
+        if not isinstance(data, list):  # Check if request data is a list for bulk creation
+            data = [data]
 
-        if isinstance(request.data, list):  # Check if request is a list for bulk creation
-            created_instances = []  # To store the response data of created instances
-            errors = []  # To accumulate any errors during creation
+        created_instances = []  # To store the response data of created instances
+        errors = []  # To accumulate any errors during creation
 
-            with transaction.atomic():  # Ensure the operation is atomic
-                for item_data in request.data:
-                    # if there is a user field update it, if not then add it
-                    if 'user' not in item_data:
-                        item_data['user'] = request.user.id
-                    else:
-                        item_data.update({'user': request.user.pk})
-                    
-                    serializer = self.get_serializer(data=item_data)
-                    print('serializer', serializer)
-                    if serializer.is_valid():
-                        # Create CellContent instance and link with Cell
-                        cell_content_instance = serializer.save()  # Calls the custom save method
-                        created_instances.append(serializer.data)  # Append the serialized data
-                    else:
-                        errors.append(serializer.errors)  # Accumulate errors
+        with transaction.atomic():  # Ensure the operation is atomic
+            for item_data in data:
+                # if there is a user field update it, if not then add it
+                if 'user' not in item_data:
+                    item_data['user'] = request.user.id
+                else:
+                    item_data.update({'user': request.user.pk})
 
-            if errors:
-                # If there were any errors, roll back and return them
-                return Response(errors, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                # If all instances were created successfully, return their data
-                return Response(created_instances, status=status.HTTP_201_CREATED)
+                # round center_x and center_y to the nearest integer
+                item_data['center_x'] = round(item_data['center_x'])
+                item_data['center_y'] = round(item_data['center_y'])
+                
+                serializer = self.get_serializer(data=item_data)
+                # print('serializer', serializer)
+                if serializer.is_valid():
+                    # Create CellContent instance and link with Cell
+                    cell_content_instance = serializer.save()  # Calls the custom save method
+                    created_instances.append(serializer.data)  # Append the serialized data
+                else:
+                    # if the error is about unique set with code='unique', then ignore it
+                    if 'unique' in str(serializer.errors):
+                        continue
+                    errors.append(serializer.errors)  # Accumulate errors
 
-        else:  # Fallback to original create method for single creations
-            return super().create(request, *args, **kwargs)
+        if errors:
+            # If there were any errors, roll back and return them
+            print(f"\nErrors: {errors}\n")
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # If all instances were created successfully, return their data
+            return Response(created_instances, status=status.HTTP_201_CREATED)
 
 
 class CellContentDetail(RetrieveUpdateDestroyAPIView):
@@ -361,7 +365,11 @@ class CellContentsByAI(ListCreateAPIView):
             # from root folder of the project, annotation folders path: ./AnnotationFiles
             # image path should be: ./AnnotationFiles/ + image.image_name
             # this views.py files path is: ./backend/scanning_bee/scanning_bee_app/views.py
-            all_detected_circles = classify_cell_states(f"./AnnotationFiles/{image.image_name}")
+
+            bag = Bag.objects.get(pk=image.bag.id)
+            bag_name = bag.name
+
+            all_detected_circles = classify_cell_states(f"AnnotationFiles/{bag_name}/{image.image_name}")
 
             # all detected circles is a dictionary of (x, y, radius): type
 
@@ -416,11 +424,23 @@ class ImageList(ListCreateAPIView):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        data = request.data.copy()
+
+        # Handle bag name
+        bag_name = data.pop('bag', None)
+        if bag_name:
+            bag, created = Bag.objects.get_or_create(name=bag_name)
+            data['bag'] = bag.id
+
+        try:
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        except Exception as e:
+            print(f"\nError: {e}\n")
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer):
         # Customize the save operation here if needed

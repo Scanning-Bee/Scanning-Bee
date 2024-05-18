@@ -179,6 +179,7 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
     '''
 
     ## read original image in gray_scale, used for first and second stage processing
+    print(f"image path: {image_path}")
     sample_image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     height, width = sample_image.shape
 
@@ -393,7 +394,7 @@ def classify_cell_states(image_path :str, model_path: str = "AI/models/cell_clas
 
 if __name__ == "__main__":
     # test_lines("AI/test_images/image_759.jpg")
-    result = classify_cell_states("AI/test_images/image_759.jpg")
+    result = classify_cell_states("AnnotationFiles/2023-10-08-00-00-01/image_759.jpg")
     print("Finished")
 
     for key, value in result.items():

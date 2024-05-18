@@ -297,6 +297,7 @@ export class BackendInterface {
                         timestamp: addTrailingZeros(new Date(imageMetadata.sec).toISOString()),
                         x_pos: imageMetadata.x_pos,
                         y_pos: imageMetadata.y_pos,
+                        bag: imageMetadata.bag_name,
                     });
                 }
 
