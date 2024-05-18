@@ -1,5 +1,5 @@
-from detect import *
-from preprocess import *
+from AI.detect import *
+from AI.preprocess import *
 import random
 from typing import List, Tuple
 from scipy import stats

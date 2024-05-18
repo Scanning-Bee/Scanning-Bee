@@ -1,4 +1,4 @@
-from set_grid import *
+from AI.set_grid import *
 import glob
 from ultralytics import YOLO
 from typing import List, Tuple
@@ -245,7 +245,7 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
 
     ## do the same process on rotated image
     first_stage_circles_rotated = detect_circles_using_hough_transform(rotated_image, use_dark=True, use_light=True) 
-    print(len(first_stage_circles_rotated))
+    # print(len(first_stage_circles_rotated))
     
     filtered_first_stage_circles_rotated = filter_intersecting_circles(first_stage_circles_rotated, mask)   
     if len(filtered_first_stage_circles_rotated) == 0:
@@ -254,9 +254,9 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
         
     # Calculate the grid and patch corners using anchor circles
     patch_corners_rotated, tight_patch_corners_rotated = get_patches(plot_img, filtered_first_stage_circles_rotated, cell_space=cell_space, 
-                                                                     error_margin=error_margin, show_grid=True, num_patches_from_anchor=3)
+                                                                     error_margin=error_margin, show_grid=False, num_patches_from_anchor=3)
 
-    print(f"Anchor cell candidates: {first_stage_circles_rotated}")
+    # print(f"Anchor cell candidates: {first_stage_circles_rotated}")
 
     # Search for circles in images patches
     second_stage_circles_rotated = detect_second_stage(rotated_image, patch_corners_rotated,filtered_first_stage_circles_rotated, show_patches=False)
@@ -332,11 +332,11 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
     #cv2.imshow("All",all_image)
 
     # print("Here")
-    cv2.namedWindow("plot img",cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("plot img", 800, 800)
-    cv2.imshow("plot img", plot_img)
+    # cv2.namedWindow("plot img",cv2.WINDOW_NORMAL)
+    # cv2.resizeWindow("plot img", 800, 800)
+    # cv2.imshow("plot img", plot_img)
     
-    cv2.waitKey(0)
+    # cv2.waitKey(0)
 
     # Convert the NumPy array to a list of tuples, for the return
     return_list = [tuple(row) for row in merged_final_circles]
@@ -383,15 +383,19 @@ def classify_cell_states(image_path :str, model_path: str = "AI/models/cell_clas
         # Draw the label
         cv2.putText(original_image, label, (x -20 , y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
-    cv2.namedWindow("Classified cells",cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Classified cells", 800, 800)
-    cv2.imshow("Classified cells",original_image)
-    cv2.waitKey(0)
+    # cv2.namedWindow("Classified cells",cv2.WINDOW_NORMAL)
+    # cv2.resizeWindow("Classified cells", 800, 800)
+    # cv2.imshow("Classified cells",original_image)
+    # cv2.waitKey(0)
 
     return cell_states
 
 
 if __name__ == "__main__":
     # test_lines("AI/test_images/image_759.jpg")
-    print(classify_cell_states(r"AI\test_images\image_759.jpg"))
+    result = classify_cell_states("AI/test_images/image_759.jpg")
+    print("Finished")
+
+    for key, value in result.items():
+        print(key, value)
     

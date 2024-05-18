@@ -1,4 +1,4 @@
-from preprocess import *
+from AI.preprocess import *
 from typing import List, Tuple
 
 THRESHOLD = 200

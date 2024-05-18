@@ -25,9 +25,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-sys.path.insert(0, '../../')
 
-from AI.test import test_lines
+#sys.path.insert(0, '../../')
+
+#from AI.test import classify_cell_states
+#from AI.set_grid import *
+from AI.test import classify_cell_states
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -346,27 +350,39 @@ class CellContentsByAI(ListCreateAPIView):
         print('image_list', image_list)
         cell_contents = list()
 
+        if len(image_list) > 1:
+            print("image list is greater than 1")
+        elif len(image_list) == 0:
+            print("image list is 0")
+
         for image in image_list:
-            all_detected_circles = test_lines("scanning_bee_app/AnnotationFiles/" + image.image_name)
+            # annotation folder is at the same level as the backend folder, but this file is in backend/scanning_bee/scanning_bee_app/views.py
+            # image should be in the same folder as the annotation folder
+            # from root folder of the project, annotation folders path: ./AnnotationFiles
+            # image path should be: ./AnnotationFiles/ + image.image_name
+            # this views.py files path is: ./backend/scanning_bee/scanning_bee_app/views.py
+            all_detected_circles = classify_cell_states(f"./AnnotationFiles/{image.image_name}")
 
-            frame = Frame.objects.get(pk=1)
-            user = CustomUser.objects.get(pk=1)
-            content = Content.objects.get(pk=9)
+            # all detected circles is a dictionary of (x, y, radius): type
 
-            for circle in all_detected_circles:
-                x = circle[0]
-                y = circle[1]
-                radius = circle[2]
-                cell_content = CellContent(cell=None,
-                                           frame=frame,
-                                           timestamp=None,
-                                           content=content,
-                                           user=user,
-                                           center_x=x,
-                                           center_y=y,
-                                           image=image,
+            frame = Frame.objects.get(pk=1)  # Assuming frame 1 for now
+
+            # get the user info from the request
+            user = request.user
+
+            for pixel_coords, content in all_detected_circles.items():
+                x, y, radius = pixel_coords
+                cell_content = CellContent(cell=None, 
+                                           frame=frame, 
+                                           timestamp=None, 
+                                           content=content, 
+                                           user=user, 
+                                           center_x=x, 
+                                           center_y=y, 
+                                           image=image, 
                                            radius=radius)
                 cell_contents.append(cell_content)
+
 
         serializer = CellContentSerializer(cell_contents, many=True)
         return Response(serializer.data)
