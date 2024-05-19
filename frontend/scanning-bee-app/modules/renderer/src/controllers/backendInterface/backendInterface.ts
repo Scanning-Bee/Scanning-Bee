@@ -356,8 +356,52 @@ export class BackendInterface {
             const res = await this.getCellContentByAI(imageMetadata.x_pos, imageMetadata.y_pos, new Date(imageMetadata.sec));
 
             res.map((cellContent) => {
+                const cellTypeNo = cellContent.content;
+                let cellType;
+                switch (cellTypeNo) {
+                    case 1:
+                        cellType = CellType.EGG;
+                        break;
+
+                    case 2:
+                        cellType = CellType.EMPTY;
+                        break;
+
+                    case 3:
+                        cellType = CellType.LARVA;
+                        break;
+
+                    case 4:
+                        cellType = CellType.NECTAR;
+                        break;
+
+                    case 5:
+                        cellType = CellType.POLLEN;
+                        break;
+
+                    case 6:
+                        cellType = CellType.PUPA;
+                        break;
+
+                    case 7:
+                        cellType = CellType.HONEY_CLOSED;
+                        break;
+
+                    case 8:
+                        cellType = CellType.BEE_OCCLUDED;
+                        break;
+
+                    case 9:
+                        cellType = CellType.NOT_CLASSIFIED;
+                        break;
+
+                    default:
+                        cellType = CellType.NOT_CLASSIFIED;
+                        break;
+                }
+
                 const annotation = new Annotation({
-                    cell_type: CellType.NOT_CLASSIFIED,
+                    cell_type: cellType,
                     center: [cellContent.center_x, cellContent.center_y],
                     radius: cellContent.radius,
                     timestamp: 0,
