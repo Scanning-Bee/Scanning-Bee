@@ -344,12 +344,12 @@ def rotation_robust_method(image_path: str, occlude:bool = False, detection_mode
 
     return return_list
     
-def classify_cell_states(image_path :str, model_path: str = "AI/models/cell_classifiers/cell_classifier_3_may.pt",error_margin = 0.15):
+def classify_cell_states(image_path :str, model_path: str = "/scanning_bee/AI/models/cell_classifiers/cell_classifier_3_may.pt",error_margin = 0.15):
     '''
     Runs the classifier model on detected circles, returns a dictionary of (x,y,r) tuples as key and labels as value
     '''
     
-    circle_list = rotation_robust_method(image_path, occlude=True, detection_model_path="AI/models/bee_detect_models/epoch-150.pt")
+    circle_list = rotation_robust_method(image_path, occlude=True, detection_model_path="/scanning_bee/AI/models/bee_detect_models/epoch-150.pt")
     
     original_image = cv2.imread(image_path)
     image_height, image_width, _ = original_image.shape

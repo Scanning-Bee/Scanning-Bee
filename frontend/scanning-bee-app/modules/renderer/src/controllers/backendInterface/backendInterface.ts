@@ -254,8 +254,8 @@ export class BackendInterface {
     }>(BACKEND_ENDPOINTS.IMAGE.POST.SCRAPE, 'post', data);
 
     // * AI
-    public getCellContentByAI = async (imageName: string) => this
-        .apiQuery<CellContentDto[]>(BACKEND_ENDPOINTS.AI.GET.BY_IMAGE_NAME(imageName), 'get');
+    public getCellContentByAI = async (x: number, y: number, timestamp: Date) => this
+        .apiQuery<CellContentDto[]>(BACKEND_ENDPOINTS.AI.GET.BY_LOCATION_AND_TIMESTAMP(x, y, timestamp), 'get');
 
     // * BAG
     public getBags = async () => this.apiQuery<ImageDto[]>(BACKEND_ENDPOINTS.BAG.GET.LIST, 'get');
@@ -345,7 +345,15 @@ export class BackendInterface {
         });
 
         try {
-            const res = await this.getCellContentByAI(imageName);
+            // get x_pos, y_pos, and timestamp of this image
+            const metadata = getAnnotationsMetadata();
+            const imageMetadata = metadata.image_data.find(meta => meta.image_name === imageName);
+            
+            if (!imageMetadata) {
+                throw new Error('Image metadata not found!');
+            }
+
+            const res = await this.getCellContentByAI(imageMetadata.x_pos, imageMetadata.y_pos, new Date(imageMetadata.sec));
 
             res.map((cellContent) => {
                 const annotation = new Annotation({
