@@ -2,6 +2,7 @@ from django.forms import ValidationError
 from django.db import transaction
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.decorators import api_view  # Import the api_view decorator
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
@@ -345,13 +346,10 @@ class CellContentsByAI(ListCreateAPIView):
 
     def get(self, request,  x_pos, y_pos, timestamp=None, format=None):
         queryset = Image.objects.filter(x_pos=x_pos, y_pos=y_pos)
-        print('queryset', queryset)
         if timestamp is not None:
-            queryset = queryset.objects.filter(timestamp=timestamp)
-            print('timestamplii queryset', queryset)
+            queryset = queryset.filter(timestamp=timestamp)
 
         image_list = list(queryset)
-        print('image_list', image_list)
         cell_contents = list()
 
         if len(image_list) > 1:
@@ -369,7 +367,12 @@ class CellContentsByAI(ListCreateAPIView):
             bag = Bag.objects.get(pk=image.bag.id)
             bag_name = bag.name
 
-            all_detected_circles = classify_cell_states(f"AnnotationFiles/{bag_name}/{image.image_name}")
+            project_root = os.path.abspath(os.path.join(settings.BASE_DIR, "../../"))
+            image_path = os.path.join(project_root, f"AnnotationFiles/{bag_name}/{image.image_name}")
+
+            print('image_path at views: ', image_path)
+
+            all_detected_circles = classify_cell_states(image_path)
 
             # all detected circles is a dictionary of (x, y, radius): type
 
@@ -379,6 +382,10 @@ class CellContentsByAI(ListCreateAPIView):
             user = request.user
 
             for pixel_coords, content in all_detected_circles.items():
+                # Find which content in the database
+                if content == "PUPPA":
+                    content = "PUPA"
+                content = Content.objects.get(name=content)
                 x, y, radius = pixel_coords
                 cell_content = CellContent(cell=None, 
                                            frame=frame, 
