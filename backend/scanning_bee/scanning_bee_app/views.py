@@ -2,6 +2,7 @@ from django.forms import ValidationError
 from django.db import transaction
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.decorators import api_view  # Import the api_view decorator
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
@@ -25,9 +26,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-sys.path.insert(0, '../../')
 
-from AI.test import test_lines
+#sys.path.insert(0, '../../')
+
+#from AI.test import classify_cell_states
+#from AI.set_grid import *
+from AI.test import classify_cell_states
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -261,7 +266,6 @@ class CellContentList(ListCreateAPIView):
 
             if cells.exists():
                 queryset = queryset.filter(cell__in=cells)
-
             else:
                 queryset = queryset.none()
 
@@ -288,40 +292,45 @@ class CellContentList(ListCreateAPIView):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        if not isinstance(request.data, list):  # Check if request is a list for bulk creation
-            request.data = [request.data]
+        data = request.data
 
+        if not isinstance(data, list):  # Check if request data is a list for bulk creation
+            data = [data]
 
-        if isinstance(request.data, list):  # Check if request is a list for bulk creation
-            created_instances = []  # To store the response data of created instances
-            errors = []  # To accumulate any errors during creation
+        created_instances = []  # To store the response data of created instances
+        errors = []  # To accumulate any errors during creation
 
-            with transaction.atomic():  # Ensure the operation is atomic
-                for item_data in request.data:
-                    # if there is a user field update it, if not then add it
-                    if 'user' not in item_data:
-                        item_data['user'] = request.user.id
-                    else:
-                        item_data.update({'user': request.user.pk})
-                    
-                    serializer = self.get_serializer(data=item_data)
-                    print('serializer', serializer)
-                    if serializer.is_valid():
-                        # Create CellContent instance and link with Cell
-                        cell_content_instance = serializer.save()  # Calls the custom save method
-                        created_instances.append(serializer.data)  # Append the serialized data
-                    else:
-                        errors.append(serializer.errors)  # Accumulate errors
+        with transaction.atomic():  # Ensure the operation is atomic
+            for item_data in data:
+                # if there is a user field update it, if not then add it
+                if 'user' not in item_data:
+                    item_data['user'] = request.user.id
+                else:
+                    item_data.update({'user': request.user.pk})
 
-            if errors:
-                # If there were any errors, roll back and return them
-                return Response(errors, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                # If all instances were created successfully, return their data
-                return Response(created_instances, status=status.HTTP_201_CREATED)
+                # round center_x and center_y to the nearest integer
+                item_data['center_x'] = round(item_data['center_x'])
+                item_data['center_y'] = round(item_data['center_y'])
+                
+                serializer = self.get_serializer(data=item_data)
+                # print('serializer', serializer)
+                if serializer.is_valid():
+                    # Create CellContent instance and link with Cell
+                    cell_content_instance = serializer.save()  # Calls the custom save method
+                    created_instances.append(serializer.data)  # Append the serialized data
+                else:
+                    # if the error is about unique set with code='unique', then ignore it
+                    if 'unique' in str(serializer.errors):
+                        continue
+                    errors.append(serializer.errors)  # Accumulate errors
 
-        else:  # Fallback to original create method for single creations
-            return super().create(request, *args, **kwargs)
+        if errors:
+            # If there were any errors, roll back and return them
+            print(f"\nErrors: {errors}\n")
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # If all instances were created successfully, return their data
+            return Response(created_instances, status=status.HTTP_201_CREATED)
 
 
 class CellContentDetail(RetrieveUpdateDestroyAPIView):
@@ -337,36 +346,58 @@ class CellContentsByAI(ListCreateAPIView):
 
     def get(self, request,  x_pos, y_pos, timestamp=None, format=None):
         queryset = Image.objects.filter(x_pos=x_pos, y_pos=y_pos)
-        print('queryset', queryset)
         if timestamp is not None:
-            queryset = queryset.objects.filter(timestamp=timestamp)
-            print('timestamplii queryset', queryset)
+            queryset = queryset.filter(timestamp=timestamp)
 
         image_list = list(queryset)
-        print('image_list', image_list)
         cell_contents = list()
 
+        if len(image_list) > 1:
+            print("image list is greater than 1")
+        elif len(image_list) == 0:
+            print("image list is 0")
+
         for image in image_list:
-            all_detected_circles = test_lines("scanning_bee_app/AnnotationFiles/" + image.image_name)
+            # annotation folder is at the same level as the backend folder, but this file is in backend/scanning_bee/scanning_bee_app/views.py
+            # image should be in the same folder as the annotation folder
+            # from root folder of the project, annotation folders path: ./AnnotationFiles
+            # image path should be: ./AnnotationFiles/ + image.image_name
+            # this views.py files path is: ./backend/scanning_bee/scanning_bee_app/views.py
 
-            frame = Frame.objects.get(pk=1)
-            user = CustomUser.objects.get(pk=1)
-            content = Content.objects.get(pk=9)
+            bag = Bag.objects.get(pk=image.bag.id)
+            bag_name = bag.name
 
-            for circle in all_detected_circles:
-                x = circle[0]
-                y = circle[1]
-                radius = circle[2]
-                cell_content = CellContent(cell=None,
-                                           frame=frame,
-                                           timestamp=None,
-                                           content=content,
-                                           user=user,
-                                           center_x=x,
-                                           center_y=y,
-                                           image=image,
+            project_root = os.path.abspath(os.path.join(settings.BASE_DIR, "../../"))
+            image_path = os.path.join(project_root, f"AnnotationFiles/{bag_name}/{image.image_name}")
+
+            print('image_path at views: ', image_path)
+
+            all_detected_circles = classify_cell_states(image_path)
+
+            # all detected circles is a dictionary of (x, y, radius): type
+
+            frame = Frame.objects.get(pk=1)  # Assuming frame 1 for now
+
+            # get the user info from the request
+            user = request.user
+
+            for pixel_coords, content in all_detected_circles.items():
+                # Find which content in the database
+                if content == "PUPPA":
+                    content = "PUPA"
+                content = Content.objects.get(name=content)
+                x, y, radius = pixel_coords
+                cell_content = CellContent(cell=None, 
+                                           frame=frame, 
+                                           timestamp=None, 
+                                           content=content, 
+                                           user=user, 
+                                           center_x=x, 
+                                           center_y=y, 
+                                           image=image, 
                                            radius=radius)
                 cell_contents.append(cell_content)
+
 
         serializer = CellContentSerializer(cell_contents, many=True)
         return Response(serializer.data)
@@ -400,11 +431,23 @@ class ImageList(ListCreateAPIView):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        data = request.data.copy()
+
+        # Handle bag name
+        bag_name = data.pop('bag', None)
+        if bag_name:
+            bag, created = Bag.objects.get_or_create(name=bag_name)
+            data['bag'] = bag.id
+
+        try:
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        except Exception as e:
+            print(f"\nError: {e}\n")
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer):
         # Customize the save operation here if needed

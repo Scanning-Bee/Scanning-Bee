@@ -254,8 +254,8 @@ export class BackendInterface {
     }>(BACKEND_ENDPOINTS.IMAGE.POST.SCRAPE, 'post', data);
 
     // * AI
-    public getCellContentByAI = async (imageName: string) => this
-        .apiQuery<CellContentDto[]>(BACKEND_ENDPOINTS.AI.GET.BY_IMAGE_NAME(imageName), 'get');
+    public getCellContentByAI = async (x: number, y: number, timestamp: Date) => this
+        .apiQuery<CellContentDto[]>(BACKEND_ENDPOINTS.AI.GET.BY_LOCATION_AND_TIMESTAMP(x, y, timestamp), 'get');
 
     // * BAG
     public getBags = async () => this.apiQuery<ImageDto[]>(BACKEND_ENDPOINTS.BAG.GET.LIST, 'get');
@@ -297,6 +297,7 @@ export class BackendInterface {
                         timestamp: addTrailingZeros(new Date(imageMetadata.sec).toISOString()),
                         x_pos: imageMetadata.x_pos,
                         y_pos: imageMetadata.y_pos,
+                        bag: imageMetadata.bag_name,
                     });
                 }
 
@@ -343,12 +344,86 @@ export class BackendInterface {
             intent: 'primary',
         });
 
+        const metadata = getAnnotationsMetadata();
+        const imageDtos = {} as { [image_name: string]: ImageDto };
+
         try {
-            const res = await this.getCellContentByAI(imageName);
+            // get x_pos, y_pos, and timestamp of this image
+            const imageMetadata = metadata.image_data.find(meta => meta.image_name === imageName);
+            
+            if (!Object.keys(imageDtos).includes(imageName)) {
+                const matchingImages = await this.getImageByLocationAndTimestamp(
+                    imageMetadata.x_pos,
+                    imageMetadata.y_pos,
+                    new Date(imageMetadata.sec),
+                );
+
+                let imageDto = matchingImages ? matchingImages[0] : null;
+
+                if (!imageDto || !imageDto.id) {
+                    imageDto = await this.createImage({
+                        image_name: imageName,
+                        timestamp: addTrailingZeros(new Date(imageMetadata.sec).toISOString()),
+                        x_pos: imageMetadata.x_pos,
+                        y_pos: imageMetadata.y_pos,
+                        bag: imageMetadata.bag_name,
+                    });
+                }
+
+                imageDtos[imageName] = imageDto;
+            }
+
+
+            const res = await this.getCellContentByAI(imageMetadata.x_pos, imageMetadata.y_pos, new Date(imageMetadata.sec));
 
             res.map((cellContent) => {
+                const cellTypeNo = cellContent.content;
+                let cellType;
+                // Find a better way to do this
+                switch (cellTypeNo) {
+                    case 1:
+                        cellType = CellType.EGG;
+                        break;
+
+                    case 2:
+                        cellType = CellType.EMPTY;
+                        break;
+
+                    case 3:
+                        cellType = CellType.LARVA;
+                        break;
+
+                    case 4:
+                        cellType = CellType.NECTAR;
+                        break;
+
+                    case 5:
+                        cellType = CellType.POLLEN;
+                        break;
+
+                    case 6:
+                        cellType = CellType.PUPA;
+                        break;
+
+                    case 7:
+                        cellType = CellType.HONEY_CLOSED;
+                        break;
+
+                    case 8:
+                        cellType = CellType.BEE_OCCLUDED;
+                        break;
+
+                    case 9:
+                        cellType = CellType.NOT_CLASSIFIED;
+                        break;
+
+                    default:
+                        cellType = CellType.NOT_CLASSIFIED;
+                        break;
+                }
+
                 const annotation = new Annotation({
-                    cell_type: CellType.NOT_CLASSIFIED,
+                    cell_type: cellType,
                     center: [cellContent.center_x, cellContent.center_y],
                     radius: cellContent.radius,
                     timestamp: 0,

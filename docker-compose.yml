@@ -15,6 +15,7 @@ services:
       - db
     environment:
       - DEBUG=1
+      - PYTHONPATH=/scanning_bee  # Set PYTHONPATH
     command: >
       sh -c "python manage.py makemigrations &&
              python manage.py migrate &&
@@ -35,5 +36,3 @@ services:
 
 volumes:
   db_data:
-
-  

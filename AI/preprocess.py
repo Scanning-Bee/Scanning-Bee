@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import os
 from scipy.signal import convolve2d
 
 
@@ -147,3 +146,29 @@ def preprocess_light_img(img, blur_kernel_size: int = 11, open_kernel_size: int 
     opening_result = cv2.morphologyEx(binary_img, cv2.MORPH_OPEN, kernel)
 
     return opening_result
+
+def rotate_input_img(image, angle):
+    mean_color = np.mean(image, axis=(0, 1)).astype(int)
+
+    height, width = image.shape[:2]
+
+    # Create a blank image with the same dimensions as the original image
+    blank_image = np.full_like(image, mean_color, dtype=np.uint8)
+
+    # Calculate the rotation matrix
+    rotation_matrix = cv2.getRotationMatrix2D((width / 2, height / 2), angle, 1)
+
+    # Perform the rotation on the blank image
+    rotated_blank_image = cv2.warpAffine(blank_image, rotation_matrix, (width, height))
+
+    # Create a binary mask in the same shape as the rotated blank image.
+    binary_mask = (rotated_blank_image != 0)
+
+    # Perform the rotation on the original image
+    rotated_image = cv2.warpAffine(image, rotation_matrix, (width, height))
+
+    # Combine the rotated image with the rotated blank image to fill the blank spaces
+    rotated_blank_image[binary_mask] = rotated_image[binary_mask]
+    rotated_blank_image[~binary_mask] = blank_image[~binary_mask]
+
+    return rotated_blank_image

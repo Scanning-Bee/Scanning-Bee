@@ -1,10 +1,11 @@
-from .preprocess import *
+from AI.preprocess import *
+from typing import List, Tuple
 
 THRESHOLD = 200
 
 
 def detect_contours(
-        img,
+        img: np.ndarray,
         default_radius: int = 70,
         max_radius: int = 100,
         min_radius: int = 60,
@@ -20,7 +21,7 @@ def detect_contours(
     large_contours = []
     small_contours = []
 
-    def check_circle(x, y, radius):
+    def check_circle(x: int, y: int, radius: int):
         h, w = img.shape
 
         # check of bounds
@@ -108,17 +109,28 @@ def detect_contours(
     return contours, min_enclosing_circles
 
 
-def detect_hough(img,
+def detect_hough(img: np.ndarray,
                  default_radius: int = 70,
                  max_radius: int = 100,
                  min_radius: int = 60,
-                 open_kernel_size: int = 55,
-                 close_kernel_size: int = 23
-                 ):
-    accepted_circles = np.array([])
-    large_circles = []
-    small_circles = []
+                 ) -> np.ndarray:
+    '''
+    Detect circles in the whole image using the Hough Circle Transform.
 
+    Parameters:
+    - img (numpy.ndarray): The input image (grayscale) in which circles are to be detected.
+    - default_radius (int): Default radius for circles. Used when no circles are found initially.
+    - max_radius (int): Maximum expected radius of circles.
+    - min_radius (int): Minimum expected radius of circles.
+
+    Returns:
+    - numpy.ndarray: An array of accepted circles represented as (x, y, radius) tuples.
+      Returns an empty array if no circles are detected.
+    '''
+
+    accepted_circles = np.array([])
+
+    # Apply Hough Circle Transform
     found_circles = cv2.HoughCircles(
         img,
         cv2.HOUGH_GRADIENT,
@@ -130,35 +142,63 @@ def detect_hough(img,
         maxRadius=max_radius,
     )
 
+    # Check if no circles are found
     if isinstance(found_circles, type(None)):
-        return None
+        return accepted_circles
 
-    accepted_circles = found_circles.reshape((-1,3)).astype(np.int32)
-    # List to store the centers and radii of the minimum enclosing circles
-    
+    # Reshape the found circles array to (x, y, radius) format
+    accepted_circles = found_circles.reshape((-1, 3)).astype(np.int32)
+
     return accepted_circles
 
 
-def return_hough(img):
-    dark_image, before_thres = preprocess_dark_img(img)
-    dark_circles = detect_hough(dark_image)
 
-    return dark_circles, before_thres, dark_image
+def detect_circles_using_hough_transform(img: np.ndarray, use_dark: bool = True, use_light: bool = False) -> np.ndarray:
+    '''
+    Takes a grayscale image as input, returns a numpy array of (x, y, r) tuples.
+    If both use_dark and use_light are False, attempts to detect without any preprocessing.
 
 
-def detect_circles(img):
-    light_image = preprocess_light_img(img)
-    dark_image, before_thres = preprocess_dark_img(img)
-    light_contours, light_circles = detect_contours(light_image)
-    dark_contours, dark_circles = detect_hough(dark_image)
+    Parameters:
+    - img (numpy.ndarray): The input image (grayscale) in which circles are to be detected.
+    - use_dark (bool): If set to True, applies preprocessing to highlight dark-colored cells and adds to the result array.
+    - use_light (bool): If set to True, applies preprocessing to highlight light-colored cells and adds to the result array.
 
-    all_contours = light_contours + dark_contours
-    all_circles = light_circles + dark_circles
+    Returns:
+    - numpy.ndarray: An array of found circles represented as (x, y, radius) tuples.
+      If no circle is found, np.array([]) is returned.
+    '''
 
-    return all_contours, all_circles, before_thres, dark_image
+    dark_circles = np.array([])
+    light_circles = np.array([])
+    no_process_circles = np.array([])
+
+    if use_dark:
+        dark_image, _ = preprocess_dark_img(img)
+        dark_circles = detect_hough(dark_image)
+   
+    if use_light:
+        light_image = preprocess_light_img(img)
+        light_circles = detect_hough(light_image)
+    
+    if not use_dark and not use_light:
+        no_process_circles = detect_hough(img)
+
+    # Filter out empty arrays before stacking
+    non_empty_arrays = [arr for arr in [dark_circles, light_circles, no_process_circles] if arr.size > 0]
+    
+    if len(non_empty_arrays)>0:
+        all_circles = np.vstack(non_empty_arrays)
+    else:
+        all_circles = np.array([])
+
+    return all_circles
 
 
 def light_detect_procedure():
+    '''
+    The old approach taken to detect the light cells. Not recommended. Deprecated.
+    '''
     bee_hive_image = cv2.imread('mini_dataset/close_up_1.jpg')
     gray_bee_hive = cv2.cvtColor(bee_hive_image, cv2.COLOR_BGR2GRAY)
     # blurred_bee_hive = cv2.GaussianBlur(gray_bee_hive, (7, 7), 0)
@@ -195,22 +235,34 @@ def light_detect_procedure():
     plt.show()
 
 
-def detect_circle_on_clip(sample_image):
-    # This is Görkem's function
+def detect_circle_on_clip(sample_image: np.ndarray) -> np.ndarray[Tuple[int, int, int]]:
+    '''
+    After the image is divided into patches which are expected to have cells inside them, each patch is
+    sent into this function.
+    '''
+    # This is Görkem's function, takes in a patch of image, return numpy array of tuples
 
+    # Find peak pixel value
     peak = get_hist_max(sample_image)
     dark_flag = False
     if peak <= 127:
         dark_flag = True
         sample_image = ~sample_image
 
+    # Supress extreme values
     sample_image[sample_image < (peak - 20)] = np.mean(sample_image[sample_image >= (peak - 20)])
+
+    # Increase the constrast near peak
     sample_image = contrast_stretching(sample_image)
     peak = plot_img_hist(sample_image)
     sample_image[sample_image < (peak - 10)] = 0
     sample_image[sample_image >= (peak - 10)] = 255
+
+    # binarize
     retval, sample_image = cv2.threshold(sample_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
+    found_circles = np.array([])
+    # detect circle on processed imaged
     circles = cv2.HoughCircles(
         sample_image,
         cv2.HOUGH_GRADIENT,
@@ -221,10 +273,26 @@ def detect_circle_on_clip(sample_image):
         minRadius=60,
         maxRadius=80,
     )
-    return circles[0]
+
+    if isinstance(circles, type(None)):
+        return found_circles
+
+    found_circles = circles.reshape((-1,3)).astype(np.int32)
+    
+    return found_circles
 
 
-def create_bee_mask(model, img):
+def create_bee_mask(model, img: np.ndarray) -> np.ndarray:
+    '''
+    Creates a bee mask based on the detections of the given detection model. 
+    
+    Parameters:
+    - model: The YOLO bee detection model.
+    - img (numpy.ndarray): The input image (grayscale) in which circles are to be detected.
+    
+    Returns:
+    - numpy.ndarray: A mask of type np.ndarray that is the same size as img.
+    '''
     # Initialize an empty mask
     mask = np.zeros_like(img, dtype=np.uint8)
 
@@ -266,12 +334,24 @@ def create_bee_mask(model, img):
     return mask
 
 
-def create_circle_mask(center, radius, mask_shape):
+def create_circle_mask(center: Tuple[int, int], radius, mask_shape) -> np.ndarray:
     mask = np.zeros(mask_shape, dtype=np.uint8)
     cv2.circle(mask, center, radius, (255, 255, 255), thickness=cv2.FILLED)
     return mask
 
-def filter_intersecting_circles(circles, binary_mask):
+def filter_intersecting_circles(circles: np.ndarray[Tuple[int, int, int]], binary_mask: np.ndarray, intersection_threshold: float = 0.4)-> List[Tuple[int, int, int]]:
+    '''
+    Eliminates the detections colliding with the bees, as well as applying non-maximum suppression to those left.
+
+    Parameters:
+    - circles (np.ndarray[Tuple[int, int, int]]): A numpy array of tuples denoting the detected circles, in (x, y, radius) format.
+    - binary_mask (numpy.ndarray): The binary mask of the detected bees.
+    - intersection_threshold (float): The lower bound for the intersection ratio (area-wise). Initialized to 0.4 by default.
+    
+    Returns:
+    - List[Tuple[int, int, int]]: A list of tuples, each tuple denoting a circle in (x, y, radius) format.
+    
+    '''
     filtered_circles = []
     
     for x, y, radius in circles:
@@ -279,14 +359,20 @@ def filter_intersecting_circles(circles, binary_mask):
         circle_mask = create_circle_mask((x, y), radius, binary_mask.shape[:2])
 
         # Perform bitwise AND operation with the binary mask
-        intersection = cv2.bitwise_and(circle_mask, binary_mask)
+        intersection = cv2.bitwise_and(circle_mask, 255 - binary_mask)
 
-        # Check if there is any non-zero value in the intersection
-        if np.any(intersection):
-            # There is an intersection, filter out the circle
-            continue
+        # Calculate the area of intersection
+        intersection_area = np.sum(intersection) / 255.0
 
-        # No intersection, add the circle to the filtered list
-        filtered_circles.append((x, y, radius))
+        # Calculate the area of the circle
+        circle_area = np.pi * radius ** 2
+
+        # Calculate the ratio of intersection area to circle area
+        intersection_ratio = intersection_area / circle_area
+
+        # Check if the ratio is below the threshold
+        if intersection_ratio <= intersection_threshold:
+            # There is an intersection, but it is below the threshold, add the circle to the filtered list
+            filtered_circles.append((x, y, radius))
 
     return filtered_circles

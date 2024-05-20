@@ -2,6 +2,7 @@ import { Button, Icon, Menu, MenuItem, Popover } from '@blueprintjs/core';
 import CellType from '@frontend/models/cellType';
 import { useAnnotations } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
+// @ts-ignore
 import h337 from 'heatmap.js';
 import React, { useEffect, useState } from 'react';
 

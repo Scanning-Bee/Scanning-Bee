@@ -128,6 +128,13 @@ export const BACKEND_ENDPOINTS = {
         GET: {
             LIST: '',
             BY_IMAGE_NAME: (imageName: string) => `${ENDPOINT_URL}/cellcontentsbyai/${imageName}/`,
+            BY_LOCATION: (x: number, y: number) => `${ENDPOINT_URL}/cellcontentsbyai/${x}/${y}`,
+            BY_LOCATION_AND_TIMESTAMP: 
+                (
+                    x: number,
+                    y: number, 
+                    timestamp: Date,
+                ) => `${ENDPOINT_URL}/cellcontentsbyai/${x}/${y}/${addTrailingZeros(timestamp.toISOString())}`,
         },
     },
     BAG: {

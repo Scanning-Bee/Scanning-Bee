@@ -75,6 +75,7 @@ const normalizeMetadata = (folderPath: string, rawMetadata: RawMetadataWrapperYa
             x_pos: originalEntry.x_pos,
             y_pos: originalEntry.y_pos,
             image_name: null,
+            bag_name: rawMetadata.bag_name,
         };
 
         entry.image_name = nextEntry.prev_image;
@@ -91,6 +92,7 @@ const normalizeMetadata = (folderPath: string, rawMetadata: RawMetadataWrapperYa
         x_pos: rawMetadataEntries[rawMetadataEntries.length - 1].x_pos,
         y_pos: rawMetadataEntries[rawMetadataEntries.length - 1].y_pos,
         image_name: remainingImageName,
+        bag_name: rawMetadata.bag_name,
     };
 
     normalizedMetadata.image_data.push(lastImageEntry);

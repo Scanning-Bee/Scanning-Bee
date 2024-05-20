@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
-from preprocess import *
-from detect import *
+from AI.preprocess import *
+from AI.detect import *
 
 sample_image = cv2.imread('AI/test_images/image_1219.jpg')
 sample_image_rgb = sample_image.copy()
