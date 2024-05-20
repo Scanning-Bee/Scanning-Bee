@@ -344,14 +344,35 @@ export class BackendInterface {
             intent: 'primary',
         });
 
+        const metadata = getAnnotationsMetadata();
+        const imageDtos = {} as { [image_name: string]: ImageDto };
+
         try {
             // get x_pos, y_pos, and timestamp of this image
-            const metadata = getAnnotationsMetadata();
             const imageMetadata = metadata.image_data.find(meta => meta.image_name === imageName);
             
-            if (!imageMetadata) {
-                throw new Error('Image metadata not found!');
+            if (!Object.keys(imageDtos).includes(imageName)) {
+                const matchingImages = await this.getImageByLocationAndTimestamp(
+                    imageMetadata.x_pos,
+                    imageMetadata.y_pos,
+                    new Date(imageMetadata.sec),
+                );
+
+                let imageDto = matchingImages ? matchingImages[0] : null;
+
+                if (!imageDto || !imageDto.id) {
+                    imageDto = await this.createImage({
+                        image_name: imageName,
+                        timestamp: addTrailingZeros(new Date(imageMetadata.sec).toISOString()),
+                        x_pos: imageMetadata.x_pos,
+                        y_pos: imageMetadata.y_pos,
+                        bag: imageMetadata.bag_name,
+                    });
+                }
+
+                imageDtos[imageName] = imageDto;
             }
+
 
             const res = await this.getCellContentByAI(imageMetadata.x_pos, imageMetadata.y_pos, new Date(imageMetadata.sec));
 
