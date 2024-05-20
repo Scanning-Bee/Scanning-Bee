@@ -34,6 +34,15 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
 
     const [loginType, setLoginType] = useState<'login' | 'signin'>('login');
 
+    const [loginError, setLoginError] = useState(false);
+
+    console.log(loginError);
+
+    useEffect(() => {
+        setLoginError(false);
+        setPasswordsMatch(true);
+    }, [loginType]);
+
     return (
         <div
             style={{
@@ -54,6 +63,12 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                     className='login-form'
                 >
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        {
+                            loginError && <p style={{ color: 'red' }}>
+                                Could not {loginType === 'login' ? 'login' : 'sign in'}. Please try again.
+                            </p>
+                        }
+                        {!passwordsMatch && <p style={{ color: 'red' }}>Passwords do not match</p>}
                         <FormGroup
                             label='Username'
                             labelFor='username'
@@ -113,17 +128,24 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                             />
                         </FormGroup>}
 
-                        {!passwordsMatch && <p style={{ color: 'red' }}>Passwords do not match</p>}
-
                         <Button
                             className='login-button'
                             text={loginType === 'login' ? 'Login' : 'Sign in'}
-                            onClick={() => {
+                            onClick={async () => {
                                 if (loginType === 'login') {
-                                    BackendInterface.getInstance().login({ username, password });
+                                    const success = await BackendInterface.getInstance().login({ username, password });
+
+                                    setLoginError(!success);
                                 } else {
-                                    setPasswordsMatch(password === repeatPassword); // [3]
-                                    BackendInterface.getInstance().signin({ username, password, email, user_type: '2' });
+                                    const pwdMatch = password === repeatPassword;
+                                    setPasswordsMatch(pwdMatch); // [3]
+
+                                    if (!pwdMatch) return;
+
+                                    const success = await BackendInterface.getInstance()
+                                        .signin({ username, password, email, user_type: '2' });
+
+                                    setLoginError(!success);
                                 }
                             }}
                             intent={loginType === 'login' ? 'primary' : 'success'}

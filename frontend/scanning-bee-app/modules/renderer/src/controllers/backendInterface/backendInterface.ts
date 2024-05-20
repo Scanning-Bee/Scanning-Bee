@@ -5,8 +5,10 @@ import { ipcRenderer, shell } from 'electron';
 import Annotation from '@frontend/models/annotation';
 import { BeehiveCell } from '@frontend/models/beehive';
 import CellType from '@frontend/models/cellType';
+import StorageService from '@frontend/services/StorageService';
 import { addAnnotation, getAnnotationsMetadata, saveChanges } from '@frontend/slices/annotationSlice';
 import { resetBackendStatus } from '@frontend/slices/backendStatusSlice';
+import { authorizeUser, unauthorizeUser } from '@frontend/slices/userInfoSlice';
 import { AppToaster } from '@frontend/Toaster';
 import { addTrailingZeros } from '@frontend/utils/miscUtils';
 import { AnnotationYaml, RENDERER_QUERIES } from '@scanning_bee/ipc-interfaces';
@@ -14,11 +16,9 @@ import { AnnotationYaml, RENDERER_QUERIES } from '@scanning_bee/ipc-interfaces';
 import { AUTH_ENDPOINTS, BACKEND_ENDPOINTS, ENDPOINT_URL } from './endpoints';
 import {
     BagID,
-    CellContentDto, CellContentID, CellDto, CellID, CellTypeDto, ContentDto, ContentID, FrameDto, FrameID, ImageDto, LoginDto, LogoutDto, RegisterResponseDto, SigninDto, LoginResponseDto, UserDto, UserTypeDto,
+    CellContentDto, CellContentID, CellDto, CellID, CellTypeDto, ContentDto, ContentID, FrameDto, FrameID, ImageDto, LoginDto, LoginResponseDto, LogoutDto, RegisterResponseDto, SigninDto, UserDto, UserTypeDto,
     UserTypeID,
 } from './payloadTypes';
-import StorageService from '@frontend/services/StorageService';
-import { authorizeUser, unauthorizeUser } from '@frontend/slices/userInfoSlice';
 
 type APIMethods = 'get' | 'post' | 'put' | 'delete';
 
@@ -44,7 +44,7 @@ export class BackendInterface {
         });
 
         this.apiClient.interceptors.response.use(
-            (response) => response,
+            response => response,
             (error) => {
                 if (error.response.status === 401) {
                     StorageService.clearTokens();
@@ -115,8 +115,10 @@ export class BackendInterface {
         }
     }
 
-    public signin = async (data: SigninDto) => {
+    public signin = async (data: SigninDto): Promise<boolean> => {
         const res: RegisterResponseDto = await this.apiQuery<any>(AUTH_ENDPOINTS.SIGNIN, 'post', data);
+
+        if (!res) return false;
 
         const { dispatch } = (window as any).store;
 
@@ -126,10 +128,14 @@ export class BackendInterface {
         StorageService.setRefreshToken(res.refresh);
 
         (window as any).RendererController.setPage('home');
-    }
 
-    public login = async (data: LoginDto) => {
+        return true;
+    };
+
+    public login = async (data: LoginDto): Promise<boolean> => {
         const res: LoginResponseDto = await this.apiQuery<any>(AUTH_ENDPOINTS.LOGIN, 'post', data);
+
+        if (!res) return false;
 
         const { dispatch } = (window as any).store;
 
@@ -139,7 +145,9 @@ export class BackendInterface {
         StorageService.setRefreshToken(res.refresh_token);
 
         (window as any).RendererController.setPage('home');
-    }
+
+        return true;
+    };
 
     public logout = async () => {
         const refresh_token = StorageService.getRefreshToken();
@@ -153,7 +161,7 @@ export class BackendInterface {
         dispatch(unauthorizeUser());
 
         (window as any).RendererController.setPage('login');
-    }
+    };
 
     // * CELLS
     public getAllCells = async () => {
@@ -350,7 +358,7 @@ export class BackendInterface {
         try {
             // get x_pos, y_pos, and timestamp of this image
             const imageMetadata = metadata.image_data.find(meta => meta.image_name === imageName);
-            
+
             if (!Object.keys(imageDtos).includes(imageName)) {
                 const matchingImages = await this.getImageByLocationAndTimestamp(
                     imageMetadata.x_pos,
@@ -373,7 +381,6 @@ export class BackendInterface {
                 imageDtos[imageName] = imageDto;
             }
 
-
             const res = await this.getCellContentByAI(imageMetadata.x_pos, imageMetadata.y_pos, new Date(imageMetadata.sec));
 
             res.map((cellContent) => {
@@ -381,45 +388,45 @@ export class BackendInterface {
                 let cellType;
                 // Find a better way to do this
                 switch (cellTypeNo) {
-                    case 1:
-                        cellType = CellType.EGG;
-                        break;
+                case 1:
+                    cellType = CellType.EGG;
+                    break;
 
-                    case 2:
-                        cellType = CellType.EMPTY;
-                        break;
+                case 2:
+                    cellType = CellType.EMPTY;
+                    break;
 
-                    case 3:
-                        cellType = CellType.LARVA;
-                        break;
+                case 3:
+                    cellType = CellType.LARVA;
+                    break;
 
-                    case 4:
-                        cellType = CellType.NECTAR;
-                        break;
+                case 4:
+                    cellType = CellType.NECTAR;
+                    break;
 
-                    case 5:
-                        cellType = CellType.POLLEN;
-                        break;
+                case 5:
+                    cellType = CellType.POLLEN;
+                    break;
 
-                    case 6:
-                        cellType = CellType.PUPA;
-                        break;
+                case 6:
+                    cellType = CellType.PUPA;
+                    break;
 
-                    case 7:
-                        cellType = CellType.HONEY_CLOSED;
-                        break;
+                case 7:
+                    cellType = CellType.HONEY_CLOSED;
+                    break;
 
-                    case 8:
-                        cellType = CellType.BEE_OCCLUDED;
-                        break;
+                case 8:
+                    cellType = CellType.BEE_OCCLUDED;
+                    break;
 
-                    case 9:
-                        cellType = CellType.NOT_CLASSIFIED;
-                        break;
+                case 9:
+                    cellType = CellType.NOT_CLASSIFIED;
+                    break;
 
-                    default:
-                        cellType = CellType.NOT_CLASSIFIED;
-                        break;
+                default:
+                    cellType = CellType.NOT_CLASSIFIED;
+                    break;
                 }
 
                 const annotation = new Annotation({
