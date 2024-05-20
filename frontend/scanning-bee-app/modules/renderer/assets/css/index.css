@@ -271,6 +271,17 @@ a {
   margin: 0px;
 }
 
+.login-input {
+}
+
+.login-input > .bp3-input {
+  width: 100% !important;
+
+  background: transparent;
+  border: 1px solid #ffffff99;
+  color: white;
+}
+
 .login-button {
   color: white !important;
 }

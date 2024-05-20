@@ -61,6 +61,7 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                             className='login-form-group'
                         >
                             <InputGroup
+                                className='login-input'
                                 id='username'
                                 value={username}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
@@ -75,6 +76,7 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                         >
                             <InputGroup
                                 id='password'
+                                className='login-input'
                                 value={password}
                                 type='password'
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
@@ -88,6 +90,7 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                             className='login-form-group'
                         >
                             <InputGroup
+                                className='login-input'
                                 id='repeat-password'
                                 value={repeatPassword}
                                 type='password'
@@ -102,6 +105,7 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                             className='login-form-group'
                         >
                             <InputGroup
+                                className='login-input'
                                 id='email'
                                 value={email}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
