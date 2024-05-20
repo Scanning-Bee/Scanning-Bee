@@ -29,6 +29,11 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
 
+    const [repeatPassword, setRepeatPassword] = useState(''); // [1]
+    const [passwordsMatch, setPasswordsMatch] = useState(true); // [2]
+
+    const [loginType, setLoginType] = useState<'login' | 'signin'>('login');
+
     return (
         <div
             style={{
@@ -76,53 +81,21 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                                 fill
                             />
                         </FormGroup>
-                        <Button
-                            text='Login'
-                            className='login-button'
-                            intent='primary'
-                            onClick={() => {
-                                BackendInterface.getInstance().login({ username, password });
-                            }}
-                            fill
-                        />
-                    </div>
-
-                    <Divider
-                        style={{
-                            margin: '20px 0',
-                            backgroundColor: 'white',
-                        }}
-                    />
-
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <FormGroup
-                            label='Username'
-                            labelFor='username'
-                            labelInfo='(required)'
-                            className='login-form-group'
-                        >
-                            <InputGroup
-                                id='username'
-                                value={username}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
-                                fill
-                            />
-                        </FormGroup>
-                        <FormGroup
-                            label='Password'
+                        {loginType === 'signin' && <FormGroup
+                            label='Repeat Password'
                             labelFor='password'
                             labelInfo='(required)'
                             className='login-form-group'
                         >
                             <InputGroup
-                                id='password'
-                                value={password}
+                                id='repeat-password'
+                                value={repeatPassword}
                                 type='password'
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRepeatPassword(e.target.value)}
                                 fill
                             />
-                        </FormGroup>
-                        <FormGroup
+                        </FormGroup>}
+                        {loginType === 'signin' && <FormGroup
                             label='Email'
                             labelFor='email'
                             labelInfo='(required)'
@@ -134,16 +107,50 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                                 fill
                             />
-                        </FormGroup>
+                        </FormGroup>}
+
+                        {!passwordsMatch && <p style={{ color: 'red' }}>Passwords do not match</p>}
+
                         <Button
                             className='login-button'
-                            text='Sign in'
+                            text={loginType === 'login' ? 'Login' : 'Sign in'}
                             onClick={() => {
-                                BackendInterface.getInstance().signin({ username, password, email, user_type: '2' });
+                                if (loginType === 'login') {
+                                    BackendInterface.getInstance().login({ username, password });
+                                } else {
+                                    setPasswordsMatch(password === repeatPassword); // [3]
+                                    BackendInterface.getInstance().signin({ username, password, email, user_type: '2' });
+                                }
                             }}
-                            intent='success'
+                            intent={loginType === 'login' ? 'primary' : 'success'}
                             fill
                         />
+
+                        <Divider />
+
+                        <div
+                            className='login-signin-switch'
+                        >
+                            <p>
+                                {
+                                    loginType === 'login'
+                                        ? 'Don\'t have an account?'
+                                        : 'Already have an account?'
+                                }
+                            </p>
+                            <Button
+                                minimal
+                                text={
+                                    loginType === 'login'
+                                        ? 'Sign up'
+                                        : 'Log in'
+                                }
+                                onClick={() => {
+                                    setLoginType(loginType === 'login' ? 'signin' : 'login');
+                                }}
+                                className={loginType === 'login' ? 'login-switch-button' : 'signin-switch-button'}
+                            />
+                        </div>
                     </div>
                 </div>
 

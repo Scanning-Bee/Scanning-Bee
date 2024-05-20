@@ -272,11 +272,35 @@ a {
 }
 
 .login-button {
-  color: white;
+  color: white !important;
 }
 
 .login-button > .bp3-button-text {
   margin-right: auto !important;
+}
+
+.login-signin-switch {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.login-signin-switch > p {
+  margin: 0;
+  align-self: center;
+}
+
+.login-signin-switch > .bp3-button {
+  margin: 0 5px;
+  padding: 5px;
+}
+
+.login-switch-button {
+  color: #ccffcc !important;
+}
+
+.signin-switch-button {
+  color: #abcdff !important;
 }
 
 .noselect{
