@@ -379,6 +379,7 @@ export class BackendInterface {
             res.map((cellContent) => {
                 const cellTypeNo = cellContent.content;
                 let cellType;
+                // Find a better way to do this
                 switch (cellTypeNo) {
                     case 1:
                         cellType = CellType.EGG;
