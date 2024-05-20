@@ -4,13 +4,13 @@ import { Provider } from 'react-redux';
 import { HotkeyHandler } from './Hotkeys';
 import { BeehivePage } from './pages/BeehivePage';
 import { HomePage } from './pages/HomePage';
+import { LoginPage } from './pages/LoginPage';
 import { ManualAnnotatorPage } from './pages/ManualAnnotatorPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { StatisticsPage } from './pages/StatisticsPage';
 import store from './store';
 import Footer from './toolbars/Footer';
 import Header from './toolbars/Header';
-import { LoginPage } from './pages/LoginPage';
 
 require('@assets/css/index.css');
 
@@ -29,16 +29,22 @@ const App = (props: {
         <Provider store={store}>
             <div
                 id="main-content"
+                style={{
+                    position: page === 'login' ? 'unset' : 'fixed',
+                }}
             >
-                <Header
-                    page={page}
-                    setPage={setPage}
-                    goBack={goBack}
-                    goForward={goForward}
-                    getPreviousPage={getPreviousPage}
-                    getNextPage={getNextPage}
-                    fullScreen={fullScreen}
-                />
+                {
+                    page !== 'login'
+                    && <Header
+                        page={page}
+                        setPage={setPage}
+                        goBack={goBack}
+                        goForward={goForward}
+                        getPreviousPage={getPreviousPage}
+                        getNextPage={getNextPage}
+                        fullScreen={fullScreen}
+                    />
+                }
 
                 {
                     (() => {
@@ -65,7 +71,9 @@ const App = (props: {
                     page === 'manual-annotator' && <HotkeyHandler />
                 }
 
-                <Footer />
+                {
+                    page !== 'login' && <Footer />
+                }
             </div>
         </Provider>
     );
