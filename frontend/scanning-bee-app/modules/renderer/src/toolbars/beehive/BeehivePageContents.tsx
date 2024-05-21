@@ -1,4 +1,4 @@
-import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
+import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import { BeehiveCell } from '@frontend/models/beehive';
 import CellType from '@frontend/models/cellType';
 import {
@@ -40,7 +40,7 @@ export const BeehivePageContents = () => {
     const [animationPaused, setAnimationPaused] = useState(false);
 
     useEffect(() => {
-        setCells(BackendInterface.getInstance().getBeehiveData(beehiveName, shownDataTimestamp));
+        setCells(BackendInterface.getBeehiveData(beehiveName, shownDataTimestamp));
     }, [shownDataTimestamp, beehiveName]);
 
     useEffect(() => {

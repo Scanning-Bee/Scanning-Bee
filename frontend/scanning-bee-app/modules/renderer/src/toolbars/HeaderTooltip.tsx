@@ -1,5 +1,5 @@
 import { Button, Divider, Icon, Menu, MenuDivider, MenuItem, Popover } from '@blueprintjs/core';
-import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
+import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import { resetAnnotations, useAnnotations, useAnnotationsFolder, useUnsavedChanges } from '@frontend/slices/annotationSlice';
 import { useBackendStatus } from '@frontend/slices/backendStatusSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
@@ -38,7 +38,7 @@ const TooltipButton = (props: { folder: string, showFolderActionsMenu: boolean }
     const handleClick = props.showFolderActionsMenu
         ? null
         : () => {
-            if (!props.folder) BackendInterface.getInstance().openFolderDialog();
+            if (!props.folder) BackendInterface.openFolderDialog();
         };
 
     const buttonText = props.showFolderActionsMenu
@@ -77,14 +77,14 @@ const TooltipMenu = (props: { page: PageType, setPage: any, folder: string, hide
                     <MenuItem
                         text="Save Annotations Locally"
                         onClick={() => {
-                            BackendInterface.getInstance().saveAnnotations(annotations, folder);
+                            BackendInterface.saveAnnotations(annotations, folder);
                         }}
                         icon='floppy-disk'
                     />
                     <MenuItem
                         text='Save Annotations to Database'
                         onClick={() => {
-                            BackendInterface.getInstance().saveAnnotationsToDatabase(annotations);
+                            BackendInterface.saveAnnotationsToDatabase(annotations);
                         }}
                         icon='database'
                         disabled={backendStatus !== 'online'}
@@ -93,21 +93,21 @@ const TooltipMenu = (props: { page: PageType, setPage: any, folder: string, hide
                     <MenuItem
                         text='Select Another Folder'
                         onClick={() => {
-                            BackendInterface.getInstance().openFolderDialog();
+                            BackendInterface.openFolderDialog();
                         }}
                         icon='folder-new'
                     />
                     <MenuItem
                         text='Open Folder Location'
                         onClick={() => {
-                            if (folder) BackendInterface.getInstance().showFolder(folder);
+                            if (folder) BackendInterface.showFolder(folder);
                         }}
                         icon='folder-open'
                     />
                     <MenuItem
                         text='Open Annotations File'
                         onClick={() => {
-                            if (folder) BackendInterface.getInstance().showFolder(`${folder}/annotations/annotations.yaml`);
+                            if (folder) BackendInterface.showFolder(`${folder}/annotations/annotations.yaml`);
                         }}
                         icon='document-open'
                     />

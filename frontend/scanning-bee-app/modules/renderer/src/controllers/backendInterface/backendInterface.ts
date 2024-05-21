@@ -16,16 +16,30 @@ import { AnnotationYaml, RENDERER_QUERIES } from '@scanning_bee/ipc-interfaces';
 import { AUTH_ENDPOINTS, BACKEND_ENDPOINTS, ENDPOINT_URL } from './endpoints';
 import {
     BagID,
-    CellContentDto, CellContentID, CellDto, CellID, CellTypeDto, ContentDto, ContentID, FrameDto, FrameID, ImageDto, LoginDto, LoginResponseDto, LogoutDto, RegisterResponseDto, SigninDto, UserDto, UserTypeDto,
+    CellContentDto,
+    CellContentID,
+    CellDto,
+    CellID,
+    CellTypeDto,
+    ContentDto,
+    ContentID,
+    FrameDto,
+    FrameID,
+    ImageDto,
+    LoginDto,
+    LoginResponseDto,
+    LogoutDto,
+    RegisterResponseDto,
+    SigninDto,
+    UserDto,
+    UserTypeDto,
     UserTypeID,
 } from './payloadTypes';
 
 type APIMethods = 'get' | 'post' | 'put' | 'delete';
 
-export class BackendInterface {
+class BackendInterface {
     apiClient: AxiosInstance = null;
-
-    static _instance: BackendInterface = null;
 
     constructor() {
         this.apiClient = axios.create({
@@ -55,14 +69,6 @@ export class BackendInterface {
                 return Promise.reject(error);
             },
         );
-    }
-
-    public static getInstance() {
-        if (!this._instance) {
-            this._instance = new BackendInterface();
-        }
-
-        return this._instance;
     }
 
     public openFolderAtLocation = (folder: string) => {
@@ -513,3 +519,5 @@ export class BackendInterface {
         ].map(ts => new Date(ts).getTime());
     };
 }
+
+export default new BackendInterface();

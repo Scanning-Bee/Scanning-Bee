@@ -41,8 +41,8 @@ export const HeatmapMounter = () => {
         const dataPoints = annotations
             .filter(annotation => !shownCellType || annotation.cell_type === shownCellType)
             .map(annotation => ({
-                x: annotation.center[0] / 2,
-                y: 540 - annotation.center[1] / 2,
+                x: annotation.center[0] / (12 / 5),
+                y: 450 - annotation.center[1] / (12 / 5),
                 value: 1,
             }));
 
@@ -69,8 +69,8 @@ export const HeatmapMounter = () => {
             >for {shownCellType || 'all cells'}</h3>
             <div
                 style={{
-                    width: '960px',
-                    height: '540px',
+                    width: '800px',
+                    height: '450px',
                 }}
                 className='heatmap-grid'
                 id={HEATMAP_CONTAINER_ID}
