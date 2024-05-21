@@ -320,12 +320,6 @@ class CellContentList(ListCreateAPIView):
                 end_time = datetime.now(timezone.utc)
 
             queryset = queryset.filter(timestamp__gte=start_time, timestamp__lte=end_time)
-        elif filter_type == "username":
-            user = self.request.user
-            if user.user_type.type == "Biolog":
-                return queryset
-            else:
-                return queryset.filter(user__username=user.username) if not queryset.none() else []
 
         return queryset
 
