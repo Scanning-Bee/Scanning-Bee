@@ -1,0 +1,92 @@
+.stats-tabs-Light >.bp3-tab-list {
+    background-color: #D9D9D9;
+    color: #333;
+  }
+  
+  .stats-tabs-Dark >.bp3-tab-list {
+    background-color: #31313188;
+    color: #f5f8fa;
+  }
+  
+  .stats-tabs-METU >.bp3-tab-list {
+    background-color: #66000088;
+    color: #f5f8fa;
+  }
+  
+  .stats-tabs-Bees >.bp3-tab-list {
+    background-color: #F4AC18;
+    color: #333;
+  }
+
+#stats-date-range-picker-Light select {
+    color: #333;
+  }
+  #stats-date-range-picker-Light .DayPicker-Day--selected-range {
+    background-color: #eeeeee;
+  }
+  #stats-date-range-picker-Light .DayPicker-Day--hovered-range {
+    background-color: #eeeeee;
+  }
+  
+  #stats-date-range-picker-Dark select {
+    color: #f5f8fa;
+  }
+  #stats-date-range-picker-Dark .DayPicker-Day--selected-range {
+    background-color: #444444;
+  }
+  #stats-date-range-picker-Dark .DayPicker-Day--hovered-range {
+    background-color: #444444;
+  }
+  
+  #stats-date-range-picker-METU select {
+    color: #f5f8fa;
+  }
+  #stats-date-range-picker-METU .DayPicker-Day--selected-range {
+    background-color: #990000;
+  }
+  #stats-date-range-picker-METU .DayPicker-Day--hovered-range {
+    background-color: #990000;
+  }
+  
+  #stats-date-range-picker-Bees select {
+    color: #333;
+  }
+  #stats-date-range-picker-Bees .DayPicker-Day--selected-range {
+    background-color: #F9C62A;
+  }
+  #stats-date-range-picker-Bees .DayPicker-Day--hovered-range {
+    background-color: #F9C62A;
+  }
+
+
+.stats-time-picker-Light {
+    background-color: #D9D9D9;
+    color: #333;
+  }
+  .stats-time-picker-Light > .bp3-menu {
+    color: #333;
+  }
+  
+  .stats-time-picker-Dark {
+    background-color: #31313188;
+    color: #f5f8fa;
+  }
+  .stats-time-picker-Dark > .bp3-menu {
+    color: #f5f8fa;
+  }
+  
+  .stats-time-picker-METU {
+    background-color: #66000088;
+    color: #f5f8fa;
+  }
+  .stats-time-picker-METU > .bp3-menu {
+    color: #f5f8fa;
+  }
+  
+  .stats-time-picker-Bees {
+    background-color: #F4AC18;
+    color: #333;
+  }
+  .stats-time-picker-Bees > .bp3-menu {
+    color: #333;
+  }

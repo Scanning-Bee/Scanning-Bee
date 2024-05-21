@@ -1,6 +1,8 @@
 import { Divider, Icon, Tab, Tabs } from '@blueprintjs/core';
 import { useAnnotationsFolder } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
+import { AnnotatorStatistics } from '@frontend/toolbars/charts/AnnotatorStatistics';
+import { AnnotatorTimeChart } from '@frontend/toolbars/charts/AnnotatorTimeChart';
 import { CellTypeChart } from '@frontend/toolbars/charts/CellTypeChart';
 import { HeatmapMounter } from '@frontend/toolbars/charts/Heatmap';
 import { XYChart } from '@frontend/toolbars/charts/XYChart';
@@ -96,6 +98,40 @@ export const StatisticsPage = () => {
                     backgroundColor: theme.secondaryForeground,
                     width: 'calc(100% - 10px)',
                 }}/>
+
+                <Tab
+                    id={'annotator-stats' as TabType}
+                    title={
+                        <div className='stats-tab'>
+                            <Icon icon='user' />
+                            Annotator Statistics
+                        </div>
+                    }
+                    panel={
+                        <div className='column-flex-center stats-panel'>
+                            <h1>Annotator Statistics</h1>
+                            <AnnotatorStatistics />
+                        </div>
+                    }
+                    style={{ color: theme.primaryForeground }}
+                />
+
+                <Tab
+                    id={'admin-panel' as TabType}
+                    title={
+                        <div className='stats-tab'>
+                            <Icon icon='console' />
+                            Admin Panel
+                        </div>
+                    }
+                    panel={
+                        <div className='column-flex-center stats-panel'>
+                            <h1>Admin Panel</h1>
+                            <AnnotatorTimeChart />
+                        </div>
+                    }
+                    style={{ color: theme.primaryForeground }}
+                />
 
                 <CellTypeInfo />
             </Tabs>

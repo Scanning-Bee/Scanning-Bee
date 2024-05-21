@@ -1,10 +1,10 @@
-import { Button, Icon, Menu, MenuItem, Popover } from '@blueprintjs/core';
 import CellType from '@frontend/models/cellType';
 import { useAnnotations } from '@frontend/slices/annotationSlice';
-import { useTheme } from '@frontend/slices/themeSlice';
 // @ts-ignore
 import h337 from 'heatmap.js';
 import React, { useEffect, useState } from 'react';
+
+import { CellTypePickerMenu } from '../common/CellTypePickerMenu';
 
 export const HEATMAP_CONTAINER_ID = 'heatmap-container';
 
@@ -19,8 +19,6 @@ export const getHeatmapContainer = (): HTMLElement => {
 };
 
 export const HeatmapMounter = () => {
-    const theme = useTheme();
-
     const annotations = useAnnotations();
 
     const [shownCellType, setShownCellType] = useState<CellType>(null);
@@ -75,35 +73,10 @@ export const HeatmapMounter = () => {
                 className='heatmap-grid'
                 id={HEATMAP_CONTAINER_ID}
             />
-            <Popover
-                interactionKind='click'
-            >
-                <Button
-                    icon={<Icon icon='tag' color={theme.secondaryForeground} />}
-                    text={<p className='nomargin' style={{ color: theme.secondaryForeground }}>
-                        {shownCellType ? `Showing ${shownCellType} only` : 'Showing All'}
-                    </p>}
-                    large
-                    minimal
-                    style={{ marginTop: '10px' }}
-                />
-                <Menu>
-                    {[...Object.keys(CellType), 'Show All'].map((cellType, index) => (
-                        <MenuItem
-                            key={index}
-                            onClick={() => {
-                                if (cellType === 'Show All') {
-                                    setShownCellType(null);
-                                    return;
-                                }
-                                setShownCellType(CellType[cellType]);
-                            }}
-                            active={shownCellType === CellType[cellType]}
-                            text={cellType}
-                        />
-                    ))}
-                </Menu>
-            </Popover>
+            <CellTypePickerMenu
+                cellType={shownCellType}
+                setCellType={setShownCellType}
+            />
         </div>
     );
 };

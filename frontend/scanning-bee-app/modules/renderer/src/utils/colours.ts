@@ -106,3 +106,28 @@ export const StaticHomePageHexagonColours = [
     '#5271ff',
     '#0097b2',
 ];
+
+/**
+ * is not an actual random function, essentially a hash function.
+ * @param seed
+ */
+export const randomColour = (seed: string) => {
+    const CHARS = 'öYİZXASüĞk3RbnrŞHIfgUÇ.Bv9QKLJM7yG6mçopğWDFC1OPdzxcT8Üh_qwulştje-i2E0s45NaVÖ';
+    const len = seed.length;
+    let sum = 0;
+
+    for (let i = 0; i < seed.length; i++) {
+        const char = seed.charAt(i);
+        const index = CHARS.indexOf(char);
+        sum += index * i;
+    }
+
+    const val = (sum / (77 * len)) * 16777216;
+    let colour = (Math.floor(val - (16777216 - val) * (len % 4) / 10) % 16777216).toString(16);
+
+    while (colour.length < 6) {
+        colour = `B${colour}`;
+    }
+
+    return `#${colour}`;
+};

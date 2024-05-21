@@ -5,7 +5,7 @@
 @import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 
 
-
+@import "./theme_dependent.css";
 @import "./fonts.css";
 @import "./bp3_overrides.css";
 
@@ -889,6 +889,11 @@ a {
 
 }
 
+#root .bp3-tab-panel {
+  width: 100%;
+  height: 100%;
+}
+
 .statistics-page > .bp3-tabs {
   width: 100%;
   height: 100%;
@@ -903,26 +908,6 @@ a {
 
 .stats-tabs > .bp3-tab-list > .bp3-tab-insicator-wrapper {
   border-radius: 10px;
-}
-
-.stats-tabs-Light >.bp3-tab-list {
-  background-color: #D9D9D9;
-  color: #333;
-}
-
-.stats-tabs-Dark >.bp3-tab-list {
-  background-color: #31313188;
-  color: #f5f8fa;
-}
-
-.stats-tabs-METU >.bp3-tab-list {
-  background-color: #66000088;
-  color: #f5f8fa;
-}
-
-.stats-tabs-Bees >.bp3-tab-list {
-  background-color: #F4AC18;
-  color: #333;
 }
 
 .stats-tab {
@@ -944,4 +929,18 @@ a {
     padding: 20px;
     overflow: scroll;
     height: 100%;
+}
+
+.list-stats {
+  justify-content: space-evenly;
+  display: flex;
+  flex-direction: column;
+}
+
+.stats-time-picker > .bp3-menu {
+  background: unset;
+}
+
+.time-pickers {
+  margin-top: 10px;
 }

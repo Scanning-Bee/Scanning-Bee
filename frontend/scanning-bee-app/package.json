@@ -54,6 +54,7 @@
         ]
     },
     "dependencies": {
+        "@mui/material": "^5.15.18",
         "@scanning_bee/ipc-interfaces": "workspace:*",
         "@scanning_bee/main": "workspace:*",
         "@scanning_bee/renderer": "workspace:*",

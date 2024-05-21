@@ -5,6 +5,7 @@ import { ipcRenderer, shell } from 'electron';
 import Annotation from '@frontend/models/annotation';
 import { BeehiveCell } from '@frontend/models/beehive';
 import CellType from '@frontend/models/cellType';
+import { AnnotatorStatistic } from '@frontend/models/statistics';
 import StorageService from '@frontend/services/StorageService';
 import { addAnnotation, getAnnotationsMetadata, saveChanges } from '@frontend/slices/annotationSlice';
 import { resetBackendStatus } from '@frontend/slices/backendStatusSlice';
@@ -517,6 +518,72 @@ class BackendInterface {
             '2021-01-01T00:00:00.000Z',
             '2021-01-28T00:00:00.000Z',
         ].map(ts => new Date(ts).getTime());
+    };
+
+    public getAnnotatorsForFolder = async (folder: string) => {
+        console.log('Getting annotators for', folder);
+
+        return [
+            `johndoe_${folder}`,
+            'janedoe',
+            'alicewonderland',
+            'bobbuilder',
+        ];
+    };
+
+    public getAnnotatorStatistics = async (folder: string) => {
+        // DUMMY FOR NOW. TODO:
+        console.log('Getting annotator statistics for', folder);
+
+        const annotatorNames = ['John Doe', 'Jane Doe', 'Alice Wonderland', 'Bob Builder'];
+        const usernames = this.getAnnotatorsForFolder(folder);
+
+        const annotatorStatistics: AnnotatorStatistic[] = [];
+
+        annotatorNames.forEach((annotatorName) => {
+            const totalImages = Math.floor(Math.random() * 100);
+
+            const annotationsByCellType = {} as Record<CellType, number>;
+
+            Object.keys(CellType).forEach((cellType) => {
+                annotationsByCellType[cellType] = Math.floor(Math.random() * 100);
+            });
+
+            const totalAnnotations = Object.values(annotationsByCellType).reduce((acc, curr) => acc + curr, 0);
+
+            annotatorStatistics.push({
+                fullName: annotatorName,
+                username: usernames[annotatorNames.indexOf(annotatorName)],
+                totalAnnotations,
+                totalImages,
+                annotationsByCellType,
+            });
+        });
+
+        return annotatorStatistics;
+    };
+
+    public getAnnotationsMadeByUser = async (username: string) => {
+        console.log('Getting annotations made by', username);
+
+        const annotations: Annotation[] = [];
+
+        const cellTypes = Object.keys(CellType);
+
+        for (let i = 0; i < Math.random() * 100; i += 1) {
+            const cellType = cellTypes[Math.floor(Math.random() * cellTypes.length)];
+
+            annotations.push(new Annotation({
+                cell_type: CellType[cellType],
+                center: [Math.random() * 100, Math.random() * 100],
+                radius: Math.random() * 10,
+                timestamp: new Date().getTime() - Math.random() * 1_000_000,
+                source_name: `image_${Math.floor(Math.random() * 100)}`,
+                poses: [0, 0],
+            }));
+        }
+
+        return annotations;
     };
 }
 
