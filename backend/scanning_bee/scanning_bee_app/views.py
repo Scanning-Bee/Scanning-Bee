@@ -5,13 +5,14 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.decorators import api_view  # Import the api_view decorator
-from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView, get_object_or_404
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate
+from .permissions import IsBiologOrSelf
 
 from .models import *
 from .serializers import *
@@ -122,24 +123,55 @@ class UserList(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = None
         user = self.request.user
         if user.user_type.type == "Biolog":
-            queryset = CustomUser.objects.all()
-        return queryset
+            return CustomUser.objects.all()
+        else:
+            return CustomUser.objects.filter(username=user.username) if not CustomUser.objects.none() else []
+
+    def get_permissions(self):
+        if self.request.method == ['PUT', 'GET']:
+            self.permission_classes = [IsAuthenticated, IsBiologOrSelf]
+        else:
+            self.permission_classes = [IsAuthenticated]
+        return super().get_permissions()
+
+    def put(self, request, *args, **kwargs):
+        user = self.request.user
+        username = self.kwargs.get('username')
+
+        # Check if the username in the request is valid
+        if not username:
+            return Response({'detail': 'Username is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get the user object to be updated
+        obj = get_object_or_404(CustomUser, username=username)
+
+        # Check permissions
+        self.check_object_permissions(request, obj)
+
+        serializer = CustomUserSerializer(obj, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserDetail(RetrieveUpdateDestroyAPIView):
+    queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
-    permission_classes = [IsAuthenticated]
-    lookup_field = 'id'
+    permission_classes = [IsAuthenticated, IsBiologOrSelf]
+    lookup_field = 'username'
 
-    def get_queryset(self):
-        queryset = None
-        user = self.request.user
-        if user.user_type.type == "Biolog":
-            queryset = CustomUser.objects.all()
-        return queryset
+    def retrieve(self, request, *args, **kwargs):
+        username = self.kwargs.get('username')
+        obj = get_object_or_404(CustomUser, username=username)
+
+        # Check object permissions
+        self.check_object_permissions(request, obj)
+
+        serializer = CustomUserSerializer(obj)
+        return Response(serializer.data)
 
 
 ##################### FRAME #####################
@@ -288,6 +320,12 @@ class CellContentList(ListCreateAPIView):
                 end_time = datetime.now(timezone.utc)
 
             queryset = queryset.filter(timestamp__gte=start_time, timestamp__lte=end_time)
+        elif filter_type == "username":
+            user = self.request.user
+            if user.user_type.type == "Biolog":
+                return queryset
+            else:
+                return queryset.filter(user__username=user.username) if not queryset.none() else []
 
         return queryset
 
@@ -334,10 +372,21 @@ class CellContentList(ListCreateAPIView):
 
 
 class CellContentDetail(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsBiologOrSelf]
     queryset = CellContent.objects.all()
     serializer_class = CellContentSerializer
     lookup_field = 'id'
+
+    def retrieve(self, request, *args, **kwargs):
+        username = self.kwargs.get('username')
+        obj = get_object_or_404(CustomUser, username=username)
+
+        # Check object permissions
+        self.check_object_permissions(request, obj)
+
+        cell_content_obj = get_object_or_404(CellContent, user=obj)
+        serializer = CellContentSerializer(cell_content_obj)
+        return Response(serializer.data)
 
 
 class CellContentsByAI(ListCreateAPIView):
