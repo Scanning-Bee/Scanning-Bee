@@ -29,7 +29,7 @@ urlpatterns = [
 
     path('cell_list', views.CellList.as_view(), name='cell-list'),
     path('cell_list/<int:id>', views.CellList.as_view(), name='cell-list'),
-    path('cell_list/<str:filter_type>/<float:location_on_frame_x>/<float:location_on_frame_y>', views.CellList.as_view(), name='cell-list'),
+    path('cell_list/<str:filter_type>/<float:i_index>/<float:j_index>', views.CellList.as_view(), name='cell-list'),
 
     path('cell_detail/<int:id>', views.CellDetail.as_view(), name='cell-detail'),
 

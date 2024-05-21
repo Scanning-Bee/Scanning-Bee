@@ -88,6 +88,8 @@ class UserRegistrationView(APIView):
         if serializer.is_valid():
             user = get_user_model().objects.create_user(
                 username=serializer.validated_data['username'],
+                first_name=serializer.validated_data['first_name'],
+                last_name=serializer.validated_data['last_name'],
                 password=serializer.validated_data['password'],
                 email=serializer.validated_data['email'],
                 user_type=serializer.validated_data.get('user_type') 
@@ -102,9 +104,11 @@ class UserRegistrationView(APIView):
 class UserLoginView(APIView):
     def post(self, request):
         username = request.data.get('username')
+        first_name = request.data.get('first_name')
+        last_name = request.data.get('last_name')
         password = request.data.get('password')
 
-        user = authenticate(username=username, password=password)
+        user = authenticate(username=username, first_name=first_name, last_name=last_name, password=password)
 
         if user is not None:
             refresh = RefreshToken.for_user(user)
@@ -210,29 +214,13 @@ class CellList(ListCreateAPIView):
         filter_type = self.kwargs.get('filter_type')
 
         if filter_type == 'location':
-            threshold = CELL_LOC_THRESHOLD
-            location_on_frame_x = self.kwargs.get('location_on_frame_x', None)
-            location_on_frame_y = self.kwargs.get('location_on_frame_y', None)
+            i_index = self.kwargs.get('i_index', None)
+            j_index = self.kwargs.get('j_index', None)
 
-            if location_on_frame_x is not None and location_on_frame_y is not None:
-                try:
-                    # Convert parameters to float and validate
-                    location_on_frame_x = float(location_on_frame_x)
-                    location_on_frame_y = float(location_on_frame_y)
-
-                    # Calculate the range for x and y based on the threshold
-                    x_min, x_max = location_on_frame_x - threshold, location_on_frame_x + threshold
-                    y_min, y_max = location_on_frame_y - threshold, location_on_frame_y + threshold
-
-                    # Filter the queryset within the range for both x and y
-                    queryset = queryset.filter(
-                        location_on_frame_x__gte=x_min, location_on_frame_x__lte=x_max,
-                        location_on_frame_y__gte=y_min, location_on_frame_y__lte=y_max
-                    )
-                except ValueError:
-                    # Handle cases where the conversion fails
-                    raise ValidationError(
-                        "Invalid parameters: Ensure 'location_on_frame_x' and 'location_on_frame_y' are valid numbers.")
+            if i_index is not None and j_index is not None:
+                queryset = queryset.filter(i_index=i_index, j_index=j_index)
+            else:
+                return Response("i_index and j_index are required for location filter.", status=status.HTTP_400_BAD_REQUEST)
 
         return queryset
 
@@ -282,6 +270,7 @@ class CellContentList(ListCreateAPIView):
             image_list = Image.objects.filter(image_name=image_name)
             queryset = queryset.filter(image__in=image_list)
 
+        # Todo: Bu kısım da değişecek...
         elif filter_type == "image_name_rect":
             image_name = self.kwargs.get('arg')
             image = Image.objects.get(image_name=image_name)
