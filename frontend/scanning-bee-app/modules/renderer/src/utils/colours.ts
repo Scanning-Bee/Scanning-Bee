@@ -1,21 +1,5 @@
 import CellType from '@frontend/models/cellType';
-
-export type Theme = {
-    title: string;
-    type: 'light' | 'dark';
-    primaryForeground: string;
-    secondaryForeground: string;
-    tertiaryForeground: string;
-    primaryBackground: string;
-    secondaryBackground: string;
-    tertiaryBackground: string;
-    primaryAccent: string;
-    secondaryAccent: string;
-    tertiaryAccent: string;
-    primaryBorder: string;
-    secondaryBorder: string;
-    tertiaryBorder: string;
-};
+import { Theme } from '@scanning_bee/ipc-interfaces/src/miscTypes';
 
 export const Themes: Theme[] = [
     {

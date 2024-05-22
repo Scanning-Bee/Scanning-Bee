@@ -2,7 +2,7 @@
 /* ------------ IPC Events ----------- */
 /* ----------------------------------- */
 
-import { AnnotationYaml, MetadataWrapperYaml } from 'miscTypes';
+import { AnnotationYaml, MetadataWrapperYaml, Theme } from 'miscTypes';
 
 /**
  * Events that are emitted by the renderer process and listened to by the main process.
@@ -11,6 +11,7 @@ export enum RENDERER_EVENTS {
     ZOOM_CHANGE = 'ZOOM_CHANGE',
     THEME_CHANGE = 'THEME_CHANGE',
     FULL_SCREEN = 'FULL_SCREEN',
+    LOGIN_PAGE = 'LOGIN_PAGE',
 }
 
 /**
@@ -29,8 +30,9 @@ export enum MAIN_EVENTS {
 
 export type RENDERER_EVENT_PAYLOADS = {
     [RENDERER_EVENTS.ZOOM_CHANGE]: number,
-    [RENDERER_EVENTS.THEME_CHANGE]: undefined,
+    [RENDERER_EVENTS.THEME_CHANGE]: Theme,
     [RENDERER_EVENTS.FULL_SCREEN]: boolean,
+    [RENDERER_EVENTS.LOGIN_PAGE]: boolean,
 };
 
 export type MAIN_EVENT_PAYLOADS = {

@@ -7,7 +7,7 @@ import {
 } from 'electron';
 import Store from 'electron-store';
 import fs from 'fs-extra';
-import { AnnotationYaml, MAIN_EVENTS, RENDERER_EVENTS, RENDERER_QUERIES, THEME_STORAGE_ID } from '@scanning_bee/ipc-interfaces';
+import { AnnotationYaml, MAIN_EVENTS, RENDERER_EVENTS, RENDERER_QUERIES, Theme, THEME_STORAGE_ID } from '@scanning_bee/ipc-interfaces';
 
 import { loadAnnotations, loadImages, loadMetadata, saveAnnotations } from './annotationUtils';
 import { invokeBackend } from './backendInvoker';
@@ -312,19 +312,42 @@ class MainController {
             }
         };
 
-        const themeChangeHandler = async () => {
-            const DEFAULT_THEME = {
-                themeType: 'light',
-                secondaryBackground: '#DCE0E5',
-            };
+        const themeChangeHandler = async (_event: any, theme?: Theme) => {
+            console.log('hey!');
 
-            const theme = new Store<Record<string, any>>().get(THEME_STORAGE_ID) || DEFAULT_THEME;
+            console.log(theme);
+
+            const headerBackground = theme
+                ? (theme.type === 'dark' ? theme.secondaryBackground : theme.tertiaryBackground)
+                : '#DCE0E5';
 
             if (this.mainWindow.setTitleBarOverlay) {
                 this.mainWindow.setTitleBarOverlay({
-                    color: '#00000000',
+                    color: headerBackground,
                     symbolColor:
                         theme.type === 'light' ? '#000' : '#fff',
+                });
+            }
+        };
+
+        const loginPageHandler = (_event: any, show: boolean) => {
+            if (!show) {
+                const DEFAULT_THEME = {
+                    themeType: 'light',
+                    secondaryBackground: '#DCE0E5',
+                };
+
+                themeChangeHandler(
+                    null,
+                    new Store<Record<string, any>>().get(THEME_STORAGE_ID) || DEFAULT_THEME,
+                );
+                return;
+            }
+
+            if (this.mainWindow.setTitleBarOverlay) {
+                this.mainWindow.setTitleBarOverlay({
+                    color: '#220d4b',
+                    symbolColor: '#fff',
                 });
             }
         };
@@ -362,6 +385,8 @@ class MainController {
         };
 
         ipcMain.on(RENDERER_EVENTS.FULL_SCREEN, setFullScreen);
+
+        ipcMain.on(RENDERER_EVENTS.LOGIN_PAGE, loginPageHandler);
 
         ipcMain.on(RENDERER_QUERIES.OPEN_FOLDER_AT_LOCATION, (_event, folderPath: string) => {
             openFolderAtLocation(folderPath);
@@ -401,7 +426,7 @@ class MainController {
         ipcMain.on(RENDERER_EVENTS.ZOOM_CHANGE, zoomChangeHandler);
         ipcMain.on(RENDERER_EVENTS.THEME_CHANGE, themeChangeHandler);
         zoomChangeHandler();
-        themeChangeHandler();
+        themeChangeHandler(null, new Store<Record<string, any>>().get(THEME_STORAGE_ID));
 
         this.mainWindow.once('closed', () => {
             // Dereference the window object, usually you would store windows

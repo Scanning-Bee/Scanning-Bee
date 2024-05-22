@@ -1,12 +1,12 @@
 import { useTheme } from '@frontend/slices/themeSlice';
 import { useZoom } from '@frontend/slices/zoomSlice';
 import { isMac } from '@frontend/utils/platform';
-import { Theme } from '@utils/colours';
 import React from 'react';
 
 import { HeaderButtons } from './HeaderButtons';
 import { HeaderLeft } from './HeaderLeft';
 import { HeaderTooltip } from './HeaderTooltip';
+import { Theme } from '@scanning_bee/ipc-interfaces';
 
 export default function Header(props: {
     page: PageType,
