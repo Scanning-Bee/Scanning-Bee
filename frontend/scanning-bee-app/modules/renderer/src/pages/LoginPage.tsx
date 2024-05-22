@@ -4,6 +4,8 @@ import BackendInterface from '@frontend/controllers/backendInterface/backendInte
 import StorageService from '@frontend/services/StorageService';
 import { useUserInfo } from '@frontend/slices/userInfoSlice';
 import { LoginFooter } from '@frontend/toolbars/LoginFooter';
+import { RENDERER_EVENTS } from '@scanning_bee/ipc-interfaces';
+import { ipcRenderer } from 'electron';
 import React, { useEffect, useState } from 'react';
 
 export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
@@ -36,7 +38,13 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
 
     const [loginError, setLoginError] = useState(false);
 
-    console.log(loginError);
+    useEffect(() => {
+        ipcRenderer.send(RENDERER_EVENTS.LOGIN_PAGE, true);
+
+        return () => {
+            ipcRenderer.send(RENDERER_EVENTS.LOGIN_PAGE, false);
+        };
+    }, []);
 
     useEffect(() => {
         setLoginError(false);

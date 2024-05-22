@@ -20,6 +20,7 @@ urlpatterns = [
     path('user_list/<int:id>', views.UserList.as_view(), name='user-list'),
 
     path('user_detail/<int:id>', views.UserDetail.as_view(), name='user-detail'),
+    path('user_detail/<str:username>', views.UserDetail.as_view(), name='user-detail'),
 
     path('frame_list', views.FrameList.as_view(), name='frame-list'),
     path('frame_list/<int:id>', views.FrameList.as_view(), name='frame-list'),
@@ -44,8 +45,10 @@ urlpatterns = [
     path('cellcontent_list/<str:filter_type>/<float:x_pos>/<float:y_pos>/<datetime:timestamp>', views.CellContentList.as_view(), name='cellcontent-detail'),
     path('cellcontent_list/<str:filter_type>/<datetime:start_time>/<datetime:end_time>', views.CellContentList.as_view(), name='cellcontent-detail'),
     path('cellcontent_list/<str:filter_type>/<datetime:start_time>', views.CellContentList.as_view(), name='cellcontent-detail'),
+    path('cellcontent_list/<str:filter_type>', views.CellContentList.as_view(), name='cellcontent-detail'),
 
     path('cellcontent_detail/<int:id>', views.CellContentDetail.as_view(), name='cellcontent-detail'),
+    path('cellcontent_detail/<str:username>', views.CellContentDetail.as_view(), name='cellcontent-detail'),
 
     path('cellcontentsbyai/<float:x_pos>/<float:y_pos>', views.CellContentsByAI.as_view(), name='cellcontent-detail'),
     path('cellcontentsbyai/<float:x_pos>/<float:y_pos>/<datetime:timestamp>', views.CellContentsByAI.as_view(), name='cellcontent-detail'),

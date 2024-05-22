@@ -1,3 +1,20 @@
+export type Theme = {
+    title: string;
+    type: 'light' | 'dark';
+    primaryForeground: string;
+    secondaryForeground: string;
+    tertiaryForeground: string;
+    primaryBackground: string;
+    secondaryBackground: string;
+    tertiaryBackground: string;
+    primaryAccent: string;
+    secondaryAccent: string;
+    tertiaryAccent: string;
+    primaryBorder: string;
+    secondaryBorder: string;
+    tertiaryBorder: string;
+};
+
 export type AnnotationYaml = {
     annotated_image: string;
     annotation: string;

@@ -2,7 +2,7 @@ import BackendInterface from '@frontend/controllers/backendInterface/backendInte
 import { useBackendStatus } from '@frontend/slices/backendStatusSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { capitalizeFirstLetter, checkIsBackendOnline, getMemoryUsage, initiateIsBackendOnlineCheck } from '@frontend/utils/miscUtils';
-import { Theme } from '@utils/colours';
+import { Theme } from '@scanning_bee/ipc-interfaces';
 import React, { useEffect, useState } from 'react';
 import Loader from 'react-loader-spinner';
 
