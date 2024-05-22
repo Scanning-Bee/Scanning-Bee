@@ -2,14 +2,17 @@ import Background from '@assets/images/login-background.png';
 import { Button, Divider, FormGroup, InputGroup } from '@blueprintjs/core';
 import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import StorageService from '@frontend/services/StorageService';
-import { useUserInfo } from '@frontend/slices/userInfoSlice';
+import { setUserInfo, useUserInfo } from '@frontend/slices/userInfoSlice';
 import { LoginFooter } from '@frontend/toolbars/LoginFooter';
 import { RENDERER_EVENTS } from '@scanning_bee/ipc-interfaces';
 import { ipcRenderer } from 'electron';
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
     const { setPage } = props;
+
+    const dispatch = useDispatch();
 
     const userInfo = useUserInfo();
 
@@ -18,6 +21,11 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
 
         if (accessToken) {
             setPage('home');
+
+            dispatch(setUserInfo({
+                ...userInfo,
+                userName: StorageService.getUsername(),
+            }));
         }
     }, []);
 
@@ -102,7 +110,7 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                             <InputGroup
                                 className='login-input'
                                 id='last_name'
-                                value={email}
+                                value={lastName}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLastName(e.target.value)}
                                 fill
                             />
@@ -173,6 +181,15 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                                 if (loginType === 'login') {
                                     const success = await BackendInterface.login({ username, password });
 
+                                    if (success) {
+                                        dispatch(setUserInfo({
+                                            userType: '2',
+                                            userName: username,
+                                            userId: '',
+                                            loggedIn: true,
+                                        }));
+                                    }
+
                                     setLoginError(!success);
                                 } else {
                                     const pwdMatch = password === repeatPassword;
@@ -182,6 +199,15 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
 
                                     const success = await BackendInterface
                                         .signin({ username, password, email, user_type: '2', first_name: firstName, last_name: lastName });
+
+                                    if (success) {
+                                        dispatch(setUserInfo({
+                                            userType: '2',
+                                            userName: username,
+                                            userId: '',
+                                            loggedIn: true,
+                                        }));
+                                    }
 
                                     setLoginError(!success);
                                 }

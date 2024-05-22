@@ -133,6 +133,7 @@ class BackendInterface {
 
         StorageService.setAccessToken(res.access);
         StorageService.setRefreshToken(res.refresh);
+        StorageService.setUsername(data.username);
 
         (window as any).RendererController.setPage('home');
 
@@ -150,6 +151,7 @@ class BackendInterface {
 
         StorageService.setAccessToken(res.access_token);
         StorageService.setRefreshToken(res.refresh_token);
+        StorageService.setUsername(data.username);
 
         (window as any).RendererController.setPage('home');
 

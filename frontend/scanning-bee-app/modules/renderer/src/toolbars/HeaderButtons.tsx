@@ -1,6 +1,7 @@
 import { Button, Icon, Menu, MenuItem, Popover } from '@blueprintjs/core';
 import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import { useTheme } from '@frontend/slices/themeSlice';
+import { useUserInfo } from '@frontend/slices/userInfoSlice';
 import React from 'react';
 
 const SettingsButton = (props: { setPage: any }) => {
@@ -27,6 +28,8 @@ export const HeaderButtons = (props: { page: any, setPage: any }) => {
 
     const theme = useTheme();
 
+    const userInfo = useUserInfo();
+
     return (
         <div
             id="header-buttons"
@@ -48,7 +51,8 @@ export const HeaderButtons = (props: { page: any, setPage: any }) => {
                     className='header-button'
                 />
                 <Menu>
-                    <MenuItem   
+                    <p style={{ margin: '10px', textAlign: 'center' }}>@{userInfo.userName}</p>
+                    <MenuItem
                         text='Log out'
                         icon='log-out'
                         onClick={() => BackendInterface.logout()}
