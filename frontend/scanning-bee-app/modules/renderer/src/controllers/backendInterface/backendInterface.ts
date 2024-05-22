@@ -227,9 +227,8 @@ class BackendInterface {
         this.apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.BY_IMAGE_NAME_RECT(imageName), 'get');
     };
 
-    public getCellContentByLocation = async (x: number, y: number) => {
-        this.apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.BY_LOCATION(x, y), 'get');
-    };
+    public getCellContentByLocation = async (x: number, y: number) => this
+        .apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.BY_LOCATION(x, y), 'get');
 
     public createCellContent = async (cellContent: CellContentDto) => this
         .apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.POST.CREATE, 'post', cellContent);
