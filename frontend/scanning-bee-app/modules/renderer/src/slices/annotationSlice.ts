@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { UUID } from 'crypto';
 import { ipcRenderer } from 'electron';
 import { useSelector } from 'react-redux';
