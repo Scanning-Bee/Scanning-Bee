@@ -47,9 +47,25 @@ def real_world_alternative(x_pos_norm, y_pos_norm, z_distance, points_2d, camera
     return (real_world_x, real_world_y)
 
 
+#def get_index_from_coordinate(real_world_x, real_world_y):
+#        i = round((real_world_x[0] - 0.04914692) / 0.00528934)
+#        j = round((real_world_y[0] - 0.00362747) / 0.00346662)
+#        return i, j
+
 def get_index_from_coordinate(real_world_x, real_world_y):
-        i = round((real_world_x - 0.04914692) / 0.00528934)
-        j = round((real_world_y - 0.00362747) / 0.00346662)
+    try:
+        if (0.08284273 <= real_world_x <= 0.4309411 and
+               0.01495806 <= real_world_y <= 0.4165364):
+            i = round((real_world_x[0] - 0.08284273) / 0.00528934)
+            j = round((real_world_y[0] - 0.01495806) / 0.00346662)
+
+            return i, j
+    
+        else:
+            raise ValueError("Invalid reaal world coordinate values..")
+        
+    except Exception as e:
+        raise(e)
 
 def get_index_from_real_world(x_pos_norm, y_pos_norm, z_distance, points_2d, camera_info_path="scanning_bee_app/camera_info.csv"):
     real_world_x, real_world_y = real_world_alternative(x_pos_norm, y_pos_norm, z_distance, points_2d, camera_info_path)

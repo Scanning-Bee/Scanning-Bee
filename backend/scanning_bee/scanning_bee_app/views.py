@@ -16,7 +16,7 @@ from .permissions import IsBiologOrSelf
 
 from .models import *
 from .serializers import *
-from .real_world_coordiantes import convert_to_world_coordinates
+from .real_world_coordiantes import get_index_from_real_world
 
 from datetime import datetime, timezone
 
@@ -88,8 +88,6 @@ class UserRegistrationView(APIView):
         if serializer.is_valid():
             user = get_user_model().objects.create_user(
                 username=serializer.validated_data['username'],
-                first_name=serializer.validated_data['first_name'],
-                last_name=serializer.validated_data['last_name'],
                 password=serializer.validated_data['password'],
                 email=serializer.validated_data['email'],
                 user_type=serializer.validated_data.get('user_type') 
@@ -118,9 +116,12 @@ class UserLoginView(APIView):
                 'refresh_token': str(refresh),
             }, status=status.HTTP_200_OK)
         else:
-            # Authentication failed
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
+        
+class UsernameById(APIView):
+    def get(self, request, id):
+        user = get_object_or_404(CustomUser, id=id)
+        return Response({'username': user.username})
 
 class UserList(ListCreateAPIView):
     serializer_class = CustomUserSerializer
@@ -128,6 +129,7 @@ class UserList(ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
+        
         if user.user_type.type == "Biolog":
             return CustomUser.objects.all()
         else:
@@ -270,25 +272,6 @@ class CellContentList(ListCreateAPIView):
             image_list = Image.objects.filter(image_name=image_name)
             queryset = queryset.filter(image__in=image_list)
 
-        # Todo: Bu kısım da değişecek...
-        elif filter_type == "image_name_rect":
-            image_name = self.kwargs.get('arg')
-            image = Image.objects.get(image_name=image_name)
-            min_x, min_y = convert_to_world_coordinates((0, 0), image.x_pos, image.y_pos)
-            max_x, max_y = convert_to_world_coordinates((1920, 1080), image.x_pos, image.y_pos)
-
-            cells = Cell.objects.filter(
-                frame=1,
-                location_on_frame_x__gte=min_x,
-                location_on_frame_x__lte=max_x,
-                location_on_frame_y__gte=min_y,
-                location_on_frame_y__lte=max_y
-            )
-
-            if cells.exists():
-                queryset = queryset.filter(cell__in=cells)
-            else:
-                queryset = queryset.none()
 
         elif filter_type == "location":
             x_pos = self.kwargs.get('x_pos')
@@ -402,7 +385,7 @@ class CellContentsByAI(ListCreateAPIView):
             project_root = os.path.abspath(os.path.join(settings.BASE_DIR, "../../"))
             image_path = os.path.join(project_root, f"AnnotationFiles/{bag_name}/{image.image_name}")
 
-            print('image_path at views: ', image_path)
+            #print('image_path at views: ', image_path)
 
             all_detected_circles = classify_cell_states(image_path)
 
@@ -415,9 +398,14 @@ class CellContentsByAI(ListCreateAPIView):
 
             for pixel_coords, content in all_detected_circles.items():
                 # Find which content in the database
+                print(content)
                 if content == "PUPPA":
                     content = "PUPA"
-                content = Content.objects.get(name=content)
+                
+                try:
+                    content = Content.objects.get(name=content)
+                except Content.DoesNotExist:
+                    print(f"SIKINTILI CONTENT: {content}")
                 x, y, radius = pixel_coords
                 cell_content = CellContent(cell=None, 
                                            frame=frame, 

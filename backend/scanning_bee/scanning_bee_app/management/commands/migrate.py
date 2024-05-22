@@ -25,8 +25,8 @@ class Command(MigrateCommand):
     def generate_initial_cells(self):
         cells = []
         pk = 1
-        for i in range(1, 81):
-            for j in range(1, 65):
+        for i in range(1, 117):
+            for j in range(1, 66):
                 cell = {
                     "model": "scanning_bee_app.cell",  # Replace with the actual app name
                     "pk": pk,

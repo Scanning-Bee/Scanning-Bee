@@ -104,8 +104,8 @@ class CellContent(models.Model):
         y_pos = my_image.y_pos
         self.timestamp = my_image.timestamp
 
-        i_index, j_index =  get_index_from_real_world(x_pos, y_pos, 0.06, [(self.center_x, self.center_y)])
-        self.cell = Cell.objects.filter(frame=self.frame, i_index=i_index, j_index=j_index)
+        i_index, j_index =  get_index_from_real_world(x_pos, y_pos, 0.06, [self.center_x, self.center_y])
+        self.cell = Cell.objects.filter(frame=self.frame, i_index=i_index, j_index=j_index).first()
 
         super(CellContent, self).save(*args, **kwargs)
 
