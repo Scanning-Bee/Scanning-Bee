@@ -46,7 +46,7 @@ export const parseWorkspace = async (folderPath: string): Promise<WorkspaceInfo>
     if (!await fs.pathExists(workspaceInfoFilePath)) {
         await createWorkspaceInfoFile(folderPath, DUMMY_WORKSPACE_INFO);
 
-        return null;
+        return DUMMY_WORKSPACE_INFO;
     }
 
     return fs.readJson(workspaceInfoFilePath);
