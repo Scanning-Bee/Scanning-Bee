@@ -5,7 +5,7 @@
 @import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 
 
-
+@import "./theme_dependent.css";
 @import "./fonts.css";
 @import "./bp3_overrides.css";
 
@@ -393,7 +393,7 @@ a {
 
 .heatmap-grid{
   background-image: linear-gradient(rgba(0, 255, 0, .7) .1em, transparent .1em), linear-gradient(90deg, rgba(0, 255, 0, .7) .1em, transparent .1em);
-  background-size: 80px 80px;
+  background-size: 50px 50px;
   border-right: 1px solid rgba(0, 255, 0, .7);
   border-bottom: 1px solid rgba(0, 255, 0, .7);
 }
@@ -883,4 +883,64 @@ a {
 
 .timestamp-display > p {
   margin: 5px 0 5px 10px;
+}
+
+.statistics-page {
+
+}
+
+#root .bp3-tab-panel {
+  width: 100%;
+  height: 100%;
+}
+
+.statistics-page > .bp3-tabs {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.stats-tabs > .bp3-tab-list {
+  width: 20%;
+  min-width: 250px;
+  display: block;
+}
+
+.stats-tabs > .bp3-tab-list > .bp3-tab-insicator-wrapper {
+  border-radius: 10px;
+}
+
+.stats-tab {
+  height: 50px;
+  width: calc(100% - 10px) !important;
+  margin: 5px;
+  display: flex;
+  align-items: center;
+  font-size: large;
+  font-weight: lighter;
+}
+
+.stats-tab > .bp3-icon {
+  margin: 0 10px 0 0;
+}
+
+.stats-panel {
+  margin-top: 0;
+    padding: 20px;
+    overflow: scroll;
+    height: 100%;
+}
+
+.list-stats {
+  justify-content: space-evenly;
+  display: flex;
+  flex-direction: column;
+}
+
+.stats-time-picker > .bp3-menu {
+  background: unset;
+}
+
+.time-pickers {
+  margin-top: 10px;
 }

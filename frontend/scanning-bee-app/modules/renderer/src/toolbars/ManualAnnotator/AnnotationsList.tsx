@@ -1,5 +1,5 @@
 import { Button, Icon } from '@blueprintjs/core';
-import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
+import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import {
     createNewAnnotation,
     setActiveAnnotations,
@@ -96,7 +96,7 @@ export const AnnotationsList = () => {
             <Button
                 text='Generate annotations with AI'
                 onClick={() => {
-                    BackendInterface.getInstance().generateAnnotationsByAI(getFileName(shownImageUrl));
+                    BackendInterface.generateAnnotationsByAI(getFileName(shownImageUrl));
                 }}
                 intent='success'
                 icon='send-to-graph'

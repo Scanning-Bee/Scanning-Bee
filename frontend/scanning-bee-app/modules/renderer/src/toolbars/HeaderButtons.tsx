@@ -1,5 +1,5 @@
 import { Button, Icon, Menu, MenuItem, Popover } from '@blueprintjs/core';
-import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
+import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import { useTheme } from '@frontend/slices/themeSlice';
 import React from 'react';
 
@@ -51,7 +51,7 @@ export const HeaderButtons = (props: { page: any, setPage: any }) => {
                     <MenuItem   
                         text='Log out'
                         icon='log-out'
-                        onClick={() => BackendInterface.getInstance().logout()}
+                        onClick={() => BackendInterface.logout()}
                     />
                 </Menu>
             </Popover>

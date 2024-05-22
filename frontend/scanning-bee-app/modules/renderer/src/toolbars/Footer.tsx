@@ -1,4 +1,4 @@
-import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
+import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import { useBackendStatus } from '@frontend/slices/backendStatusSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { capitalizeFirstLetter, checkIsBackendOnline, getMemoryUsage, initiateIsBackendOnlineCheck } from '@frontend/utils/miscUtils';
@@ -47,7 +47,7 @@ export default function Footer() {
                 <p
                     className={`backend-status-indicator ${backendStatus}`}
                     onClick={() => {
-                        if (backendStatus === 'offline') BackendInterface.getInstance().invokeBackend();
+                        if (backendStatus === 'offline') BackendInterface.invokeBackend();
                     }}
                 >
                     Backend: {capitalizeFirstLetter(backendStatus)}

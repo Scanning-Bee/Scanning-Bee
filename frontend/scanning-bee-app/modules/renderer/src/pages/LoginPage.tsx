@@ -1,6 +1,6 @@
 import Background from '@assets/images/login-background.png';
 import { Button, Divider, FormGroup, InputGroup } from '@blueprintjs/core';
-import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
+import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import StorageService from '@frontend/services/StorageService';
 import { useUserInfo } from '@frontend/slices/userInfoSlice';
 import { LoginFooter } from '@frontend/toolbars/LoginFooter';
@@ -141,7 +141,7 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                             text={loginType === 'login' ? 'Login' : 'Sign in'}
                             onClick={async () => {
                                 if (loginType === 'login') {
-                                    const success = await BackendInterface.getInstance().login({ username, password });
+                                    const success = await BackendInterface.login({ username, password });
 
                                     setLoginError(!success);
                                 } else {
@@ -150,7 +150,7 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
 
                                     if (!pwdMatch) return;
 
-                                    const success = await BackendInterface.getInstance()
+                                    const success = await BackendInterface
                                         .signin({ username, password, email, user_type: '2' });
 
                                     setLoginError(!success);
