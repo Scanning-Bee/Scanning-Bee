@@ -1,9 +1,12 @@
 import numpy as np
 import cv2
 import pandas as pd
+from typing import Tuple
 
+def euclidean_distance(p1, p2):
+    return np.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
 
-def get_camera_info(camera_info_file_path="scanning_bee_app/camera_info.csv"):
+def get_camera_info(camera_info_file_path="scanning_bee_app/camera_info.csv") -> Tuple[np.ndarray, np.ndarray]:
     try:
         # Read the CSV file using Pandas
         camera_info = pd.read_csv(camera_info_file_path)
@@ -20,35 +23,35 @@ def get_camera_info(camera_info_file_path="scanning_bee_app/camera_info.csv"):
     
     except Exception as e:
         raise ValueError(f"An error occurred while reading the camera info: {e}")
-
-
-def convert_to_world_coordinates(point_2d, x_pos, y_pos, Z=1, camera_info_path="scanning_bee_app/camera_info.csv"):
-    """
-    Converts a 2D point in image coordinates to 3D world coordinates using the camera's calibration data.
-
-    :param point_2d: A tuple or list with the x, y coordinates of the point in the image.
-    :param K: Intrinsic matrix of the camera.
-    :param D: Distortion coefficients of the camera.
-    :param x_pos: The x position of the camera in world coordinates.
-    :param y_pos: The y position of the camera in world coordinates.
-    :param Z: Assumed depth for the 3D point. Defaults to 1.
-    :return: Numpy array representing the 3D point in world coordinates.
-    """
+    
+def real_world_alternative(x_pos_norm, y_pos_norm, z_distance, points_2d, camera_info_path="scanning_bee_app/camera_info.csv"):
     K, D = get_camera_info(camera_info_path)
-
-    # Ensure the point is in the correct shape for cv2.undistortPoints
-    point_2d = np.array(point_2d, dtype='float64').reshape(1, 1, 2)
+    points_2d = np.array(points_2d, dtype=np.float32).reshape(-1, 1, 2)
     
-    # Correct for distortion and convert to normalized camera coordinates
-    undistorted_normalized = cv2.undistortPoints(point_2d, K, D, None, K)
+    # step 1: Undistort points
+    undistorted_points = cv2.undistortPoints(points_2d, K, D, None, K)
+    undistorted_points = undistorted_points.reshape(-1, 2)
 
-    # Convert the normalized point to homogeneous coordinates
-    point_normalized_homogeneous = np.array([undistorted_normalized[0][0][0], undistorted_normalized[0][0][1], 1])
-    
-    # Apply the camera's position as translation
-    world_point = np.dot(np.linalg.inv(K), point_normalized_homogeneous) * Z
-    world_point[0] += x_pos
-    world_point[1] += y_pos
+    # calculate the pixel size (in meters)
+    pixel_size = z_distance / K[0, 0]
 
-    return world_point[0], world_point[1]
+    # step 2: Convert pixel coordinates to meters
+    # coordinates are centered around the optical center and scaled
+    real_world_x = (undistorted_points[:, 0] - K[0, 2]) * pixel_size
+    real_world_y = (undistorted_points[:, 1] - K[1, 2]) * pixel_size
+
+    # add the real world camera translations to the converted coordinate values
+    real_world_x += x_pos_norm
+    real_world_y += y_pos_norm
+
+    return (real_world_x, real_world_y)
+
+
+def get_index_from_coordinate(real_world_x, real_world_y):
+        i = round((real_world_x - 0.04914692) / 0.00528934)
+        j = round((real_world_y - 0.00362747) / 0.00346662)
+
+def get_index_from_real_world(x_pos_norm, y_pos_norm, z_distance, points_2d, camera_info_path="scanning_bee_app/camera_info.csv"):
+    real_world_x, real_world_y = real_world_alternative(x_pos_norm, y_pos_norm, z_distance, points_2d, camera_info_path)
+    return get_index_from_coordinate(real_world_x, real_world_y)
 

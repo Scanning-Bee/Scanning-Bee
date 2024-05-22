@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 
 from .managers import CustomUserManager
-from .real_world_coordiantes import convert_to_world_coordinates
+from .real_world_coordiantes import get_index_from_real_world
 
 CELL_LOC_THRESHOLD = 0.01
 
@@ -104,10 +104,11 @@ class CellContent(models.Model):
         y_pos = my_image.y_pos
         self.timestamp = my_image.timestamp
 
-        # Todo: index şeysi gelince ekle fonksiyonu buraya ve yorum satırından çıkar.
-        # i_index, j_index = find_index_of_cell()
-        # self.cell = Cell.objects.filter(frame=self.frame, i_index=i_index, j_index=j_index)
+        i_index, j_index =  get_index_from_real_world(x_pos, y_pos, 0.06, [(self.center_x, self.center_y)])
+        self.cell = Cell.objects.filter(frame=self.frame, i_index=i_index, j_index=j_index)
 
         super(CellContent, self).save(*args, **kwargs)
+
+    
 
 
