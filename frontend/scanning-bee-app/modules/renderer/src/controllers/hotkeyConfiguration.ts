@@ -11,7 +11,7 @@ import {
 } from '@frontend/slices/annotationSlice';
 import { isMac } from '@frontend/utils/platform';
 
-import { BackendInterface } from './backendInterface/backendInterface';
+import BackendInterface from './backendInterface/backendInterface';
 
 export interface HotkeyConfigurationInterface {
     dispatch: (action: any) => void;
@@ -71,7 +71,7 @@ export const initializeHotkeyConfiguration = (ifc: HotkeyConfigurationInterface)
                 return;
             }
 
-            BackendInterface.getInstance().saveAnnotations(annotations, targetFolder);
+            BackendInterface.saveAnnotations(annotations, targetFolder);
         },
     },
     {
@@ -85,7 +85,7 @@ export const initializeHotkeyConfiguration = (ifc: HotkeyConfigurationInterface)
                 return;
             }
 
-            BackendInterface.getInstance().saveAnnotationsToDatabase(annotations);
+            BackendInterface.saveAnnotationsToDatabase(annotations);
         },
     },
     {

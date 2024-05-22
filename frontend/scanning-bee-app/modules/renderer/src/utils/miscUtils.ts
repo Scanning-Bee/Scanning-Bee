@@ -1,5 +1,5 @@
 import { getProcessMemoryInfo } from 'process';
-import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
+import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import { setBackendOnline } from '@frontend/slices/backendStatusSlice';
 
 import { isMac } from './platform';
@@ -52,7 +52,7 @@ export const getMemoryUsage = async () => {
 };
 
 export const checkIsBackendOnline = async () => {
-    BackendInterface.getInstance().getFrames().then((res) => {
+    BackendInterface.getFrames().then((res) => {
         setBackendOnline(res !== null);
     }).catch(() => {
         setBackendOnline(false);

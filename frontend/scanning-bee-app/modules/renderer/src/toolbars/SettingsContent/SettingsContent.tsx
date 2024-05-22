@@ -1,6 +1,9 @@
-import { Button, ButtonGroup, Card, Menu, MenuItem, Popover } from '@blueprintjs/core';
+import {
+    Button, ButtonGroup, Card, FormGroup, InputGroup, Menu, MenuItem, NumericInput, Popover, Position,
+} from '@blueprintjs/core';
 import { initializeHotkeyConfiguration } from '@frontend/controllers/hotkeyConfiguration';
 import StorageService from '@frontend/services/StorageService';
+import { updateWorkspaceInfo, useWorkspaceInfo } from '@frontend/slices/annotationSlice';
 import { setTheme, useTheme } from '@frontend/slices/themeSlice';
 import { resetZoom, setZoom } from '@frontend/slices/zoomSlice';
 import { Themes } from '@frontend/utils/colours';
@@ -144,6 +147,99 @@ export const AdvancedSettings = () => {
                         }}
                         style={{ alignSelf: 'center', height: 'fit-content' }}
                     />
+                </div>
+            </Card>
+        </div>
+    );
+};
+
+export const WorkspaceSettings = () => {
+    const theme = useTheme();
+
+    const workspace = useWorkspaceInfo();
+
+    const dispatch = useDispatch();
+
+    return (
+        <div>
+            <h2 className='settings-title'>Workspace Settings</h2>
+            <Card style={{ backgroundColor: theme.secondaryBackground }}>
+                <div className='settings-card'>
+                    <p>
+                    Workspace Name
+                    </p>
+                    <FormGroup
+                    >
+                        <InputGroup
+                            id='workspace-input'
+                            value={workspace.name}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(updateWorkspaceInfo({
+                                name: e.target.value,
+                            }))}
+                        />
+                    </FormGroup>
+                </div>
+            </Card>
+            <Card style={{ backgroundColor: theme.secondaryBackground }}>
+                <div className='settings-card'>
+                    <p>
+                    Workspace Frame
+                    </p>
+                    <NumericInput
+                        placeholder='change'
+                        value={workspace.frame}
+                        onValueChange={val => dispatch(updateWorkspaceInfo({
+                            frame: val,
+                        }))}
+                        buttonPosition={Position.LEFT}
+                        style={{
+                            width: '50px',
+                        }}
+                        min={0}
+                    />
+                </div>
+            </Card>
+            <Card style={{ backgroundColor: theme.secondaryBackground }}>
+                <div className='settings-card'>
+                    <p>
+                    Workspace Hive
+                    </p>
+                    <Popover
+                        interactionKind='click'
+                    >
+                        <Button
+                            text={workspace.hive}
+                            rightIcon='caret-down'
+                            style={{ alignSelf: 'center' }}
+                        />
+                        <Menu>
+                            {
+                                [
+                                    'Austria',
+                                    'Belgium',
+                                    'Bulgaria',
+                                    'Turkey',
+                                    workspace.hive,
+                                ].map((beehive, index) => (
+                                    <MenuItem
+                                        key={index}
+                                        text={beehive}
+                                        onClick={() => {
+                                            dispatch(updateWorkspaceInfo({
+                                                hive: beehive,
+                                            }));
+                                        }}
+                                        style={{
+                                            padding: '5px',
+                                            margin: '0 5px',
+                                            color: 'black',
+                                        }}
+                                        active={beehive === workspace.hive}
+                                    />
+                                ))
+                            }
+                        </Menu>
+                    </Popover>
                 </div>
             </Card>
         </div>

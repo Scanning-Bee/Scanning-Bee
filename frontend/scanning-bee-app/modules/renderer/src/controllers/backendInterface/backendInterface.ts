@@ -5,6 +5,7 @@ import { ipcRenderer, shell } from 'electron';
 import Annotation from '@frontend/models/annotation';
 import { BeehiveCell } from '@frontend/models/beehive';
 import CellType from '@frontend/models/cellType';
+import { AnnotatorStatistic } from '@frontend/models/statistics';
 import StorageService from '@frontend/services/StorageService';
 import { addAnnotation, getAnnotationsMetadata, saveChanges } from '@frontend/slices/annotationSlice';
 import { resetBackendStatus } from '@frontend/slices/backendStatusSlice';
@@ -16,16 +17,30 @@ import { AnnotationYaml, RENDERER_QUERIES } from '@scanning_bee/ipc-interfaces';
 import { AUTH_ENDPOINTS, BACKEND_ENDPOINTS, ENDPOINT_URL } from './endpoints';
 import {
     BagID,
-    CellContentDto, CellContentID, CellDto, CellID, CellTypeDto, ContentDto, ContentID, FrameDto, FrameID, ImageDto, LoginDto, LoginResponseDto, LogoutDto, RegisterResponseDto, SigninDto, UserDto, UserTypeDto,
+    CellContentDto,
+    CellContentID,
+    CellDto,
+    CellID,
+    CellTypeDto,
+    ContentDto,
+    ContentID,
+    FrameDto,
+    FrameID,
+    ImageDto,
+    LoginDto,
+    LoginResponseDto,
+    LogoutDto,
+    RegisterResponseDto,
+    SigninDto,
+    UserDto,
+    UserTypeDto,
     UserTypeID,
 } from './payloadTypes';
 
 type APIMethods = 'get' | 'post' | 'put' | 'delete';
 
-export class BackendInterface {
+class BackendInterface {
     apiClient: AxiosInstance = null;
-
-    static _instance: BackendInterface = null;
 
     constructor() {
         this.apiClient = axios.create({
@@ -55,14 +70,6 @@ export class BackendInterface {
                 return Promise.reject(error);
             },
         );
-    }
-
-    public static getInstance() {
-        if (!this._instance) {
-            this._instance = new BackendInterface();
-        }
-
-        return this._instance;
     }
 
     public openFolderAtLocation = (folder: string) => {
@@ -211,21 +218,17 @@ export class BackendInterface {
     public deleteContent = async (id: ContentID) => this.apiQuery<ContentDto>(BACKEND_ENDPOINTS.CONTENT.DELETE.BY_ID(id), 'delete');
 
     // * CELL CONTENT
-    public getCellContents = async () => {
-        this.apiQuery<CellContentDto[]>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.LIST, 'get');
-    };
+    public getCellContents = async () => this.apiQuery<CellContentDto[]>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.LIST, 'get');
 
-    public getCellContentByImageName = async (imageName: string) => {
-        this.apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.BY_IMAGE_NAME(imageName), 'get');
-    };
+    public getCellContentByImageName = async (imageName: string) => this
+        .apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.BY_IMAGE_NAME(imageName), 'get');
 
     public getCellContentByImageNameRectangle = async (imageName: string) => {
         this.apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.BY_IMAGE_NAME_RECT(imageName), 'get');
     };
 
-    public getCellContentByLocation = async (x: number, y: number) => {
-        this.apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.BY_LOCATION(x, y), 'get');
-    };
+    public getCellContentByLocation = async (x: number, y: number) => this
+        .apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.BY_LOCATION(x, y), 'get');
 
     public createCellContent = async (cellContent: CellContentDto) => this
         .apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.POST.CREATE, 'post', cellContent);
@@ -237,6 +240,15 @@ export class BackendInterface {
     public getUsers = async () => this.apiQuery<UserDto[]>(BACKEND_ENDPOINTS.USER.GET.LIST, 'get');
 
     public createUser = async (user: UserDto) => this.apiQuery<UserDto>(BACKEND_ENDPOINTS.USER.POST.CREATE, 'post', user);
+
+    // return this.apiQuery<UserDto>(BACKEND_ENDPOINTS.USER.GET.BY_ID(id), 'get');
+    public getUserByID = async (id: number) => ({
+        id,
+        user_type: 2,
+        username: `johndoe${String(id)}`,
+        email: `johndoe${String(id)}@example.com`,
+        annotation_count: 0,
+    } as UserDto);
 
     // * USER TYPES
     public getUserTypes = async () => this.apiQuery<UserTypeDto[]>(BACKEND_ENDPOINTS.USER_TYPE.GET.LIST, 'get');
@@ -512,4 +524,73 @@ export class BackendInterface {
             '2021-01-28T00:00:00.000Z',
         ].map(ts => new Date(ts).getTime());
     };
+
+    public getAnnotatorsForFolder = async (folder: string) => {
+        console.log('Getting annotators for', folder);
+
+        return [
+            `johndoe_${folder}`,
+            'janedoe',
+            'alicewonderland',
+            'bobbuilder',
+        ];
+    };
+
+    public getAnnotatorStatistics = async (folder: string) => {
+        // DUMMY FOR NOW. TODO:
+        console.log('Getting annotator statistics for', folder);
+
+        const annotatorNames = ['John Doe', 'Jane Doe', 'Alice Wonderland', 'Bob Builder'];
+        const usernames = this.getAnnotatorsForFolder(folder);
+
+        const annotatorStatistics: AnnotatorStatistic[] = [];
+
+        annotatorNames.forEach((annotatorName) => {
+            const totalImages = Math.floor(Math.random() * 100);
+
+            const annotationsByCellType = {} as Record<CellType, number>;
+
+            Object.keys(CellType).forEach((cellType) => {
+                annotationsByCellType[cellType] = Math.floor(Math.random() * 100);
+            });
+
+            const totalAnnotations = Object.values(annotationsByCellType).reduce((acc, curr) => acc + curr, 0);
+
+            annotatorStatistics.push({
+                fullName: annotatorName,
+                username: usernames[annotatorNames.indexOf(annotatorName)],
+                totalAnnotations,
+                totalImages,
+                annotationsByCellType,
+            });
+        });
+
+        return annotatorStatistics;
+    };
+
+    public getAnnotationsMadeByUser = async (username: string) => {
+        console.log('Getting annotations made by', username);
+
+        const annotations: Annotation[] = [];
+
+        const cellTypes = Object.keys(CellType);
+
+        for (let i = 0; i < Math.random() * 10000; i += 1) {
+            const cellType = cellTypes[Math.floor(Math.random() * cellTypes.length)];
+
+            annotations.push(new Annotation({
+                cell_type: CellType[cellType],
+                center: [Math.random() * 100, Math.random() * 100],
+                radius: Math.random() * 10,
+                timestamp: new Date().getTime() - Math.random() * 1_000_000_000,
+                source_name: `image_${Math.floor(Math.random() * 100)}`,
+                poses: [0, 0],
+                created_by: username,
+            }));
+        }
+
+        return annotations;
+    };
 }
+
+export default new BackendInterface();

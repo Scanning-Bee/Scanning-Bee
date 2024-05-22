@@ -1,9 +1,11 @@
 import Background from '@assets/images/login-background.png';
 import { Button, Divider, FormGroup, InputGroup } from '@blueprintjs/core';
-import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
+import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import StorageService from '@frontend/services/StorageService';
 import { useUserInfo } from '@frontend/slices/userInfoSlice';
 import { LoginFooter } from '@frontend/toolbars/LoginFooter';
+import { RENDERER_EVENTS } from '@scanning_bee/ipc-interfaces';
+import { ipcRenderer } from 'electron';
 import React, { useEffect, useState } from 'react';
 
 export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
@@ -36,7 +38,13 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
 
     const [loginError, setLoginError] = useState(false);
 
-    console.log(loginError);
+    useEffect(() => {
+        ipcRenderer.send(RENDERER_EVENTS.LOGIN_PAGE, true);
+
+        return () => {
+            ipcRenderer.send(RENDERER_EVENTS.LOGIN_PAGE, false);
+        };
+    }, []);
 
     useEffect(() => {
         setLoginError(false);
@@ -133,7 +141,7 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                             text={loginType === 'login' ? 'Login' : 'Sign in'}
                             onClick={async () => {
                                 if (loginType === 'login') {
-                                    const success = await BackendInterface.getInstance().login({ username, password });
+                                    const success = await BackendInterface.login({ username, password });
 
                                     setLoginError(!success);
                                 } else {
@@ -142,7 +150,7 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
 
                                     if (!pwdMatch) return;
 
-                                    const success = await BackendInterface.getInstance()
+                                    const success = await BackendInterface
                                         .signin({ username, password, email, user_type: '2' });
 
                                     setLoginError(!success);

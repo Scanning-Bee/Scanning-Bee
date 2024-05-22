@@ -14,7 +14,7 @@ export type SigninDto = {
     password: string;
     email: string;
     user_type: string;
-}
+};
 
 export type LoginDto = {
     username: string;
@@ -28,14 +28,14 @@ export type LogoutDto = {
 export type LoginResponseDto = {
     access_token: string;
     refresh_token: string;
-}
+};
 
 export type RegisterResponseDto = {
     refresh: string;
     access: string;
     message: string;
     user: string;
-}
+};
 
 export type BagDto = {
     id?: BagID;
@@ -49,8 +49,10 @@ export type UserTypeDto = {
 
 export type UserDto = {
     id?: UserID;
-    name: string;
     user_type: number;
+    username: string;
+    email: string;
+    annotation_count: number;
 };
 
 export type FrameDto = {
@@ -85,7 +87,7 @@ export type CellContentDto = {
     frame: number;
     timestamp: string;
     content: ContentDto | number;
-    user: UserDto | number;
+    user: number;
     center_x: number;
     center_y: number;
     image: string | number | ImageDto;

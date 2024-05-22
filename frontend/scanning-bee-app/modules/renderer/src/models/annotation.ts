@@ -10,6 +10,7 @@ export interface AnnotationProps {
     source_name: string,
     timestamp: number,
     poses: number[],
+    created_by?: string,
 }
 
 export type AnnotationPropsWithID = AnnotationProps & { id: UUID };
@@ -34,6 +35,8 @@ export default class Annotation {
 
     poses: number[];
 
+    created_by: string;
+
     constructor(
         annotationProps: AnnotationProps,
     ) {
@@ -44,6 +47,7 @@ export default class Annotation {
             source_name,
             timestamp,
             poses,
+            created_by,
         } = annotationProps;
 
         this.radius = radius;
@@ -52,6 +56,7 @@ export default class Annotation {
         this.source_name = source_name;
         this.timestamp = timestamp;
         this.poses = poses;
+        this.created_by = created_by;
 
         // Generate a UUID for this annotation
         this.id = crypto.randomUUID() as UUID;
