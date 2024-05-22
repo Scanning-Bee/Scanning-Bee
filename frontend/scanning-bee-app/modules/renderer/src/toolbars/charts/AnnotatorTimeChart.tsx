@@ -1,4 +1,5 @@
 /* eslint-disable no-await-in-loop */
+import { CellContentDto, UserDto } from '@frontend/controllers/backendInterface/payloadTypes';
 import { useAnnotationsFolder } from '@frontend/slices/annotationSlice';
 import { randomColour } from '@frontend/utils/colours';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -7,7 +8,7 @@ import {
 } from 'recharts';
 
 import BackendInterface from '../../controllers/backendInterface/backendInterface';
-import { AnnotatorData, processAnnotatorData } from './tools/processAnnotatorData';
+import { processAnnotatorData } from './tools/processAnnotatorData';
 
 /**
  * returns tools to enable highlighting a user when their name on the legend is hovered over.
@@ -49,47 +50,57 @@ export const useHighlights = (users: string[]) => {
 };
 
 export const AnnotatorTimeChart = () => {
-    const [data, setData] = useState<AnnotatorData>(null);
+    const [data, setData] = useState<CellContentDto[]>(null);
+    const [users, setUsers] = useState<UserDto[]>(null);
+
+    const processedData = processAnnotatorData(data, users);
 
     const folder = useAnnotationsFolder();
 
-    const [users, setUsers] = useState<string[]>([]);
-
-    const { opacity, handleMouseEnter, handleMouseLeave } = useHighlights(users);
+    const { opacity, handleMouseEnter, handleMouseLeave } = useHighlights(users ? users.map(user => user.username) : []);
 
     useEffect(() => {
-        async function fetchUsersForFolder() {
-            const res = await BackendInterface.getAnnotatorsForFolder(folder);
-            setUsers(res);
+        async function fetchUserWithID(id: number) {
+            const res = await BackendInterface.getUserByID(id);
+            return res;
         }
 
-        fetchUsersForFolder();
-    }, [folder]);
+        async function fetchAllCellContents() {
+            const res = await BackendInterface.getCellContents();
+            setData(res);
 
-    useEffect(() => {
-        async function fetchAnnotatorData() {
-            const dataToBeSet: AnnotatorData = {};
+            if (!res) {
+                setUsers([]);
 
-            for (const user of users) {
-                const res = await BackendInterface.getAnnotationsMadeByUser(user);
-
-                dataToBeSet[user] = res;
+                return;
             }
 
-            setData(dataToBeSet);
+            const annotators = [...new Set(res.map(cell => cell.user))];
+
+            if (annotators.length === 0) {
+                setUsers([]);
+
+                return;
+            }
+
+            const awaitedAnnotators = await Promise.all(annotators.map(fetchUserWithID));
+
+            setUsers(
+                awaitedAnnotators,
+            );
         }
 
-        fetchAnnotatorData();
-    }, [users]);
+        fetchAllCellContents();
+    }, [folder]);
 
-    console.log(processAnnotatorData(data));
+    console.log(processedData);
 
     return (
         <div className="Chart">
             <AreaChart
                 width={800}
                 height={500}
-                data={processAnnotatorData(data)}
+                data={processedData}
                 margin={{
                     top: 10,
                     right: 30,
@@ -104,16 +115,16 @@ export const AnnotatorTimeChart = () => {
 
                 <Tooltip itemSorter={item => (item.value as number) * (-1)}/>
                 <Legend onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}/>
-                {data && Object.keys(data).map((key, index) => <Area
-                    name={key}
+                {users && users.map((key, index) => <Area
+                    name={key.username}
                     key={index}
                     type="monotone"
-                    dataKey={key}
+                    dataKey={key.username}
                     stackId={1}
-                    stroke={randomColour(key)}
+                    stroke={randomColour(key.username)}
                     strokeOpacity={0}
-                    fillOpacity={opacity[key]}
-                    fill={randomColour(key)}
+                    fillOpacity={opacity[key.username]}
+                    fill={randomColour(key.username)}
                 />)}
             </AreaChart>
         </div>

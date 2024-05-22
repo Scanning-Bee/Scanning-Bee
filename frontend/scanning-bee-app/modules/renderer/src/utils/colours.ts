@@ -107,7 +107,7 @@ export const randomColour = (seed: string) => {
     }
 
     const val = (sum / (77 * len)) * 16777216;
-    let colour = (Math.floor(val - (16777216 - val) * (len % 4) / 10) % 16777216).toString(16);
+    let colour = (Math.floor(val - ((16777216 - val) * (len % 4)) / 10) % 16777216).toString(16);
 
     while (colour.length < 6) {
         colour = `B${colour}`;

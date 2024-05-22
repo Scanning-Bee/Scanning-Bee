@@ -22,7 +22,7 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
     }, []);
 
     useEffect(() => {
-        if (userInfo.loggedIn || true) {
+        if (userInfo.loggedIn) {
             setPage('home');
         }
     }, [userInfo.loggedIn, setPage]);

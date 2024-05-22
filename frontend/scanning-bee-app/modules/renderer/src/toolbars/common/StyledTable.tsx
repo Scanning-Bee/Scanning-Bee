@@ -1,6 +1,6 @@
-import { Theme } from '@frontend/utils/colours';
 import { TableCell, tableCellClasses, TableRow } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { Theme } from '@scanning_bee/ipc-interfaces';
 
 export const StyledTableRow = styled(TableRow)(({ theme }) => ({
     '&:nth-of-type(odd)': {

@@ -218,13 +218,10 @@ class BackendInterface {
     public deleteContent = async (id: ContentID) => this.apiQuery<ContentDto>(BACKEND_ENDPOINTS.CONTENT.DELETE.BY_ID(id), 'delete');
 
     // * CELL CONTENT
-    public getCellContents = async () => {
-        this.apiQuery<CellContentDto[]>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.LIST, 'get');
-    };
+    public getCellContents = async () => this.apiQuery<CellContentDto[]>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.LIST, 'get');
 
-    public getCellContentByImageName = async (imageName: string) => {
-        this.apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.BY_IMAGE_NAME(imageName), 'get');
-    };
+    public getCellContentByImageName = async (imageName: string) => this
+        .apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.BY_IMAGE_NAME(imageName), 'get');
 
     public getCellContentByImageNameRectangle = async (imageName: string) => {
         this.apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.BY_IMAGE_NAME_RECT(imageName), 'get');
@@ -244,6 +241,15 @@ class BackendInterface {
     public getUsers = async () => this.apiQuery<UserDto[]>(BACKEND_ENDPOINTS.USER.GET.LIST, 'get');
 
     public createUser = async (user: UserDto) => this.apiQuery<UserDto>(BACKEND_ENDPOINTS.USER.POST.CREATE, 'post', user);
+
+    // return this.apiQuery<UserDto>(BACKEND_ENDPOINTS.USER.GET.BY_ID(id), 'get');
+    public getUserByID = async (id: number) => ({
+        id,
+        user_type: 2,
+        username: `johndoe${String(id)}`,
+        email: `johndoe${String(id)}@example.com`,
+        annotation_count: 0,
+    } as UserDto);
 
     // * USER TYPES
     public getUserTypes = async () => this.apiQuery<UserTypeDto[]>(BACKEND_ENDPOINTS.USER_TYPE.GET.LIST, 'get');

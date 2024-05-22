@@ -1,3 +1,4 @@
+import { CellContentDto, UserDto } from '@frontend/controllers/backendInterface/payloadTypes';
 import Annotation from '@frontend/models/annotation';
 
 export type AnnotatorData = {
@@ -19,42 +20,34 @@ export type AnnotatorChartData = {
  * }
  * @param data
  */
-export const processAnnotatorData = (data: AnnotatorData): AnnotatorChartData[] => {
-    if (!data) return [];
-
-    const usernames = Object.keys(data);
-
-    if (usernames.length === 0) return null;
+export const processAnnotatorData = (data: CellContentDto[], users: UserDto[]): AnnotatorChartData[] => {
+    if (!data || !users) return [];
 
     const final: AnnotatorChartData[] = [];
 
     let activeTimeCell: number = -1;
 
     // sort the data
-    const sortedData: AnnotatorData = {};
+    const sortedData: CellContentDto[] = data.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
-    Object.keys(data).forEach((username) => {
-        sortedData[username] = data[username].sort((a, b) => a.timestamp - b.timestamp);
-    });
-
-    Object.values(sortedData).forEach((log) => {
-        const cell = (new Date(log[0].timestamp)).toDateString();
+    Object.values(sortedData).forEach((cellContent) => {
+        const cell = (new Date(cellContent.timestamp)).toDateString();
         const timeCellExists = activeTimeCell !== -1 && final[activeTimeCell]!.name === cell;
-        const username = log[0].created_by;
+        const user = users.find(u => u.id === cellContent.user);
 
-        console.log(username, cell, timeCellExists, activeTimeCell, final[activeTimeCell]);
+        console.log(user.username, cell, timeCellExists, activeTimeCell, final[activeTimeCell]);
 
         if (!timeCellExists) {
             activeTimeCell++;
 
             const pushed: AnnotatorChartData = { name: cell! } as AnnotatorChartData;
-            usernames.forEach((u: string) => {
-                pushed[u] = 0;
+            users.forEach((u: UserDto) => {
+                pushed[u.username] = 0;
             });
             final.push(pushed);
         }
 
-        final[activeTimeCell]![username]++;
+        final[activeTimeCell]![user.username]++;
     });
 
     return final;
