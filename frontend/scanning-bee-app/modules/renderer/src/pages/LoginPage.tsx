@@ -27,6 +27,8 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
         }
     }, [userInfo.loggedIn, setPage]);
 
+    const [firstName, setFirstName] = useState(''); // [1]
+    const [lastName, setLastName] = useState(''); // [2]
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
@@ -77,6 +79,34 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                             </p>
                         }
                         {!passwordsMatch && <p style={{ color: 'red' }}>Passwords do not match</p>}
+                        {loginType === 'signin' && <FormGroup
+                            label='First Name'
+                            labelFor='first_name'
+                            labelInfo='(required)'
+                            className='login-form-group'
+                        >
+                            <InputGroup
+                                className='login-input'
+                                id='first_name'
+                                value={firstName}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value)}
+                                fill
+                            />
+                        </FormGroup>}
+                        {loginType === 'signin' && <FormGroup
+                            label='Last Name'
+                            labelFor='last_name'
+                            labelInfo='(required)'
+                            className='login-form-group'
+                        >
+                            <InputGroup
+                                className='login-input'
+                                id='last_name'
+                                value={email}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLastName(e.target.value)}
+                                fill
+                            />
+                        </FormGroup>}
                         <FormGroup
                             label='Username'
                             labelFor='username'
@@ -151,7 +181,7 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                                     if (!pwdMatch) return;
 
                                     const success = await BackendInterface
-                                        .signin({ username, password, email, user_type: '2' });
+                                        .signin({ username, password, email, user_type: '2', first_name: firstName, last_name: lastName });
 
                                     setLoginError(!success);
                                 }

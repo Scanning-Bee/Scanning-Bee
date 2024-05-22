@@ -241,14 +241,7 @@ class BackendInterface {
 
     public createUser = async (user: UserDto) => this.apiQuery<UserDto>(BACKEND_ENDPOINTS.USER.POST.CREATE, 'post', user);
 
-    // return this.apiQuery<UserDto>(BACKEND_ENDPOINTS.USER.GET.BY_ID(id), 'get');
-    public getUserByID = async (id: number) => ({
-        id,
-        user_type: 2,
-        username: `johndoe${String(id)}`,
-        email: `johndoe${String(id)}@example.com`,
-        annotation_count: 0,
-    } as UserDto);
+    public getUserByID = async (id: number) => this.apiQuery<UserDto>(BACKEND_ENDPOINTS.USER.GET.BY_ID(id), 'get');
 
     // * USER TYPES
     public getUserTypes = async () => this.apiQuery<UserTypeDto[]>(BACKEND_ENDPOINTS.USER_TYPE.GET.LIST, 'get');

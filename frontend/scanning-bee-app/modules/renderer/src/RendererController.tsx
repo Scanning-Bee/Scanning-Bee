@@ -84,6 +84,8 @@ export class RendererController extends React.Component {
             metadata: payload.metadata,
         }));
 
+        console.log('in cuming', payload.workspaceInfo);
+
         dispatch(setWorkspaceInfo(payload.workspaceInfo));
 
         StorageService.saveProp('recentlyOpenedFolders', payload.folder, new Date().toISOString());

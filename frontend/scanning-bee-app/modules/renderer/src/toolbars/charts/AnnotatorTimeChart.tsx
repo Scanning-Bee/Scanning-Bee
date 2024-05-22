@@ -8,6 +8,7 @@ import {
 } from 'recharts';
 
 import BackendInterface from '../../controllers/backendInterface/backendInterface';
+import { DateRangePicker } from './common/DateRangePicker';
 import { processAnnotatorData } from './tools/processAnnotatorData';
 
 /**
@@ -53,7 +54,10 @@ export const AnnotatorTimeChart = () => {
     const [data, setData] = useState<CellContentDto[]>(null);
     const [users, setUsers] = useState<UserDto[]>(null);
 
-    const processedData = processAnnotatorData(data, users);
+    const [startTime, setStartTime] = useState<Date>(null);
+    const [endTime, setEndTime] = useState<Date>(null);
+
+    const processedData = processAnnotatorData(data, users, startTime, endTime);
 
     const folder = useAnnotationsFolder();
 
@@ -96,37 +100,46 @@ export const AnnotatorTimeChart = () => {
     console.log(processedData);
 
     return (
-        <div className="Chart">
-            <AreaChart
-                width={800}
-                height={500}
-                data={processedData}
-                margin={{
-                    top: 10,
-                    right: 30,
-                    left: 0,
-                    bottom: 0,
-                }}
-            >
+        <div className="list-stats">
+            <div className="Chart">
+                <AreaChart
+                    width={800}
+                    height={500}
+                    data={processedData}
+                    margin={{
+                        top: 10,
+                        right: 30,
+                        left: 0,
+                        bottom: 0,
+                    }}
+                >
 
-                <CartesianGrid strokeDasharray="3 3"/>
-                <XAxis dataKey="name"/>
-                <YAxis label={{ value: 'total opens', angle: -90, position: 'insideLeft', fontSize: 24 }}/>
+                    <CartesianGrid strokeDasharray="3 3"/>
+                    <XAxis dataKey="name"/>
+                    <YAxis label={{ value: 'total opens', angle: -90, position: 'insideLeft', fontSize: 24 }}/>
 
-                <Tooltip itemSorter={item => (item.value as number) * (-1)}/>
-                <Legend onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}/>
-                {users && users.map((key, index) => <Area
-                    name={key.username}
-                    key={index}
-                    type="monotone"
-                    dataKey={key.username}
-                    stackId={1}
-                    stroke={randomColour(key.username)}
-                    strokeOpacity={0}
-                    fillOpacity={opacity[key.username]}
-                    fill={randomColour(key.username)}
-                />)}
-            </AreaChart>
+                    <Tooltip itemSorter={item => (item.value as number) * (-1)}/>
+                    <Legend onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}/>
+                    {users && users.map((key, index) => <Area
+                        name={key.username}
+                        key={index}
+                        type="monotone"
+                        dataKey={key.username}
+                        stackId={1}
+                        stroke={randomColour(key.username)}
+                        strokeOpacity={0}
+                        fillOpacity={opacity[key.username]}
+                        fill={randomColour(key.username)}
+                    />)}
+                </AreaChart>
+            </div>
+
+            <DateRangePicker
+                setStartTime={setStartTime}
+                setEndTime={setEndTime}
+                startTime={startTime}
+                endTime={endTime}
+            />
         </div>
     );
 };

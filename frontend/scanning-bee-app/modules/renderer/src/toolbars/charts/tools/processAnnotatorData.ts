@@ -20,7 +20,7 @@ export type AnnotatorChartData = {
  * }
  * @param data
  */
-export const processAnnotatorData = (data: CellContentDto[], users: UserDto[]): AnnotatorChartData[] => {
+export const processAnnotatorData = (data: CellContentDto[], users: UserDto[], startTime: Date, endTime: Date): AnnotatorChartData[] => {
     if (!data || !users) return [];
 
     const final: AnnotatorChartData[] = [];
@@ -28,9 +28,14 @@ export const processAnnotatorData = (data: CellContentDto[], users: UserDto[]): 
     let activeTimeCell: number = -1;
 
     // sort the data
-    const sortedData: CellContentDto[] = data.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    const sortedFilteredData: CellContentDto[] = data
+        .filter((cellContent) => {
+            const cellDate = new Date(cellContent.timestamp);
+            return (!startTime || cellDate >= startTime) && (!endTime || cellDate <= endTime);
+        })
+        .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
-    Object.values(sortedData).forEach((cellContent) => {
+    Object.values(sortedFilteredData).forEach((cellContent) => {
         const cell = (new Date(cellContent.timestamp)).toDateString();
         const timeCellExists = activeTimeCell !== -1 && final[activeTimeCell]!.name === cell;
         const user = users.find(u => u.id === cellContent.user);

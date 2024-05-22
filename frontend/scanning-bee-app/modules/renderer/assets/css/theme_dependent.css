@@ -20,6 +20,7 @@
 
 #stats-date-range-picker-Light select {
     color: #333;
+    background-color: #D9D9D9;
   }
   #stats-date-range-picker-Light .DayPicker-Day--selected-range {
     background-color: #eeeeee;
@@ -30,6 +31,7 @@
   
   #stats-date-range-picker-Dark select {
     color: #f5f8fa;
+    background-color: #313131;
   }
   #stats-date-range-picker-Dark .DayPicker-Day--selected-range {
     background-color: #444444;
@@ -40,6 +42,7 @@
   
   #stats-date-range-picker-METU select {
     color: #f5f8fa;
+    background-color: #660000;
   }
   #stats-date-range-picker-METU .DayPicker-Day--selected-range {
     background-color: #990000;
@@ -50,6 +53,7 @@
   
   #stats-date-range-picker-Bees select {
     color: #333;
+    background-color: #F4AC18;
   }
   #stats-date-range-picker-Bees .DayPicker-Day--selected-range {
     background-color: #F9C62A;
