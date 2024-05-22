@@ -570,16 +570,17 @@ class BackendInterface {
 
         const cellTypes = Object.keys(CellType);
 
-        for (let i = 0; i < Math.random() * 100; i += 1) {
+        for (let i = 0; i < Math.random() * 10000; i += 1) {
             const cellType = cellTypes[Math.floor(Math.random() * cellTypes.length)];
 
             annotations.push(new Annotation({
                 cell_type: CellType[cellType],
                 center: [Math.random() * 100, Math.random() * 100],
                 radius: Math.random() * 10,
-                timestamp: new Date().getTime() - Math.random() * 1_000_000,
+                timestamp: new Date().getTime() - Math.random() * 1_000_000_000,
                 source_name: `image_${Math.floor(Math.random() * 100)}`,
                 poses: [0, 0],
+                created_by: username,
             }));
         }
 

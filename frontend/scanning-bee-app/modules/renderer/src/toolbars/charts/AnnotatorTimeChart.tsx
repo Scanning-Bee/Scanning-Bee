@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 
 import BackendInterface from '../../controllers/backendInterface/backendInterface';
+import { AnnotatorData, processAnnotatorData } from './tools/processAnnotatorData';
 
 /**
  * returns tools to enable highlighting a user when their name on the legend is hovered over.
@@ -81,15 +82,14 @@ export const AnnotatorTimeChart = () => {
         fetchAnnotatorData();
     }, [users]);
 
+    console.log(processAnnotatorData(data));
+
     return (
         <div className="Chart">
             <AreaChart
                 width={800}
                 height={500}
-                data={{
-                    name: 'Time',
-                    ...data,
-                }}
+                data={processAnnotatorData(data)}
                 margin={{
                     top: 10,
                     right: 30,
@@ -104,7 +104,7 @@ export const AnnotatorTimeChart = () => {
 
                 <Tooltip itemSorter={item => (item.value as number) * (-1)}/>
                 <Legend onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}/>
-                {Object.keys(data).map((key, index) => <Area
+                {data && Object.keys(data).map((key, index) => <Area
                     name={key}
                     key={index}
                     type="monotone"

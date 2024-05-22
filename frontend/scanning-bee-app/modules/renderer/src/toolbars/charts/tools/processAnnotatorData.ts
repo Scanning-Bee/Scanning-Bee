@@ -1,8 +1,10 @@
 import Annotation from '@frontend/models/annotation';
 
-type AnnotatorData = [string, Annotation[]];
+export type AnnotatorData = {
+    [username: string]: Annotation[];
+};
 
-type AnnotatorChartData = {
+export type AnnotatorChartData = {
     name: string;
     data: { [key: string]: number };
 };
@@ -17,4 +19,43 @@ type AnnotatorChartData = {
  * }
  * @param data
  */
-export const processAnnotatorData = (data: AnnotatorData): AnnotatorChartData => null;
+export const processAnnotatorData = (data: AnnotatorData): AnnotatorChartData[] => {
+    if (!data) return [];
+
+    const usernames = Object.keys(data);
+
+    if (usernames.length === 0) return null;
+
+    const final: AnnotatorChartData[] = [];
+
+    let activeTimeCell: number = -1;
+
+    // sort the data
+    const sortedData: AnnotatorData = {};
+
+    Object.keys(data).forEach((username) => {
+        sortedData[username] = data[username].sort((a, b) => a.timestamp - b.timestamp);
+    });
+
+    Object.values(sortedData).forEach((log) => {
+        const cell = (new Date(log[0].timestamp)).toDateString();
+        const timeCellExists = activeTimeCell !== -1 && final[activeTimeCell]!.name === cell;
+        const username = log[0].created_by;
+
+        console.log(username, cell, timeCellExists, activeTimeCell, final[activeTimeCell]);
+
+        if (!timeCellExists) {
+            activeTimeCell++;
+
+            const pushed: AnnotatorChartData = { name: cell! } as AnnotatorChartData;
+            usernames.forEach((u: string) => {
+                pushed[u] = 0;
+            });
+            final.push(pushed);
+        }
+
+        final[activeTimeCell]![username]++;
+    });
+
+    return final;
+};
