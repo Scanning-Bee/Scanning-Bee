@@ -1,4 +1,4 @@
-import { AnnotationYaml, MAIN_EVENTS, MetadataWrapperYaml } from '@scanning_bee/ipc-interfaces';
+import { MAIN_EVENT_PAYLOADS, MAIN_EVENTS } from '@scanning_bee/ipc-interfaces';
 import { ipcRenderer } from 'electron';
 import React, { StrictMode } from 'react';
 import { render } from 'react-dom';
@@ -8,7 +8,7 @@ import App from './App';
 import Annotation from './models/annotation';
 import { HistoryService } from './services/HistoryService';
 import StorageService from './services/StorageService';
-import { generateAnnotationsFromYaml, openFolder } from './slices/annotationSlice';
+import { generateAnnotationsFromYaml, openFolder, setWorkspaceInfo } from './slices/annotationSlice';
 import { AppToaster } from './Toaster';
 
 type RendererControllerState = {
@@ -55,6 +55,11 @@ export class RendererController extends React.Component {
             });
         });
         ipcRenderer.on(MAIN_EVENTS.FULL_SCREEN, this.handleFullScreenChange);
+        ipcRenderer.on(MAIN_EVENTS.WORKSPACE_INFO_READY, (_event, payload: MAIN_EVENT_PAYLOADS[MAIN_EVENTS.WORKSPACE_INFO_READY]) => {
+            const { dispatch } = (window as any).store;
+
+            dispatch(setWorkspaceInfo(payload));
+        });
 
         this.initialize();
     }
@@ -67,12 +72,7 @@ export class RendererController extends React.Component {
         this.renderAgain();
     }
 
-    private handleParsedAnnotations(_event, payload: {
-        folder: string,
-        annotations: AnnotationYaml[],
-        images: string[],
-        metadata: MetadataWrapperYaml,
-    }) {
+    private handleParsedAnnotations(_event, payload: MAIN_EVENT_PAYLOADS[MAIN_EVENTS.ANNOTATIONS_PARSED]) {
         const { dispatch } = (window as any).store;
 
         const annotations = generateAnnotationsFromYaml(payload.annotations);
@@ -83,6 +83,8 @@ export class RendererController extends React.Component {
             images: payload.images,
             metadata: payload.metadata,
         }));
+
+        dispatch(setWorkspaceInfo(payload.workspaceInfo));
 
         StorageService.saveProp('recentlyOpenedFolders', payload.folder, new Date().toISOString());
     }

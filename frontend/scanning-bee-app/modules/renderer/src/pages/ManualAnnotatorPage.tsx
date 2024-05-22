@@ -5,9 +5,11 @@ import {
     useAnnotationsFolder,
     useImages,
     useShownImageUrl,
+    useWorkspaceInfo,
 } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { setViewScale } from '@frontend/slices/viewScaleSlice';
+import { AppToaster } from '@frontend/Toaster';
 import { ZoomSlider } from '@frontend/toolbars/common/ZoomSlider';
 import { AnnotatedImage } from '@frontend/toolbars/ManualAnnotator/AnnotatedImage';
 import { AnnotationEditorTools } from '@frontend/toolbars/ManualAnnotator/AnnotationEditorTools';
@@ -29,12 +31,31 @@ export const ManualAnnotatorPage = () => {
     const shownImageUrl = useShownImageUrl();
     const activeAnnotations = useActiveAnnotations();
     const images = useImages();
+    const workspaceInfo = useWorkspaceInfo();
 
     const dispatch = useDispatch();
 
     const setShownImageUrl = (url: string) => {
         dispatch(showImageWithURL(url));
     };
+
+    useEffect(() => {
+        if (folder && (
+            !workspaceInfo || workspaceInfo.hive === 'untitled' || workspaceInfo.frame === -1 || workspaceInfo.hive === 'untitled'
+        )) {
+            AppToaster.show({
+                message: 'Please fill in the workspace information. Go to Settings -> Workspace',
+                intent: 'warning',
+                timeout: 10_000,
+                action: {
+                    text: 'Go to Settings',
+                    onClick: () => {
+                        (window as any).RendererController.setPage('settings');
+                    },
+                },
+            });
+        }
+    }, [workspaceInfo]);
 
     useEffect(() => {
         // if no image is shown or the image shown is not in the folder, set the shown image to the first image in the folder

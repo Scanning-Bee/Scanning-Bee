@@ -1,4 +1,5 @@
 import { UUID } from 'crypto';
+import { ipcRenderer } from 'electron';
 import { useSelector } from 'react-redux';
 import Annotation, { AnnotationMutation, AnnotationPropsWithID } from '@frontend/models/annotation';
 import CellType from '@frontend/models/cellType';
@@ -6,7 +7,7 @@ import { RootState } from '@frontend/store';
 import { focusOnImageButton } from '@frontend/utils/annotationUtils';
 import { getFileName } from '@frontend/utils/fileNameUtils';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AnnotationYaml, MetadataWrapperYaml } from '@scanning_bee/ipc-interfaces';
+import { AnnotationYaml, MetadataWrapperYaml, RENDERER_QUERIES, RENDERER_QUERY_PAYLOADS, WorkspaceInfo } from '@scanning_bee/ipc-interfaces';
 
 export enum ManualAnnotatorMode {
     Default = 'default',
@@ -38,6 +39,8 @@ type AnnotationsState = {
     modeParams: ManualAnnotatorModeParams;
 
     unsavedChanges: boolean;
+
+    workspaceInfo: WorkspaceInfo;
 };
 
 const initialState: AnnotationsState = {
@@ -53,6 +56,8 @@ const initialState: AnnotationsState = {
     modeParams: {},
 
     unsavedChanges: false,
+
+    workspaceInfo: null,
 };
 
 const annotationSlice = createSlice({
@@ -144,6 +149,9 @@ const annotationSlice = createSlice({
         saveChanges(state) {
             state.unsavedChanges = false;
         },
+        setWorkspaceInfo(state, action: PayloadAction<WorkspaceInfo>) {
+            state.workspaceInfo = action.payload;
+        },
     },
 });
 
@@ -160,6 +168,7 @@ export const {
     setManualAnnotatorMode,
     setModeParams,
     saveChanges,
+    setWorkspaceInfo,
 } = annotationSlice.actions;
 
 export const selectAnnotations = (state: RootState) => state.annotation.annotationObjects.map(Annotation.fromPlainObject);
@@ -170,6 +179,7 @@ export const selectImages = (state: RootState) => state.annotation.images;
 export const selectMode = (state: RootState) => state.annotation.mode;
 export const selectModeParams = (state: RootState) => state.annotation.modeParams;
 export const selectUnsavedChanges = (state: RootState) => state.annotation.unsavedChanges;
+export const selectWorkspaceInfo = (state: RootState) => state.annotation.workspaceInfo;
 
 export const getAnnotations = () => (window as any).store.getState().annotation.annotationObjects.map(Annotation.fromPlainObject);
 export const getShownImageUrl = () => (window as any).store.getState().annotation.shownImageUrl;
@@ -179,6 +189,7 @@ export const getImages = () => (window as any).store.getState().annotation.image
 export const getManualAnnotatorMode = () => (window as any).store.getState().annotation.mode;
 export const getManualAnnotatorModeParams = () => (window as any).store.getState().annotation.modeParams;
 export const getUnsavedChanges = () => (window as any).store.getState().annotation.unsavedChanges;
+export const getWorkspaceInfo = () => (window as any).store.getState().annotation.workspaceInfo;
 
 export const useAnnotations = () => {
     const annotations = useSelector(selectAnnotations);
@@ -227,6 +238,14 @@ export const useUnsavedChanges = () => {
     return unsavedChanges;
 };
 
+export const useWorkspaceInfo = () => {
+    const workspaceInfo = useSelector(selectWorkspaceInfo);
+    return workspaceInfo;
+};
+
+/**
+ * various helper functions
+ */
 export const generateAnnotationsFromYaml = (yaml: AnnotationYaml[]): Annotation[] => yaml.map((annotationYaml) => {
     const annotation = Annotation.fromYaml(annotationYaml);
 
@@ -245,6 +264,20 @@ export const createNewAnnotation = () => {
 
     const newAnnotation = new Annotation(newAnnotationProps);
     return addAnnotation(Annotation.toPlainObject(newAnnotation));
+};
+
+export const updateWorkspaceInfo = (updates: Partial<WorkspaceInfo>) => {
+    const updatedWorkspaceInfo = {
+        ...getWorkspaceInfo(),
+        ...updates,
+    };
+
+    ipcRenderer.send(RENDERER_QUERIES.SET_WORKSPACE_INFO, {
+        folder: getAnnotationsFolder(),
+        workspaceInfo: updatedWorkspaceInfo,
+    } as RENDERER_QUERY_PAYLOADS[RENDERER_QUERIES.SET_WORKSPACE_INFO]);
+
+    return setWorkspaceInfo(updatedWorkspaceInfo);
 };
 
 export default annotationSlice.reducer;
