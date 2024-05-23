@@ -93,6 +93,7 @@ export const BACKEND_ENDPOINTS = {
         GET: {
             LIST: `${ENDPOINT_URL}/user_list`,
             BY_ID: (id: number) => `${ENDPOINT_URL}/usernameById/${id}`,
+            BY_USERNAME: (username: string) => `${ENDPOINT_URL}/user_detail/${username}`,
         },
         POST: {
             CREATE: `${ENDPOINT_URL}/user_list`,

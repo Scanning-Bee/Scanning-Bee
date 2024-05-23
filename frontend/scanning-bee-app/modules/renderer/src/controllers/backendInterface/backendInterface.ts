@@ -243,7 +243,9 @@ class BackendInterface {
 
     public createUser = async (user: UserDto) => this.apiQuery<UserDto>(BACKEND_ENDPOINTS.USER.POST.CREATE, 'post', user);
 
-    public getUserByID = async (id: number) => this.apiQuery<UserDto>(BACKEND_ENDPOINTS.USER.GET.BY_ID(id), 'get');
+    public getUsernameByID = async (id: number) => this.apiQuery<UserDto>(BACKEND_ENDPOINTS.USER.GET.BY_ID(id), 'get');
+
+    public getUserByUsername = async (username: string) => this.apiQuery<UserDto>(BACKEND_ENDPOINTS.USER.GET.BY_USERNAME(username), 'get');
 
     // * USER TYPES
     public getUserTypes = async () => this.apiQuery<UserTypeDto[]>(BACKEND_ENDPOINTS.USER_TYPE.GET.LIST, 'get');
@@ -295,7 +297,11 @@ class BackendInterface {
             const annotation = annotations[i];
             const imageName = annotation.source_name;
 
-            const imageMetadata = metadata.image_data.find(meta => meta.image_name === imageName);
+            const imageMetadata = metadata.image_data.find(meta => meta.image_name === imageName)
+
+            if (!imageMetadata) {
+                console.log('Image metadata not found!', imageName);
+            }
 
             if (!Object.keys(imageDtos).includes(imageName)) {
                 const matchingImages = await this.getImageByLocationAndTimestamp(
@@ -365,6 +371,10 @@ class BackendInterface {
         try {
             // get x_pos, y_pos, and timestamp of this image
             const imageMetadata = metadata.image_data.find(meta => meta.image_name === imageName);
+
+            if (!imageMetadata) {
+                console.log('Image metadata not found!', imageName);
+            }
 
             if (!Object.keys(imageDtos).includes(imageName)) {
                 const matchingImages = await this.getImageByLocationAndTimestamp(

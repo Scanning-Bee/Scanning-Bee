@@ -1,5 +1,6 @@
 import { UUID } from 'crypto';
 import { IconName } from '@blueprintjs/core';
+import { CellContentDto } from '@frontend/controllers/backendInterface/payloadTypes';
 import Annotation from '@frontend/models/annotation';
 import StorageService from '@frontend/services/StorageService';
 import { ManualAnnotatorMode } from '@frontend/slices/annotationSlice';
@@ -61,4 +62,14 @@ export const getRecentlyOpenedFolders = (n?: number): string[] => {
     return Object.keys(recentlyOpenedFolders)
         .sort((a, b) => new Date(recentlyOpenedFolders[b]).getTime() - new Date(recentlyOpenedFolders[a]).getTime())
         .slice(0, n || 5);
+};
+
+export const sortCellContentsByTimestamp = (contents: CellContentDto[]): CellContentDto[] => contents
+    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+export const getCellContentsBetween = (contents: CellContentDto[], start: Date, end: Date): CellContentDto[] => {
+    if (!start || !end) return contents;
+
+    return contents
+        .filter(annotation => new Date(annotation.timestamp) >= start && new Date(annotation.timestamp) <= end);
 };

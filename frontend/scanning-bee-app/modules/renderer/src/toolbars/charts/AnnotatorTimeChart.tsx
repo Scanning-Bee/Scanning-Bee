@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import { CellContentDto, UserDto } from '@frontend/controllers/backendInterface/payloadTypes';
 import { useAnnotationsFolder } from '@frontend/slices/annotationSlice';
+import { getCellContentsBetween } from '@frontend/utils/annotationUtils';
 import { randomColour } from '@frontend/utils/colours';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
@@ -65,12 +66,12 @@ export const AnnotatorTimeChart = () => {
 
     useEffect(() => {
         async function fetchUserWithID(id: number) {
-            const res = await BackendInterface.getUserByID(id);
-            return res;
+            const res = await BackendInterface.getUsernameByID(id);
+            return { ...res, id };
         }
 
         async function fetchAllCellContents() {
-            const res = await BackendInterface.getCellContents();
+            const res = getCellContentsBetween(await BackendInterface.getCellContents(), startTime, endTime);
             setData(res);
 
             if (!res) {
@@ -95,9 +96,7 @@ export const AnnotatorTimeChart = () => {
         }
 
         fetchAllCellContents();
-    }, [folder]);
-
-    console.log(processedData);
+    }, [folder, startTime, endTime]);
 
     return (
         <div className="list-stats">

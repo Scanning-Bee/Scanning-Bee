@@ -40,8 +40,6 @@ export const processAnnotatorData = (data: CellContentDto[], users: UserDto[], s
         const timeCellExists = activeTimeCell !== -1 && final[activeTimeCell]!.name === cell;
         const user = users.find(u => u.id === cellContent.user);
 
-        console.log(user.username, cell, timeCellExists, activeTimeCell, final[activeTimeCell]);
-
         if (!timeCellExists) {
             activeTimeCell++;
 
