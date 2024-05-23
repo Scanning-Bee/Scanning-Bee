@@ -1,5 +1,4 @@
 import { UserDto } from '@frontend/controllers/backendInterface/payloadTypes';
-import CellType from '@frontend/models/cellType';
 import { useAnnotationsFolder } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { getCellContentsBetween } from '@frontend/utils/annotationUtils';
@@ -9,7 +8,6 @@ import {
 import React, { useEffect, useState } from 'react';
 
 import BackendInterface from '../../controllers/backendInterface/backendInterface';
-import { CellTypePickerMenu } from '../common/CellTypePickerMenu';
 import { getStyledTableCell, StyledTableRow } from '../common/StyledTable';
 import { DateRangePicker } from './common/DateRangePicker';
 
@@ -20,8 +18,6 @@ export const AnnotatorStatistics = () => {
 
     const [startTime, setStartTime] = useState<Date>(null);
     const [endTime, setEndTime] = useState<Date>(null);
-
-    const [cellType, setCellType] = useState<CellType>(null);
 
     const folder = useAnnotationsFolder();
 
@@ -100,13 +96,6 @@ export const AnnotatorStatistics = () => {
                         </TableBody>
                     </Table>
                 </TableContainer>
-            </div>
-
-            <div className='cell-type-picker'>
-                <CellTypePickerMenu
-                    cellType={cellType}
-                    setCellType={setCellType}
-                />
             </div>
 
             <DateRangePicker

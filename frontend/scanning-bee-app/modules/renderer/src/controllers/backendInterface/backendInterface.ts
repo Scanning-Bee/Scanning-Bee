@@ -11,6 +11,7 @@ import { addAnnotation, getAnnotationsMetadata, saveChanges } from '@frontend/sl
 import { resetBackendStatus } from '@frontend/slices/backendStatusSlice';
 import { authorizeUser, unauthorizeUser } from '@frontend/slices/userInfoSlice';
 import { AppToaster } from '@frontend/Toaster';
+import { getCellTypeFromNumber } from '@frontend/utils/annotationUtils';
 import { addTrailingZeros } from '@frontend/utils/miscUtils';
 import { AnnotationYaml, RENDERER_QUERIES } from '@scanning_bee/ipc-interfaces';
 
@@ -409,49 +410,7 @@ class BackendInterface {
 
             res.map((cellContent) => {
                 const cellTypeNo = cellContent.content;
-                let cellType;
-                // Find a better way to do this
-                switch (cellTypeNo) {
-                case 1:
-                    cellType = CellType.EGG;
-                    break;
-
-                case 2:
-                    cellType = CellType.EMPTY;
-                    break;
-
-                case 3:
-                    cellType = CellType.LARVA;
-                    break;
-
-                case 4:
-                    cellType = CellType.NECTAR;
-                    break;
-
-                case 5:
-                    cellType = CellType.POLLEN;
-                    break;
-
-                case 6:
-                    cellType = CellType.PUPA;
-                    break;
-
-                case 7:
-                    cellType = CellType.HONEY_CLOSED;
-                    break;
-
-                case 8:
-                    cellType = CellType.BEE_OCCLUDED;
-                    break;
-
-                case 9:
-                    cellType = CellType.NOT_CLASSIFIED;
-                    break;
-
-                default:
-                    cellType = CellType.NOT_CLASSIFIED;
-                    break;
-                }
+                const cellType = getCellTypeFromNumber(cellTypeNo as number);
 
                 const annotation = new Annotation({
                     cell_type: cellType,

@@ -73,11 +73,11 @@ export const CellTypeColours: { [key in CellType]: string } = {
     [CellType.EGG]: 'rgb(200, 200, 200)',
     [CellType.EMPTY]: 'rgba(255, 102, 195, 1)',
     [CellType.HONEY_CLOSED]: 'rgba(129, 77, 1, 1)',
-    [CellType.LARVA]: 'rgba(93, 24, 235, 1)',
+    [CellType.LARVAE]: 'rgba(93, 24, 235, 1)',
     [CellType.NECTAR]: 'rgba(191, 27, 27, 1)',
     [CellType.NOT_CLASSIFIED]: 'rgba(192, 145, 34, 1)',
     [CellType.POLLEN]: 'rgba(0, 190, 98, 1)',
-    [CellType.PUPA]: 'rgba(1, 150, 178, 1)',
+    [CellType.PUPPA]: 'rgba(1, 150, 178, 1)',
 };
 
 export const StaticHomePageHexagonColours = [
