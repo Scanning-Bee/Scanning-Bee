@@ -297,10 +297,17 @@ class BackendInterface {
             const annotation = annotations[i];
             const imageName = annotation.source_name;
 
-            const imageMetadata = metadata.image_data.find(meta => meta.image_name === imageName)
+            const imageMetadata = metadata.image_data.find(meta => meta.image_name === imageName);
 
             if (!imageMetadata) {
                 console.log('Image metadata not found!', imageName);
+            }
+
+            if (
+                (imageMetadata.x_pos >= 0.1 && imageMetadata.x_pos <= 0.43)
+                || (imageMetadata.x_pos >= 0.02 && imageMetadata.x_pos <= 0.42)
+            ) {
+                continue;
             }
 
             if (!Object.keys(imageDtos).includes(imageName)) {
