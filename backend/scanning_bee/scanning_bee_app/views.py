@@ -89,6 +89,8 @@ class UserRegistrationView(APIView):
             user = get_user_model().objects.create_user(
                 username=serializer.validated_data['username'],
                 password=serializer.validated_data['password'],
+                first_name=serializer.validated_data['first_name'],
+                last_name=serializer.validated_data['last_name'],
                 email=serializer.validated_data['email'],
                 user_type=serializer.validated_data.get('user_type') 
             )
