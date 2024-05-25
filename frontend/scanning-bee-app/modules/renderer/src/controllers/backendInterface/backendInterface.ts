@@ -294,7 +294,7 @@ class BackendInterface {
 
             if (
                 (imageMetadata.x_pos >= 0.1 && imageMetadata.x_pos <= 0.43)
-                || (imageMetadata.x_pos >= 0.02 && imageMetadata.x_pos <= 0.42)
+                || (imageMetadata.y_pos >= 0.02 && imageMetadata.y_pos <= 0.42)
             ) {
                 continue;
             }
