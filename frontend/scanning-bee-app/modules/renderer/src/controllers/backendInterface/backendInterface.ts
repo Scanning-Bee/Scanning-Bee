@@ -4,8 +4,6 @@ import axios, { AxiosInstance } from 'axios';
 import { ipcRenderer, shell } from 'electron';
 import Annotation from '@frontend/models/annotation';
 import { BeehiveCell } from '@frontend/models/beehive';
-import CellType from '@frontend/models/cellType';
-import { AnnotatorStatistic } from '@frontend/models/statistics';
 import StorageService from '@frontend/services/StorageService';
 import { addAnnotation, getAnnotationsMetadata, saveChanges } from '@frontend/slices/annotationSlice';
 import { resetBackendStatus } from '@frontend/slices/backendStatusSlice';
@@ -216,16 +214,16 @@ class BackendInterface {
      * @param timestamp
      * @returns
      */
-    public getCellContentsBeforeTimestamp = async (timestamp: Date) => {
+    public getCellContentsBeforeTimestamp = async (timestamp: number) => {
         const allCellContents = await this.getCellContents();
 
-        return allCellContents.filter(cellContent => new Date(cellContent.timestamp) < timestamp);
+        return allCellContents.filter(cellContent => new Date(cellContent.timestamp).getTime() < timestamp);
     };
 
-    public getCellContentsAtTimestamp = async (timestamp: Date) => {
+    public getCellContentsAtTimestamp = async (timestamp: number) => {
         const allCellContents = await this.getCellContents();
 
-        return allCellContents.filter(cellContent => new Date(cellContent.timestamp) === timestamp);
+        return allCellContents.filter(cellContent => new Date(cellContent.timestamp).getTime() === timestamp);
     };
 
     public getCellContentByImageName = async (imageName: string) => this
@@ -310,8 +308,8 @@ class BackendInterface {
             }
 
             if (
-                (imageMetadata.x_pos >= 0.1 && imageMetadata.x_pos <= 0.43)
-                || (imageMetadata.y_pos >= 0.02 && imageMetadata.y_pos <= 0.42)
+                !(imageMetadata.x_pos >= 0.1 && imageMetadata.x_pos <= 0.43)
+                || !(imageMetadata.y_pos >= 0.02 && imageMetadata.y_pos <= 0.42)
             ) {
                 continue;
             }
@@ -447,14 +445,10 @@ class BackendInterface {
      * Returns the beehive data closest to the given time.
      */
     public getBeehiveData = async (
-        beehiveName: string,
         timestampToLookFor?: number,
     ): Promise<BeehiveCell[]> => {
-        // DUMMY FOR NOW. TODO:
-
         console.log(
-            'Getting beehive data from',
-            beehiveName,
+            'Getting beehive data',
             'closest to:',
             timestampToLookFor || 'CURRENT',
         );
@@ -465,7 +459,7 @@ class BackendInterface {
         const cellHeight = 42;
 
         const cellContents = await this.getCellContentsBeforeTimestamp(
-            timestampToLookFor ? new Date(timestampToLookFor) : new Date(),
+            timestampToLookFor || new Date().getTime(),
         );
 
         cellContents.map((cellContent) => {
@@ -474,7 +468,7 @@ class BackendInterface {
             cells.push({
                 cellType: getCellTypeFromNumber(cellContent.content as number),
                 id: cellContent.id,
-                x: cellContent.cell_indices[0] * cellWidth,
+                x: cellContent.cell_indices[0] * cellWidth + (cellContent.cell_indices[1] % 2 === 0 ? 0 : cellWidth / 2),
                 y: cellContent.cell_indices[1] * cellHeight,
             });
 

@@ -6,7 +6,6 @@ import {
     setShownDataTimestamp,
     useAnimationSpeed,
     useAnimationTimestamps,
-    useBeehiveName,
     useIsAnimationPlaying,
     useShownDataTimestamp,
 } from '@frontend/slices/beehiveSlice';
@@ -30,7 +29,6 @@ export const BeehivePageContents = () => {
 
     const [cellDetailDialogOpen, setCellDetailDialogOpen] = useState(false);
 
-    const beehiveName = useBeehiveName();
     const isAnimationPlaying = useIsAnimationPlaying();
     const [start, end] = useAnimationTimestamps();
     const shownDataTimestamp = useShownDataTimestamp();
@@ -40,8 +38,14 @@ export const BeehivePageContents = () => {
     const [animationPaused, setAnimationPaused] = useState(false);
 
     useEffect(() => {
-        setCells(BackendInterface.getBeehiveData(beehiveName, shownDataTimestamp));
-    }, [shownDataTimestamp, beehiveName]);
+        async function fetchAllCells() {
+            const cellContents = await BackendInterface.getBeehiveData(shownDataTimestamp);
+
+            setCells(cellContents);
+        }
+
+        fetchAllCells();
+    }, [shownDataTimestamp]);
 
     useEffect(() => {
         if (!start || !end) {
