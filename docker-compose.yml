@@ -11,28 +11,14 @@ services:
       - ./backend:/scanning_bee/backend
       - ./AI:/scanning_bee/AI
       - ./AnnotationFiles:/scanning_bee/AnnotationFiles
-    depends_on:
-      - db
     environment:
       - DEBUG=1
-      - PYTHONPATH=/scanning_bee  # Set PYTHONPATH
+      - PYTHONPATH=/scanning_bee
     command: >
       sh -c "python manage.py makemigrations &&
              python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
 
-  db:
-    build:
-      context: .
-      dockerfile: Dockerfile.db
-    container_name: scanning_bee_db
-    ports:
-      - "3306:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=pass
-      - MYSQL_DATABASE=scanning_bee_db
-    volumes:
-      - db_data:/var/lib/mysql
-
 volumes:
-  db_data:
+  db_data:  # This volume is no longer needed, but you can keep it if you plan to use a local database in the future
+
