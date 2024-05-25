@@ -1,4 +1,5 @@
 import { Tab, Tabs } from '@blueprintjs/core';
+import { useAnnotationsFolder } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import {
     AccessibilitySettings,
@@ -6,11 +7,14 @@ import {
     AppearanceSettings,
     GeneralSettings,
     KeyboardShortcuts,
+    WorkspaceSettings,
 } from '@frontend/toolbars/SettingsContent/SettingsContent';
 import React, { useState } from 'react';
 
 export const SettingsPage = () => {
     const theme = useTheme();
+
+    const folder = useAnnotationsFolder();
 
     const [activeTab, setActiveTab] = useState('general');
 
@@ -67,6 +71,15 @@ export const SettingsPage = () => {
                         className='settings-tab'
                         style={{ color: theme.primaryForeground }}
                     />
+                    {
+                        folder && <Tab
+                            id='workspace'
+                            title='Workspace'
+                            panel={<WorkspaceSettings />}
+                            className='settings-tab'
+                            style={{ color: theme.primaryForeground }}
+                        />
+                    }
                     <Tabs.Expander />
                 </Tabs>
             </div>

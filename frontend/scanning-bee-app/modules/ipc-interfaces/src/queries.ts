@@ -2,7 +2,7 @@
 /* ------------ IPC Queries ---------- */
 /* ----------------------------------- */
 
-import { AnnotationYaml } from 'miscTypes';
+import { AnnotationYaml, WorkspaceInfo } from 'miscTypes';
 
 /**
  ** Queries sent by the renderer process to the main process.
@@ -12,6 +12,8 @@ export enum RENDERER_QUERIES {
     OPEN_FOLDER_AT_LOCATION = 'OPEN_FOLDER_AT_LOCATION',
     SAVE_ANNOTATIONS = 'SAVE_ANNOTATIONS',
     INVOKE_BACKEND = 'INVOKE_BACKEND',
+    GET_WORKSPACE_INFO = 'GET_WORKSPACE_INFO',
+    SET_WORKSPACE_INFO = 'SET_WORKSPACE_INFO',
 }
 
 /**
@@ -29,6 +31,8 @@ export type RENDERER_QUERY_PAYLOADS = {
     [RENDERER_QUERIES.OPEN_FOLDER_AT_LOCATION]: string,
     [RENDERER_QUERIES.SAVE_ANNOTATIONS]: { targetFolder: string; annotations: AnnotationYaml[] },
     [RENDERER_QUERIES.INVOKE_BACKEND]: undefined,
+    [RENDERER_QUERIES.GET_WORKSPACE_INFO]: string,
+    [RENDERER_QUERIES.SET_WORKSPACE_INFO]: { folder: string; workspaceInfo: Partial<WorkspaceInfo> },
 };
 
 export type MAIN_QUERY_PAYLOADS = {

@@ -19,7 +19,7 @@
         "model": "scanning_bee_app.content",
         "pk": 3,
         "fields": {
-            "name": "LARVA",
+            "name": "LARVAE",
             "content_description": "Larvae Cell Annotation"
         }
     },

@@ -2,39 +2,83 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@frontend/store';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export enum Permission {
-    BEEHIVE = 'beehive',
-    MANUAL_ANNOTATOR = 'manual_annotator',
-    STATISTICS = 'statistics',
-    MANAGE_USERS = 'manage_users',
-    REGISTRATE_USERS = 'registrate_users',
+export type Permissions = {
+    registrateUsers: boolean;
+    manageUsers: boolean;
+    beehive: boolean;
+    manualAnnotator: boolean;
+    statistics: boolean;
+};
+
+export enum Roles {
+    BIOLOG = 1,
+    ANNOTATOR = 2,
 }
 
+export const ROLE_PERMISSION_TABLE: Record<Roles, Permissions> = {
+    [Roles.BIOLOG]: {
+        registrateUsers: true,
+        manageUsers: true,
+        beehive: true,
+        manualAnnotator: true,
+        statistics: true,
+    },
+    [Roles.ANNOTATOR]: {
+        registrateUsers: false,
+        manageUsers: false,
+        beehive: true,
+        manualAnnotator: true,
+        statistics: true,
+    },
+};
+
 type PermissionState = {
-    permissions: Permission[];
+    role: Roles;
+    permissions: Permissions;
 };
 
 const initialState: PermissionState = {
-    permissions: [],
+    role: Roles.ANNOTATOR,
+    permissions: ROLE_PERMISSION_TABLE[Roles.ANNOTATOR],
 };
 
 const permissionSlice = createSlice({
     name: 'permission',
     initialState,
     reducers: {
-        setPermissions(state, action: PayloadAction<Permission[]>) {
+        setRole: (state, action: PayloadAction<Roles>) => {
+            state.role = action.payload;
+            state.permissions = ROLE_PERMISSION_TABLE[action.payload];
+        },
+
+        setPermissions: (state, action: PayloadAction<Permissions>) => {
             state.permissions = action.payload;
+        },
+
+        updatePermission: (state, action: PayloadAction<Partial<Permissions>>) => {
+            state.permissions = {
+                ...state.permissions,
+                ...action.payload,
+            };
         },
     },
 });
 
 export const {
+    setRole,
     setPermissions,
+    updatePermission,
 } = permissionSlice.actions;
 
+export const selectRole = (state: RootState) => state.permission.role;
 export const selectPermissions = (state: RootState) => state.permission.permissions;
 
-export const usePermissions = (): Permission[] => {
+export const useRole = (): Roles => {
+    const role = useSelector(selectRole);
+    return role;
+};
+
+export const usePermissions = (): Permissions => {
     const permissions = useSelector(selectPermissions);
     return permissions;
 };

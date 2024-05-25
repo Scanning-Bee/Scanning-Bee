@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
+import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import { RootState } from '@frontend/store';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -32,7 +32,7 @@ const beehiveSlice = createSlice({
         openBeehive: (state, action: PayloadAction<string>) => {
             state.beehiveName = action.payload;
 
-            state.animationTimestamps = BackendInterface.getInstance().getBeehiveTimestamps(action.payload);
+            state.animationTimestamps = BackendInterface.getBeehiveTimestamps(action.payload);
             [, state.shownDataTimestamp] = state.animationTimestamps;
         },
         setBeehiveName: (state, action: PayloadAction<string>) => {

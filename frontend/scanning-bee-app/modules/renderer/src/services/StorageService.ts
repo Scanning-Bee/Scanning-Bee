@@ -9,6 +9,8 @@ class StorageService {
 
     refresh_token_key = 'refresh_token';
 
+    username_key = 'username';
+
     constructor() {
         this.store = new Store();
     }
@@ -88,6 +90,14 @@ class StorageService {
 
     setRefreshToken(refreshToken: string) {
         this.store.set(this.refresh_token_key, refreshToken);
+    }
+
+    getUsername() {
+        return this.store.get(this.username_key);
+    }
+
+    setUsername(username: string) {
+        this.store.set(this.username_key, username);
     }
 
     clearTokens() {

@@ -1,10 +1,10 @@
 enum CellType {
     EGG = 'EGG',
     EMPTY = 'EMPTY',
-    LARVA = 'LARVA',
+    LARVAE = 'LARVAE',
     NECTAR = 'NECTAR',
     POLLEN = 'POLLEN',
-    PUPA = 'PUPA',
+    PUPPA = 'PUPPA',
     HONEY_CLOSED = 'HONEY_CLOSED',
     BEE_OCCLUDED = 'BEE_OCCLUDED',
     NOT_CLASSIFIED = 'NOT_CLASSIFIED',

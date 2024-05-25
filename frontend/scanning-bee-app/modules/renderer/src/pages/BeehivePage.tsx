@@ -17,7 +17,7 @@ export const BeehivePage = () => {
     const beehiveName = useBeehiveName();
 
     /* useEffect(() => {
-        const cells = BackendInterface.getInstance().getBeehiveData();
+        const cells = BackendInterface.getBeehiveData();
 
         dispatch(setBeehiveCells(cells));
     }, []); */

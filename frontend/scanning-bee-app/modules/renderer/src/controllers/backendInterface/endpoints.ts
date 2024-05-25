@@ -92,6 +92,8 @@ export const BACKEND_ENDPOINTS = {
     USER: {
         GET: {
             LIST: `${ENDPOINT_URL}/user_list`,
+            BY_ID: (id: number) => `${ENDPOINT_URL}/usernameById/${id}`,
+            BY_USERNAME: (username: string) => `${ENDPOINT_URL}/user_detail/${username}`,
         },
         POST: {
             CREATE: `${ENDPOINT_URL}/user_list`,
@@ -129,10 +131,10 @@ export const BACKEND_ENDPOINTS = {
             LIST: '',
             BY_IMAGE_NAME: (imageName: string) => `${ENDPOINT_URL}/cellcontentsbyai/${imageName}/`,
             BY_LOCATION: (x: number, y: number) => `${ENDPOINT_URL}/cellcontentsbyai/${x}/${y}`,
-            BY_LOCATION_AND_TIMESTAMP: 
+            BY_LOCATION_AND_TIMESTAMP:
                 (
                     x: number,
-                    y: number, 
+                    y: number,
                     timestamp: Date,
                 ) => `${ENDPOINT_URL}/cellcontentsbyai/${x}/${y}/${addTrailingZeros(timestamp.toISOString())}`,
         },

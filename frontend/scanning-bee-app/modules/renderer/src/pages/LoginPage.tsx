@@ -1,13 +1,18 @@
 import Background from '@assets/images/login-background.png';
 import { Button, Divider, FormGroup, InputGroup } from '@blueprintjs/core';
-import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
+import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import StorageService from '@frontend/services/StorageService';
-import { useUserInfo } from '@frontend/slices/userInfoSlice';
+import { setUserInfo, useUserInfo } from '@frontend/slices/userInfoSlice';
 import { LoginFooter } from '@frontend/toolbars/LoginFooter';
+import { RENDERER_EVENTS } from '@scanning_bee/ipc-interfaces';
+import { ipcRenderer } from 'electron';
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
     const { setPage } = props;
+
+    const dispatch = useDispatch();
 
     const userInfo = useUserInfo();
 
@@ -16,6 +21,11 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
 
         if (accessToken) {
             setPage('home');
+
+            dispatch(setUserInfo({
+                ...userInfo,
+                userName: StorageService.getUsername(),
+            }));
         }
     }, []);
 
@@ -25,6 +35,8 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
         }
     }, [userInfo.loggedIn, setPage]);
 
+    const [firstName, setFirstName] = useState(''); // [1]
+    const [lastName, setLastName] = useState(''); // [2]
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
@@ -36,7 +48,13 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
 
     const [loginError, setLoginError] = useState(false);
 
-    console.log(loginError);
+    useEffect(() => {
+        ipcRenderer.send(RENDERER_EVENTS.LOGIN_PAGE, true);
+
+        return () => {
+            ipcRenderer.send(RENDERER_EVENTS.LOGIN_PAGE, false);
+        };
+    }, []);
 
     useEffect(() => {
         setLoginError(false);
@@ -69,6 +87,34 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                             </p>
                         }
                         {!passwordsMatch && <p style={{ color: 'red' }}>Passwords do not match</p>}
+                        {loginType === 'signin' && <FormGroup
+                            label='First Name'
+                            labelFor='first_name'
+                            labelInfo='(required)'
+                            className='login-form-group'
+                        >
+                            <InputGroup
+                                className='login-input'
+                                id='first_name'
+                                value={firstName}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value)}
+                                fill
+                            />
+                        </FormGroup>}
+                        {loginType === 'signin' && <FormGroup
+                            label='Last Name'
+                            labelFor='last_name'
+                            labelInfo='(required)'
+                            className='login-form-group'
+                        >
+                            <InputGroup
+                                className='login-input'
+                                id='last_name'
+                                value={lastName}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLastName(e.target.value)}
+                                fill
+                            />
+                        </FormGroup>}
                         <FormGroup
                             label='Username'
                             labelFor='username'
@@ -133,7 +179,16 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                             text={loginType === 'login' ? 'Login' : 'Sign in'}
                             onClick={async () => {
                                 if (loginType === 'login') {
-                                    const success = await BackendInterface.getInstance().login({ username, password });
+                                    const success = await BackendInterface.login({ username, password });
+
+                                    if (success) {
+                                        dispatch(setUserInfo({
+                                            userType: '2',
+                                            userName: username,
+                                            userId: '',
+                                            loggedIn: true,
+                                        }));
+                                    }
 
                                     setLoginError(!success);
                                 } else {
@@ -142,8 +197,17 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
 
                                     if (!pwdMatch) return;
 
-                                    const success = await BackendInterface.getInstance()
-                                        .signin({ username, password, email, user_type: '2' });
+                                    const success = await BackendInterface
+                                        .signin({ username, password, email, user_type: '2', first_name: firstName, last_name: lastName });
+
+                                    if (success) {
+                                        dispatch(setUserInfo({
+                                            userType: '2',
+                                            userName: username,
+                                            userId: '',
+                                            loggedIn: true,
+                                        }));
+                                    }
 
                                     setLoginError(!success);
                                 }

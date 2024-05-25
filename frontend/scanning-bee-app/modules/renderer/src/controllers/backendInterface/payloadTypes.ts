@@ -14,7 +14,9 @@ export type SigninDto = {
     password: string;
     email: string;
     user_type: string;
-}
+    first_name?: string;
+    last_name?: string;
+};
 
 export type LoginDto = {
     username: string;
@@ -28,14 +30,14 @@ export type LogoutDto = {
 export type LoginResponseDto = {
     access_token: string;
     refresh_token: string;
-}
+};
 
 export type RegisterResponseDto = {
     refresh: string;
     access: string;
     message: string;
     user: string;
-}
+};
 
 export type BagDto = {
     id?: BagID;
@@ -49,8 +51,10 @@ export type UserTypeDto = {
 
 export type UserDto = {
     id?: UserID;
-    name: string;
     user_type: number;
+    username: string;
+    email: string;
+    annotation_count: number;
 };
 
 export type FrameDto = {
@@ -85,7 +89,7 @@ export type CellContentDto = {
     frame: number;
     timestamp: string;
     content: ContentDto | number;
-    user: UserDto | number;
+    user: number;
     center_x: number;
     center_y: number;
     image: string | number | ImageDto;
@@ -96,10 +100,10 @@ export type CellContentDto = {
 export const CellTypeDto = {
     [CellType.EGG]: 1,
     [CellType.EMPTY]: 2,
-    [CellType.LARVA]: 3,
+    [CellType.LARVAE]: 3,
     [CellType.NECTAR]: 4,
     [CellType.POLLEN]: 5,
-    [CellType.PUPA]: 6,
+    [CellType.PUPPA]: 6,
     [CellType.HONEY_CLOSED]: 7,
     [CellType.BEE_OCCLUDED]: 8,
     [CellType.NOT_CLASSIFIED]: 9,

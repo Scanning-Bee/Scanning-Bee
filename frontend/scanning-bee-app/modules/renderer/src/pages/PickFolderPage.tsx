@@ -1,5 +1,5 @@
 import { Button } from '@blueprintjs/core';
-import { BackendInterface } from '@frontend/controllers/backendInterface/backendInterface';
+import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { getRecentlyOpenedFolders } from '@frontend/utils/annotationUtils';
 import { getFileName, getParentFolder, shortenFileName, shortenFolderPath } from '@frontend/utils/fileNameUtils';
@@ -32,7 +32,7 @@ const RecentlyOpenedFolders = ({ folders }: { folders: string[] }) => {
                         minimal
                         fill
                         onClick={() => {
-                            BackendInterface.getInstance().openFolderAtLocation(folder);
+                            BackendInterface.openFolderAtLocation(folder);
                         }}
                         style={{
                             padding: '5px',
@@ -70,7 +70,7 @@ export const PickFolderPage = () => {
                     minimal
                     large
                     onClick={() => {
-                        BackendInterface.getInstance().openFolderDialog();
+                        BackendInterface.openFolderDialog();
                     }}
                     intent='success'
                     icon='folder-new'

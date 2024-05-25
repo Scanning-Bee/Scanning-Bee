@@ -37,9 +37,15 @@ class ContentSerializer(serializers.ModelSerializer):
 
 
 class CellContentSerializer(serializers.ModelSerializer):
+    cell_indices = serializers.SerializerMethodField()
+
     class Meta:
         model = CellContent
-        fields = '__all__'
+        fields = [field.name for field in CellContent._meta.fields if field.name != 'cell']  # Include all fields except 'cell'
+        fields.append('cell_indices')
+
+    def get_cell_indices(self, obj):
+        return (obj.cell.i_index, obj.cell.j_index) if obj.cell else None
 
 
 class ImageSerializer(serializers.ModelSerializer):

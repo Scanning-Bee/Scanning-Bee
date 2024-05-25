@@ -16,7 +16,7 @@ from .permissions import IsBiologOrSelf
 
 from .models import *
 from .serializers import *
-from .real_world_coordiantes import convert_to_world_coordinates
+from .real_world_coordiantes import get_index_from_real_world
 
 from datetime import datetime, timezone
 
@@ -102,9 +102,11 @@ class UserRegistrationView(APIView):
 class UserLoginView(APIView):
     def post(self, request):
         username = request.data.get('username')
+        first_name = request.data.get('first_name')
+        last_name = request.data.get('last_name')
         password = request.data.get('password')
 
-        user = authenticate(username=username, password=password)
+        user = authenticate(username=username, first_name=first_name, last_name=last_name, password=password)
 
         if user is not None:
             refresh = RefreshToken.for_user(user)
@@ -114,9 +116,12 @@ class UserLoginView(APIView):
                 'refresh_token': str(refresh),
             }, status=status.HTTP_200_OK)
         else:
-            # Authentication failed
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
+        
+class UsernameById(APIView):
+    def get(self, request, id):
+        user = get_object_or_404(CustomUser, id=id)
+        return Response({'username': user.username})
 
 class UserList(ListCreateAPIView):
     serializer_class = CustomUserSerializer
@@ -124,6 +129,7 @@ class UserList(ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
+        
         if user.user_type.type == "Biolog":
             return CustomUser.objects.all()
         else:
@@ -210,29 +216,13 @@ class CellList(ListCreateAPIView):
         filter_type = self.kwargs.get('filter_type')
 
         if filter_type == 'location':
-            threshold = CELL_LOC_THRESHOLD
-            location_on_frame_x = self.kwargs.get('location_on_frame_x', None)
-            location_on_frame_y = self.kwargs.get('location_on_frame_y', None)
+            i_index = self.kwargs.get('i_index', None)
+            j_index = self.kwargs.get('j_index', None)
 
-            if location_on_frame_x is not None and location_on_frame_y is not None:
-                try:
-                    # Convert parameters to float and validate
-                    location_on_frame_x = float(location_on_frame_x)
-                    location_on_frame_y = float(location_on_frame_y)
-
-                    # Calculate the range for x and y based on the threshold
-                    x_min, x_max = location_on_frame_x - threshold, location_on_frame_x + threshold
-                    y_min, y_max = location_on_frame_y - threshold, location_on_frame_y + threshold
-
-                    # Filter the queryset within the range for both x and y
-                    queryset = queryset.filter(
-                        location_on_frame_x__gte=x_min, location_on_frame_x__lte=x_max,
-                        location_on_frame_y__gte=y_min, location_on_frame_y__lte=y_max
-                    )
-                except ValueError:
-                    # Handle cases where the conversion fails
-                    raise ValidationError(
-                        "Invalid parameters: Ensure 'location_on_frame_x' and 'location_on_frame_y' are valid numbers.")
+            if i_index is not None and j_index is not None:
+                queryset = queryset.filter(i_index=i_index, j_index=j_index)
+            else:
+                return Response("i_index and j_index are required for location filter.", status=status.HTTP_400_BAD_REQUEST)
 
         return queryset
 
@@ -282,24 +272,6 @@ class CellContentList(ListCreateAPIView):
             image_list = Image.objects.filter(image_name=image_name)
             queryset = queryset.filter(image__in=image_list)
 
-        elif filter_type == "image_name_rect":
-            image_name = self.kwargs.get('arg')
-            image = Image.objects.get(image_name=image_name)
-            min_x, min_y = convert_to_world_coordinates((0, 0), image.x_pos, image.y_pos)
-            max_x, max_y = convert_to_world_coordinates((1920, 1080), image.x_pos, image.y_pos)
-
-            cells = Cell.objects.filter(
-                frame=1,
-                location_on_frame_x__gte=min_x,
-                location_on_frame_x__lte=max_x,
-                location_on_frame_y__gte=min_y,
-                location_on_frame_y__lte=max_y
-            )
-
-            if cells.exists():
-                queryset = queryset.filter(cell__in=cells)
-            else:
-                queryset = queryset.none()
 
         elif filter_type == "location":
             x_pos = self.kwargs.get('x_pos')
@@ -413,7 +385,7 @@ class CellContentsByAI(ListCreateAPIView):
             project_root = os.path.abspath(os.path.join(settings.BASE_DIR, "../../"))
             image_path = os.path.join(project_root, f"AnnotationFiles/{bag_name}/{image.image_name}")
 
-            print('image_path at views: ', image_path)
+            #print('image_path at views: ', image_path)
 
             all_detected_circles = classify_cell_states(image_path)
 
@@ -426,9 +398,14 @@ class CellContentsByAI(ListCreateAPIView):
 
             for pixel_coords, content in all_detected_circles.items():
                 # Find which content in the database
+                print(content)
                 if content == "PUPPA":
                     content = "PUPA"
-                content = Content.objects.get(name=content)
+                
+                try:
+                    content = Content.objects.get(name=content)
+                except Content.DoesNotExist:
+                    print(f"SIKINTILI CONTENT: {content}")
                 x, y, radius = pixel_coords
                 cell_content = CellContent(cell=None, 
                                            frame=frame, 

@@ -4,14 +4,16 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 
 from .managers import CustomUserManager
-from .real_world_coordiantes import convert_to_world_coordinates
+from .real_world_coordiantes import get_index_from_real_world
 
 CELL_LOC_THRESHOLD = 0.01
 
 
 class CustomUser(AbstractUser):
     username = models.CharField(max_length=100, unique=True)
-    email = models.EmailField(_("email address"), unique=True)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField(_("email address"))
     user_type = models.ForeignKey("UserType", on_delete=models.PROTECT, null=True)
     annotation_count = models.IntegerField(default=0) # count of annotations made by the user
     
@@ -37,17 +39,17 @@ class Frame(models.Model):
     def __str__(self):
         return str(self.pk) + " - " + self.description
 
-
+# save methodlarını değiştir cell'in bağlantılı olduklarını.
 class Cell(models.Model):
-    location_on_frame_x = models.FloatField()
-    location_on_frame_y = models.FloatField()
+    i_index = models.IntegerField(null=True)
+    j_index = models.IntegerField(null=True)
     frame = models.ForeignKey(Frame, on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.pk) + " - (" + str(self.location_on_frame_x) + ", " + str(self.location_on_frame_y) + ")"
+        return str(self.pk) + " - (" + str(self.i_index) + ", " + str(self.j_index) + ")"
     
     class Meta:
-        unique_together = ('location_on_frame_x', 'location_on_frame_y', 'frame')
+        unique_together = ('i_index', 'j_index', 'frame')
 
 
 class Content(models.Model):
@@ -102,31 +104,11 @@ class CellContent(models.Model):
         y_pos = my_image.y_pos
         self.timestamp = my_image.timestamp
 
-        calculated_x, calculated_y = convert_to_world_coordinates((self.center_x, self.center_y), x_pos, y_pos)
-
-        cell = self.find_or_create_cell(calculated_x, calculated_y, self.frame)
-        self.cell = cell
+        i_index, j_index =  get_index_from_real_world(x_pos, y_pos, 0.06, [self.center_x, self.center_y])
+        self.cell = Cell.objects.filter(frame=self.frame, i_index=i_index, j_index=j_index).first()
 
         super(CellContent, self).save(*args, **kwargs)
 
-    def find_or_create_cell(self, calculated_x, calculated_y, frame):
-        threshold = CELL_LOC_THRESHOLD
-        cells = Cell.objects.filter(
-            frame=frame,
-            location_on_frame_x__gte=calculated_x - threshold,
-            location_on_frame_x__lte=calculated_x + threshold,
-            location_on_frame_y__gte=calculated_y - threshold,
-            location_on_frame_y__lte=calculated_y + threshold
-        )
+    
 
-        if cells.exists():
-            return cells.first()
-        else:
-            new_cell = Cell(
-                location_on_frame_x=calculated_x,
-                location_on_frame_y=calculated_y,
-                frame=frame
-            )
-            new_cell.save()
-            return new_cell
 
