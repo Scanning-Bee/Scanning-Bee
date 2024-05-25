@@ -211,6 +211,23 @@ class BackendInterface {
     // * CELL CONTENT
     public getCellContents = async () => this.apiQuery<CellContentDto[]>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.LIST, 'get');
 
+    /**
+     * used to get the state of the cells at a certain timestamp.
+     * @param timestamp
+     * @returns
+     */
+    public getCellContentsBeforeTimestamp = async (timestamp: Date) => {
+        const allCellContents = await this.getCellContents();
+
+        return allCellContents.filter(cellContent => new Date(cellContent.timestamp) < timestamp);
+    };
+
+    public getCellContentsAtTimestamp = async (timestamp: Date) => {
+        const allCellContents = await this.getCellContents();
+
+        return allCellContents.filter(cellContent => new Date(cellContent.timestamp) === timestamp);
+    };
+
     public getCellContentByImageName = async (imageName: string) => this
         .apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.BY_IMAGE_NAME(imageName), 'get');
 
@@ -429,10 +446,10 @@ class BackendInterface {
     /**
      * Returns the beehive data closest to the given time.
      */
-    public getBeehiveData = (
+    public getBeehiveData = async (
         beehiveName: string,
         timestampToLookFor?: number,
-    ): BeehiveCell[] => {
+    ): Promise<BeehiveCell[]> => {
         // DUMMY FOR NOW. TODO:
 
         console.log(
@@ -442,113 +459,39 @@ class BackendInterface {
             timestampToLookFor || 'CURRENT',
         );
 
-        const cellCount = 450;
-
-        const cellCountPerRow = 30;
-
         const cells: BeehiveCell[] = [];
 
         const cellWidth = 48;
         const cellHeight = 42;
 
-        let rowNumber = -1;
+        const cellContents = await this.getCellContentsBeforeTimestamp(
+            timestampToLookFor ? new Date(timestampToLookFor) : new Date(),
+        );
 
-        const cellTypes = Object.keys(CellType);
-
-        for (let i = 0; i < cellCount; i += 1) {
-            if (i % cellCountPerRow === 0) {
-                rowNumber += 1;
-            }
-
-            const cellTypeIdx = Math.floor(Math.random() * 16) + 1;
-
-            const cellType = cellTypeIdx <= 8 ? cellTypes[cellTypeIdx] : 'NOT_CLASSIFIED';
+        cellContents.map((cellContent) => {
+            if (!cellContent.cell_indices) return null;
 
             cells.push({
-                cellType: CellType[cellType],
-                id: i,
-                x: (i % cellCountPerRow) * cellWidth + (rowNumber % 2 === 0 ? 0 : cellWidth / 2),
-                y: rowNumber * cellHeight,
+                cellType: getCellTypeFromNumber(cellContent.content as number),
+                id: cellContent.id,
+                x: cellContent.cell_indices[0] * cellWidth,
+                y: cellContent.cell_indices[1] * cellHeight,
             });
-        }
+
+            return null;
+        });
 
         return cells;
     };
 
-    public getBeehiveTimestamps = (beehiveName: string): number[] => {
+    public getBeehiveTimestamps = async (beehiveName: string): Promise<Date[]> => {
         console.log('Getting beehive timestamps for', beehiveName);
 
-        return [
-            '2021-01-01T00:00:00.000Z',
-            '2021-01-28T00:00:00.000Z',
-        ].map(ts => new Date(ts).getTime());
-    };
+        const allCellContents = await this.getCellContents();
 
-    public getAnnotatorsForFolder = async (folder: string) => {
-        console.log('Getting annotators for', folder);
+        const allTimestamps = [...new Set(allCellContents.map(cellContent => new Date(cellContent.timestamp)))];
 
-        return [
-            `johndoe_${folder}`,
-            'janedoe',
-            'alicewonderland',
-            'bobbuilder',
-        ];
-    };
-
-    public getAnnotatorStatistics = async (folder: string) => {
-        // DUMMY FOR NOW. TODO:
-        console.log('Getting annotator statistics for', folder);
-
-        const annotatorNames = ['John Doe', 'Jane Doe', 'Alice Wonderland', 'Bob Builder'];
-        const usernames = this.getAnnotatorsForFolder(folder);
-
-        const annotatorStatistics: AnnotatorStatistic[] = [];
-
-        annotatorNames.forEach((annotatorName) => {
-            const totalImages = Math.floor(Math.random() * 100);
-
-            const annotationsByCellType = {} as Record<CellType, number>;
-
-            Object.keys(CellType).forEach((cellType) => {
-                annotationsByCellType[cellType] = Math.floor(Math.random() * 100);
-            });
-
-            const totalAnnotations = Object.values(annotationsByCellType).reduce((acc, curr) => acc + curr, 0);
-
-            annotatorStatistics.push({
-                fullName: annotatorName,
-                username: usernames[annotatorNames.indexOf(annotatorName)],
-                totalAnnotations,
-                totalImages,
-                annotationsByCellType,
-            });
-        });
-
-        return annotatorStatistics;
-    };
-
-    public getAnnotationsMadeByUser = async (username: string) => {
-        console.log('Getting annotations made by', username);
-
-        const annotations: Annotation[] = [];
-
-        const cellTypes = Object.keys(CellType);
-
-        for (let i = 0; i < Math.random() * 10000; i += 1) {
-            const cellType = cellTypes[Math.floor(Math.random() * cellTypes.length)];
-
-            annotations.push(new Annotation({
-                cell_type: CellType[cellType],
-                center: [Math.random() * 100, Math.random() * 100],
-                radius: Math.random() * 10,
-                timestamp: new Date().getTime() - Math.random() * 1_000_000_000,
-                source_name: `image_${Math.floor(Math.random() * 100)}`,
-                poses: [0, 0],
-                created_by: username,
-            }));
-        }
-
-        return annotations;
+        return allTimestamps;
     };
 }
 
