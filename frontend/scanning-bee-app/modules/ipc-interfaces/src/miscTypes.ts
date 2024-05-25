@@ -52,9 +52,3 @@ export type MetadataYaml = {
     x_pos: number;
     y_pos: number;
 };
-
-export type WorkspaceInfo = {
-    name: string;
-    hive: string;
-    frame: number;
-};

@@ -8,13 +8,12 @@ import {
 import Store from 'electron-store';
 import fs from 'fs-extra';
 import {
-    AnnotationYaml, MAIN_EVENT_PAYLOADS, MAIN_EVENTS, RENDERER_EVENTS, RENDERER_QUERIES, Theme, THEME_STORAGE_ID, WorkspaceInfo,
+    AnnotationYaml, MAIN_EVENT_PAYLOADS, MAIN_EVENTS, RENDERER_EVENTS, RENDERER_QUERIES, Theme, THEME_STORAGE_ID,
 } from '@scanning_bee/ipc-interfaces';
 
 import { loadAnnotations, loadImages, loadMetadata, saveAnnotations } from './annotationUtils';
 import { invokeBackend } from './backendInvoker';
 import { isRunningDevMode } from './utils';
-import { parseWorkspace, updateWorkspaceInfoFile } from './workspace/workspaceHandler';
 
 // Determine the mode (dev or production)
 const IS_RUNNING_DEV_MODE = isRunningDevMode();
@@ -384,15 +383,12 @@ class MainController {
             const imageUrls = loadImages(folderPath);
             const metadata = loadMetadata(folderPath);
 
-            const workspaceInfo = await parseWorkspace(folderPath);
-
             this.send(MAIN_EVENTS.ANNOTATIONS_PARSED, {
                 folder: folderPath,
                 annotations,
                 images:
                 imageUrls,
                 metadata,
-                workspaceInfo,
             } as MAIN_EVENT_PAYLOADS[MAIN_EVENTS.ANNOTATIONS_PARSED]);
         };
 
@@ -433,19 +429,6 @@ class MainController {
 
         ipcMain.on(RENDERER_QUERIES.INVOKE_BACKEND, () => {
             this.initBackend();
-        });
-
-        ipcMain.on(RENDERER_QUERIES.GET_WORKSPACE_INFO, async (_event, folderPath: string) => {
-            const workspaceInfo = await parseWorkspace(folderPath);
-
-            this.send(MAIN_EVENTS.WORKSPACE_INFO_READY, workspaceInfo as MAIN_EVENT_PAYLOADS[MAIN_EVENTS.WORKSPACE_INFO_READY]);
-        });
-
-        ipcMain.on(RENDERER_QUERIES.SET_WORKSPACE_INFO, async (_event, { folder, workspaceInfo }: {
-            folder: string,
-            workspaceInfo: Partial<WorkspaceInfo>
-        }) => {
-            updateWorkspaceInfoFile(folder, workspaceInfo);
         });
 
         ipcMain.on(RENDERER_EVENTS.ZOOM_CHANGE, zoomChangeHandler);
