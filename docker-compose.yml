@@ -17,8 +17,8 @@ services:
     command: >
       sh -c "python manage.py makemigrations &&
              python manage.py migrate &&
+             python manage.py load_large_fixtures &&
              python manage.py runserver 0.0.0.0:8000"
 
 volumes:
-  db_data:  # This volume is no longer needed, but you can keep it if you plan to use a local database in the future
-
+  db_data:
