@@ -174,29 +174,17 @@ class BackendInterface {
     };
 
     // * CELLS
-    public getAllCells = async () => {
-        this.apiQuery<CellDto[]>(BACKEND_ENDPOINTS.CELL.GET.LIST, 'get');
-    };
+    public getAllCells = async () => this.apiQuery<CellDto[]>(BACKEND_ENDPOINTS.CELL.GET.LIST, 'get');
 
-    public getCellById = async (id: CellID) => {
-        this.apiQuery<CellDto>(BACKEND_ENDPOINTS.CELL.GET.BY_ID(id), 'get');
-    };
+    public getCellById = async (id: CellID) => this.apiQuery<CellDto>(BACKEND_ENDPOINTS.CELL.GET.BY_ID(id), 'get');
 
-    public getCellByLocation = async (x: number, y: number) => {
-        this.apiQuery<CellDto>(BACKEND_ENDPOINTS.CELL.GET.BY_LOCATION(x, y), 'get');
-    };
+    public getCellByLocation = async (x: number, y: number) => this.apiQuery<CellDto>(BACKEND_ENDPOINTS.CELL.GET.BY_LOCATION(x, y), 'get');
 
-    public createCell = async (cell: CellDto) => {
-        this.apiQuery<CellDto>(BACKEND_ENDPOINTS.CELL.POST.CREATE, 'post', cell);
-    };
+    public createCell = async (cell: CellDto) => this.apiQuery<CellDto>(BACKEND_ENDPOINTS.CELL.POST.CREATE, 'post', cell);
 
-    public updateCell = async (id: CellID, cell: CellDto) => {
-        this.apiQuery<CellDto>(BACKEND_ENDPOINTS.CELL.PUT.UPDATE(id), 'put', cell);
-    };
+    public updateCell = async (id: CellID, cell: CellDto) => this.apiQuery<CellDto>(BACKEND_ENDPOINTS.CELL.PUT.UPDATE(id), 'put', cell);
 
-    public deleteCell = async (id: CellID) => {
-        this.apiQuery<CellDto>(BACKEND_ENDPOINTS.CELL.DELETE.BY_ID(id), 'delete');
-    };
+    public deleteCell = async (id: CellID) => this.apiQuery<CellDto>(BACKEND_ENDPOINTS.CELL.DELETE.BY_ID(id), 'delete');
 
     // * FRAMES
     public getFrames = async () => this.apiQuery<FrameDto[]>(BACKEND_ENDPOINTS.FRAME.GET.LIST, 'get');

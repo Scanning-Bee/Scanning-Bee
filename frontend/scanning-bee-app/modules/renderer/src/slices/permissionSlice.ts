@@ -10,6 +10,8 @@ export type Permissions = {
     statistics: boolean;
 };
 
+export type Permission = keyof Permissions;
+
 export enum Roles {
     BIOLOG = 1,
     ANNOTATOR = 2,
@@ -81,6 +83,11 @@ export const useRole = (): Roles => {
 export const usePermissions = (): Permissions => {
     const permissions = useSelector(selectPermissions);
     return permissions;
+};
+
+export const useHasPermissionTo = (permission: Permission): boolean => {
+    const permissions = usePermissions();
+    return permissions[permission];
 };
 
 export default permissionSlice.reducer;

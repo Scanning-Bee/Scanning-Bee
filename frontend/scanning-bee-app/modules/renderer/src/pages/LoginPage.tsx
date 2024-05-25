@@ -1,13 +1,16 @@
 import Background from '@assets/images/login-background.png';
-import { Button, Divider, FormGroup, InputGroup } from '@blueprintjs/core';
+import { Button, Divider, FormGroup, InputGroup, Radio, RadioGroup } from '@blueprintjs/core';
 import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import StorageService from '@frontend/services/StorageService';
+import { Roles } from '@frontend/slices/permissionSlice';
 import { setUserInfo, useUserInfo } from '@frontend/slices/userInfoSlice';
 import { LoginFooter } from '@frontend/toolbars/LoginFooter';
 import { RENDERER_EVENTS } from '@scanning_bee/ipc-interfaces';
 import { ipcRenderer } from 'electron';
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+
+import { setRole as setUserRole } from '../slices/permissionSlice';
 
 export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
     const { setPage } = props;
@@ -40,6 +43,7 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
+    const [role, setRole] = useState<Roles>(Roles.ANNOTATOR); // [3]
 
     const [repeatPassword, setRepeatPassword] = useState(''); // [1]
     const [passwordsMatch, setPasswordsMatch] = useState(true); // [2]
@@ -173,6 +177,18 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                                 fill
                             />
                         </FormGroup>}
+                        {loginType === 'signin' && <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+                            <p className='nomargin'>Role</p>
+                            <RadioGroup
+                                onChange={e => setRole(parseInt(e.currentTarget.value, 10))}
+                                selectedValue={role}
+                                className='signin-role-radio-group'
+                                inline
+                            >
+                                <Radio label="Biolog" value={1} />
+                                <Radio label="Annotator" value={2} style={{ marginRight: 'unset' }} />
+                            </RadioGroup>
+                        </div>}
 
                         <Button
                             className='login-button'
@@ -183,7 +199,6 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
 
                                     if (success) {
                                         dispatch(setUserInfo({
-                                            userType: '2',
                                             userName: username,
                                             userId: '',
                                             loggedIn: true,
@@ -198,15 +213,23 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                                     if (!pwdMatch) return;
 
                                     const success = await BackendInterface
-                                        .signin({ username, password, email, user_type: '2', first_name: firstName, last_name: lastName });
+                                        .signin({
+                                            username,
+                                            password,
+                                            email,
+                                            user_type: role.toString(),
+                                            first_name: firstName,
+                                            last_name: lastName,
+                                        });
 
                                     if (success) {
                                         dispatch(setUserInfo({
-                                            userType: '2',
                                             userName: username,
                                             userId: '',
                                             loggedIn: true,
                                         }));
+
+                                        dispatch(setUserRole(role));
                                     }
 
                                     setLoginError(!success);
