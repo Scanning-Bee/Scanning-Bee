@@ -1,5 +1,4 @@
 import { Tab, Tabs } from '@blueprintjs/core';
-import { useAnnotationsFolder } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import {
     AccessibilitySettings,
@@ -12,8 +11,6 @@ import React, { useState } from 'react';
 
 export const SettingsPage = () => {
     const theme = useTheme();
-
-    const folder = useAnnotationsFolder();
 
     const [activeTab, setActiveTab] = useState('general');
 
