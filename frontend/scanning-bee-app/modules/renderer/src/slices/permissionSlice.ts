@@ -63,6 +63,11 @@ const permissionSlice = createSlice({
                 ...action.payload,
             };
         },
+
+        resetRole: (state) => {
+            state.role = Roles.ANNOTATOR;
+            state.permissions = ROLE_PERMISSION_TABLE[Roles.ANNOTATOR];
+        },
     },
 });
 
@@ -70,6 +75,7 @@ export const {
     setRole,
     setPermissions,
     updatePermission,
+    resetRole,
 } = permissionSlice.actions;
 
 export const selectRole = (state: RootState) => state.permission.role;

@@ -8,6 +8,7 @@ export type UserID = number;
 export type ImageID = number;
 export type UserTypeID = number;
 export type BagID = number;
+export type BackendUserType = 'Biolog' | 'Annotator';
 
 export type SigninDto = {
     username: string;
@@ -55,6 +56,18 @@ export type UserDto = {
     username: string;
     email: string;
     annotation_count: number;
+    first_name: string;
+    last_name: string;
+};
+
+export type ActiveUserDto = {
+    id?: UserID;
+    user_type: BackendUserType;
+    username: string;
+    email: string;
+    annotation_count: number;
+    first_name: string;
+    last_name: string;
 };
 
 export type FrameDto = {

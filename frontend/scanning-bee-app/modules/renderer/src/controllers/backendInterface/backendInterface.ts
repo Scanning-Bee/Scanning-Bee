@@ -7,7 +7,8 @@ import { BeehiveCell } from '@frontend/models/beehive';
 import StorageService from '@frontend/services/StorageService';
 import { addAnnotation, getAnnotationsMetadata, saveChanges } from '@frontend/slices/annotationSlice';
 import { resetBackendStatus } from '@frontend/slices/backendStatusSlice';
-import { authorizeUser, unauthorizeUser } from '@frontend/slices/userInfoSlice';
+import { resetRole, Roles, setRole } from '@frontend/slices/permissionSlice';
+import { authorizeUser, resetUserInfo, setUserInfo, unauthorizeUser } from '@frontend/slices/userInfoSlice';
 import { AppToaster } from '@frontend/Toaster';
 import { getCellTypeFromNumber } from '@frontend/utils/annotationUtils';
 import { addTrailingZeros } from '@frontend/utils/miscUtils';
@@ -15,6 +16,7 @@ import { AnnotationYaml, RENDERER_QUERIES } from '@scanning_bee/ipc-interfaces';
 
 import { AUTH_ENDPOINTS, BACKEND_ENDPOINTS, ENDPOINT_URL } from './endpoints';
 import {
+    ActiveUserDto,
     BagID,
     CellContentDto,
     CellContentID,
@@ -121,40 +123,68 @@ class BackendInterface {
         }
     }
 
-    public signin = async (data: SigninDto): Promise<boolean> => {
-        const res: RegisterResponseDto = await this.apiQuery<any>(AUTH_ENDPOINTS.SIGNIN, 'post', data);
-
-        if (!res) return false;
-
+    private afterAuth = async (tokens: {
+        access_token: string;
+        refresh_token: string;
+    }) => {
         const { dispatch } = (window as any).store;
 
         dispatch(authorizeUser());
 
-        StorageService.setAccessToken(res.access);
-        StorageService.setRefreshToken(res.refresh);
-        StorageService.setUsername(data.username);
+        StorageService.setAccessToken(tokens.access_token);
+        StorageService.setRefreshToken(tokens.refresh_token);
+
+        const activeUser = await this.getActiveUser();
+
+        StorageService.setUsername(activeUser.username);
+
+        dispatch(setUserInfo({
+            firstName: activeUser.first_name,
+            lastName: activeUser.last_name,
+            userName: activeUser.username,
+            loggedIn: true,
+        }));
+
+        dispatch(setRole(activeUser.user_type === 'Annotator' ? Roles.ANNOTATOR : Roles.BIOLOG));
 
         (window as any).RendererController.setPage('home');
+    };
 
-        return true;
+    public signin = async (data: SigninDto): Promise<boolean> => {
+        try {
+            const res: RegisterResponseDto = await this.apiQuery<any>(AUTH_ENDPOINTS.SIGNIN, 'post', data);
+
+            if (!res) return false;
+
+            const tokens = {
+                access_token: res.access,
+                refresh_token: res.refresh,
+            };
+
+            this.afterAuth(tokens);
+
+            return true;
+        } catch (error) {
+            console.error('Error while trying to sign in.', error);
+
+            return false;
+        }
     };
 
     public login = async (data: LoginDto): Promise<boolean> => {
-        const res: LoginResponseDto = await this.apiQuery<any>(AUTH_ENDPOINTS.LOGIN, 'post', data);
+        try {
+            const res: LoginResponseDto = await this.apiQuery<any>(AUTH_ENDPOINTS.LOGIN, 'post', data);
 
-        if (!res) return false;
+            if (!res) return false;
 
-        const { dispatch } = (window as any).store;
+            this.afterAuth(res);
 
-        dispatch(authorizeUser());
+            return true;
+        } catch (error) {
+            console.error('Error while trying to log in.', error);
 
-        StorageService.setAccessToken(res.access_token);
-        StorageService.setRefreshToken(res.refresh_token);
-        StorageService.setUsername(data.username);
-
-        (window as any).RendererController.setPage('home');
-
-        return true;
+            return false;
+        }
     };
 
     public logout = async () => {
@@ -167,6 +197,8 @@ class BackendInterface {
         const { dispatch } = (window as any).store;
 
         dispatch(unauthorizeUser());
+        dispatch(resetUserInfo());
+        dispatch(resetRole());
 
         (window as any).RendererController.setPage('login');
     };
@@ -250,6 +282,8 @@ class BackendInterface {
     public getUsernameByID = async (id: number) => this.apiQuery<UserDto>(BACKEND_ENDPOINTS.USER.GET.BY_ID(id), 'get');
 
     public getUserByUsername = async (username: string) => this.apiQuery<UserDto>(BACKEND_ENDPOINTS.USER.GET.BY_USERNAME(username), 'get');
+
+    public getActiveUser = async () => this.apiQuery<ActiveUserDto>(BACKEND_ENDPOINTS.USER.GET.ACTIVE, 'get');
 
     // * USER TYPES
     public getUserTypes = async () => this.apiQuery<UserTypeDto[]>(BACKEND_ENDPOINTS.USER_TYPE.GET.LIST, 'get');

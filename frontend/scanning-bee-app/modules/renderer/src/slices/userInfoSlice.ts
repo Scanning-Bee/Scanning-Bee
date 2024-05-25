@@ -4,14 +4,16 @@ import { RootState } from '@frontend/store';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 type UserInfoState = {
+    firstName: string,
+    lastName: string,
     userName: string,
-    userId: string,
     loggedIn: boolean,
 };
 
 const initialState: UserInfoState = {
+    firstName: '',
+    lastName: '',
     userName: '',
-    userId: '',
     loggedIn: StorageService.getAccessToken() !== null,
 };
 
@@ -20,13 +22,15 @@ const userInfoSlice = createSlice({
     initialState,
     reducers: {
         setUserInfo: (state, action: PayloadAction<UserInfoState>) => {
+            state.firstName = action.payload.firstName;
+            state.lastName = action.payload.lastName;
             state.userName = action.payload.userName;
-            state.userId = action.payload.userId;
             state.loggedIn = action.payload.loggedIn;
         },
         resetUserInfo: (state) => {
+            state.firstName = '';
+            state.lastName = '';
             state.userName = '';
-            state.userId = '';
             state.loggedIn = false;
         },
         authorizeUser: (state) => {

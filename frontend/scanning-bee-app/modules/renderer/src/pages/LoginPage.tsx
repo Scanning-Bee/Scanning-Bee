@@ -10,8 +10,6 @@ import { ipcRenderer } from 'electron';
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { setRole as setUserRole } from '../slices/permissionSlice';
-
 export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
     const { setPage } = props;
 
@@ -197,14 +195,6 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                                 if (loginType === 'login') {
                                     const success = await BackendInterface.login({ username, password });
 
-                                    if (success) {
-                                        dispatch(setUserInfo({
-                                            userName: username,
-                                            userId: '',
-                                            loggedIn: true,
-                                        }));
-                                    }
-
                                     setLoginError(!success);
                                 } else {
                                     const pwdMatch = password === repeatPassword;
@@ -221,16 +211,6 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                                             first_name: firstName,
                                             last_name: lastName,
                                         });
-
-                                    if (success) {
-                                        dispatch(setUserInfo({
-                                            userName: username,
-                                            userId: '',
-                                            loggedIn: true,
-                                        }));
-
-                                        dispatch(setUserRole(role));
-                                    }
 
                                     setLoginError(!success);
                                 }
