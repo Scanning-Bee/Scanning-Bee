@@ -104,10 +104,10 @@ REST_AUTH_SERIALIZERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'scanning_bee_db',
-        'USER': 'root',
-        'PASSWORD': 'pass',
-        'HOST': 'db',
+        'NAME': 'scanningbeedb',  # Replace with your actual DB name if different
+        'USER': 'admin',  # Replace with your RDS username
+        'PASSWORD': 'gorkemchatgptreferansversin',  # Replace with your RDS password
+        'HOST': 'scanning-bee-db.cxc6mqaqeyn5.eu-central-1.rds.amazonaws.com',  # RDS endpoint
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
