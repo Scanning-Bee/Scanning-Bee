@@ -8,7 +8,7 @@ import App from './App';
 import Annotation from './models/annotation';
 import { HistoryService } from './services/HistoryService';
 import StorageService from './services/StorageService';
-import { generateAnnotationsFromYaml, openFolder, setWorkspaceInfo } from './slices/annotationSlice';
+import { generateAnnotationsFromYaml, openFolder } from './slices/annotationSlice';
 import { AppToaster } from './Toaster';
 
 type RendererControllerState = {
@@ -55,11 +55,6 @@ export class RendererController extends React.Component {
             });
         });
         ipcRenderer.on(MAIN_EVENTS.FULL_SCREEN, this.handleFullScreenChange);
-        ipcRenderer.on(MAIN_EVENTS.WORKSPACE_INFO_READY, (_event, payload: MAIN_EVENT_PAYLOADS[MAIN_EVENTS.WORKSPACE_INFO_READY]) => {
-            const { dispatch } = (window as any).store;
-
-            dispatch(setWorkspaceInfo(payload));
-        });
 
         this.initialize();
     }
@@ -83,8 +78,6 @@ export class RendererController extends React.Component {
             images: payload.images,
             metadata: payload.metadata,
         }));
-
-        dispatch(setWorkspaceInfo(payload.workspaceInfo));
 
         StorageService.saveProp('recentlyOpenedFolders', payload.folder, new Date().toISOString());
     }

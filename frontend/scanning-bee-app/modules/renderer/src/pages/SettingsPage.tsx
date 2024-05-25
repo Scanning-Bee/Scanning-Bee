@@ -7,7 +7,6 @@ import {
     AppearanceSettings,
     GeneralSettings,
     KeyboardShortcuts,
-    WorkspaceSettings,
 } from '@frontend/toolbars/SettingsContent/SettingsContent';
 import React, { useState } from 'react';
 
@@ -71,15 +70,6 @@ export const SettingsPage = () => {
                         className='settings-tab'
                         style={{ color: theme.primaryForeground }}
                     />
-                    {
-                        folder && <Tab
-                            id='workspace'
-                            title='Workspace'
-                            panel={<WorkspaceSettings />}
-                            className='settings-tab'
-                            style={{ color: theme.primaryForeground }}
-                        />
-                    }
                     <Tabs.Expander />
                 </Tabs>
             </div>

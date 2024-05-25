@@ -307,12 +307,12 @@ class BackendInterface {
                 console.log('Image metadata not found!', imageName);
             }
 
-            if (
+            /* if (
                 !(imageMetadata.x_pos >= 0.1 && imageMetadata.x_pos <= 0.43)
                 || !(imageMetadata.y_pos >= 0.02 && imageMetadata.y_pos <= 0.42)
             ) {
                 continue;
-            }
+            } */
 
             if (!Object.keys(imageDtos).includes(imageName)) {
                 const matchingImages = await this.getImageByLocationAndTimestamp(

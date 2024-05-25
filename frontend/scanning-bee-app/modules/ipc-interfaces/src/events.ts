@@ -2,7 +2,7 @@
 /* ------------ IPC Events ----------- */
 /* ----------------------------------- */
 
-import { AnnotationYaml, MetadataWrapperYaml, Theme, WorkspaceInfo } from 'miscTypes';
+import { AnnotationYaml, MetadataWrapperYaml, Theme } from 'miscTypes';
 
 /**
  * Events that are emitted by the renderer process and listened to by the main process.
@@ -22,7 +22,6 @@ export enum MAIN_EVENTS {
     SAVE_ANNOTATIONS_SUCCESS = 'SAVE_ANNOTATIONS_SUCCESS',
     SAVE_ANNOTATIONS_ERROR = 'SAVE_ANNOTATIONS_ERROR',
     FULL_SCREEN = 'FULL_SCREEN',
-    WORKSPACE_INFO_READY = 'WORKSPACE_INFO_READY',
 }
 
 /* ----------------------------------- */
@@ -42,10 +41,8 @@ export type MAIN_EVENT_PAYLOADS = {
         annotations: AnnotationYaml[];
         images: string[];
         metadata: MetadataWrapperYaml;
-        workspaceInfo: WorkspaceInfo;
     },
     [MAIN_EVENTS.SAVE_ANNOTATIONS_SUCCESS]: { targetFolder: string },
     [MAIN_EVENTS.SAVE_ANNOTATIONS_ERROR]: { targetFolder: string, error: any },
     [MAIN_EVENTS.FULL_SCREEN]: boolean,
-    [MAIN_EVENTS.WORKSPACE_INFO_READY]: WorkspaceInfo,
 };
