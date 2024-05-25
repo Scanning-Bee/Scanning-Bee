@@ -94,6 +94,7 @@ export type CellContentDto = {
     center_y: number;
     image: string | number | ImageDto;
     radius: number;
+    cell_indices?: number[];
     cell?: typeof CellTypeDto[keyof typeof CellTypeDto];
 };
 

@@ -39,7 +39,7 @@ const clickHandler = (
             cell_type: cellType,
             poses: [0, 0],
             source_name: getFileName(shownImageUrl),
-            timestamp: 0,
+            timestamp: new Date().getTime(),
         });
 
         dispatch(addAnnotation(Annotation.toPlainObject(newAnnotation)));
