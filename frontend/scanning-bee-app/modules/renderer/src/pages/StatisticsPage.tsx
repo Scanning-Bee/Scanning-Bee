@@ -1,5 +1,6 @@
 import { Divider, Icon, Tab, Tabs } from '@blueprintjs/core';
 import { useAnnotationsFolder } from '@frontend/slices/annotationSlice';
+import { Roles, useRole } from '@frontend/slices/permissionSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { AnnotatorStatistics } from '@frontend/toolbars/charts/AnnotatorStatistics';
 import { AnnotatorTimeChart } from '@frontend/toolbars/charts/AnnotatorTimeChart';
@@ -15,6 +16,8 @@ type TabType = 'cell-types' | 'xy-coordinates' | 'heatmap' | 'annotator-stats';
 
 export const StatisticsPage = () => {
     const folder = useAnnotationsFolder();
+
+    const userRole = useRole();
 
     const theme = useTheme();
 
@@ -116,7 +119,7 @@ export const StatisticsPage = () => {
                     style={{ color: theme.primaryForeground }}
                 />
 
-                <Tab
+                {userRole === Roles.BIOLOG && <Tab
                     id={'admin-panel' as TabType}
                     title={
                         <div className='stats-tab'>
@@ -131,7 +134,7 @@ export const StatisticsPage = () => {
                         </div>
                     }
                     style={{ color: theme.primaryForeground }}
-                />
+                />}
 
                 <CellTypeInfo />
             </Tabs>

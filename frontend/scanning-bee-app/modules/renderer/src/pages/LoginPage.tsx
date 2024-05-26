@@ -3,19 +3,14 @@ import { Button, Divider, FormGroup, InputGroup, Radio, RadioGroup } from '@blue
 import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import StorageService from '@frontend/services/StorageService';
 import { Roles } from '@frontend/slices/permissionSlice';
-import { setUserInfo, useUserInfo } from '@frontend/slices/userInfoSlice';
+import { useUserInfo } from '@frontend/slices/userInfoSlice';
 import { LoginFooter } from '@frontend/toolbars/LoginFooter';
 import { RENDERER_EVENTS } from '@scanning_bee/ipc-interfaces';
 import { ipcRenderer } from 'electron';
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-
-import { setRole as setUserRole } from '../slices/permissionSlice';
 
 export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
     const { setPage } = props;
-
-    const dispatch = useDispatch();
 
     const userInfo = useUserInfo();
 
@@ -23,12 +18,7 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
         const accessToken = StorageService.getAccessToken();
 
         if (accessToken) {
-            setPage('home');
-
-            dispatch(setUserInfo({
-                ...userInfo,
-                userName: StorageService.getUsername(),
-            }));
+            BackendInterface.afterAuth();
         }
     }, []);
 
@@ -197,14 +187,6 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                                 if (loginType === 'login') {
                                     const success = await BackendInterface.login({ username, password });
 
-                                    if (success) {
-                                        dispatch(setUserInfo({
-                                            userName: username,
-                                            userId: '',
-                                            loggedIn: true,
-                                        }));
-                                    }
-
                                     setLoginError(!success);
                                 } else {
                                     const pwdMatch = password === repeatPassword;
@@ -221,16 +203,6 @@ export const LoginPage = (props: { setPage: (arg: PageType) => void }) => {
                                             first_name: firstName,
                                             last_name: lastName,
                                         });
-
-                                    if (success) {
-                                        dispatch(setUserInfo({
-                                            userName: username,
-                                            userId: '',
-                                            loggedIn: true,
-                                        }));
-
-                                        dispatch(setUserRole(role));
-                                    }
 
                                     setLoginError(!success);
                                 }
