@@ -274,6 +274,9 @@ class BackendInterface {
     public createCellContent = async (cellContent: CellContentDto) => this
         .apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.POST.CREATE, 'post', cellContent);
 
+    public createCellContents = async (cellContents: CellContentDto[]) => this
+        .apiQuery<CellContentDto[]>(BACKEND_ENDPOINTS.CELL_CONTENT.POST.CREATE, 'post', cellContents);
+
     public deleteCellContent = async (id: CellContentID) => this
         .apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.DELETE.BY_ID(id), 'delete');
 
@@ -327,6 +330,8 @@ class BackendInterface {
 
         const imageDtos = {} as { [image_name: string]: ImageDto };
 
+        const cellContents = [] as CellContentDto[];
+
         let success = true;
 
         AppToaster.show({
@@ -352,6 +357,7 @@ class BackendInterface {
             } */
 
             if (!Object.keys(imageDtos).includes(imageName)) {
+                console.log('Creating image:', imageName);
                 const matchingImages = await this.getImageByLocationAndTimestamp(
                     imageMetadata.x_pos,
                     imageMetadata.y_pos,
@@ -386,8 +392,14 @@ class BackendInterface {
                 image: imageDtos[imageName].id,
             } as CellContentDto;
 
-            // eslint-disable-next-line no-await-in-loop
-            const res = await this.createCellContent(obj);
+            cellContents.push(obj);
+        }
+
+        console.log('Cell contents:', cellContents);
+
+        if (cellContents.length > 0) {
+            const res = await this.createCellContents(cellContents);
+
             if (!res) {
                 success = false;
             }
