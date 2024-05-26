@@ -9,6 +9,7 @@ import {
     removeAnnotation,
     showImageWithURL,
 } from '@frontend/slices/annotationSlice';
+import { getFileName } from '@frontend/utils/fileNameUtils';
 import { isMac } from '@frontend/utils/platform';
 
 import BackendInterface from './backendInterface/backendInterface';
@@ -164,6 +165,16 @@ export const initializeHotkeyConfiguration = (ifc: HotkeyConfigurationInterface)
             activeAnnotationIds.forEach((annotationId) => {
                 ifc.dispatch(removeAnnotation(annotationId));
             });
+        },
+    },
+    {
+        combo: 'mod + g',
+        global: true,
+        label: 'Generate annotations by AI',
+        onKeyDown: () => {
+            const shownImageUrl = getShownImageUrl();
+
+            BackendInterface.generateAnnotationsByAI(getFileName(shownImageUrl));
         },
     },
 ];
