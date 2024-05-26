@@ -75,6 +75,9 @@ export const getCellContentsBetween = (contents: CellContentDto[], start: Date, 
         .filter(annotation => new Date(annotation.timestamp) >= start && new Date(annotation.timestamp) <= end);
 };
 
+export const filterAnnotationsByUserID = (contents: CellContentDto[], userId: number): CellContentDto[] => contents
+    .filter(content => content.user === userId);
+
 export const filterCellContentsForCellType = (contents: CellContentDto[], cellType: CellType): CellContentDto[] => contents
     .filter(content => content.content === getNumberFromCellType(cellType));
 

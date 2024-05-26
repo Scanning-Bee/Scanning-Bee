@@ -1,6 +1,8 @@
 import { UserDto } from '@frontend/controllers/backendInterface/payloadTypes';
 import { useAnnotationsFolder } from '@frontend/slices/annotationSlice';
+import { Roles, useRole } from '@frontend/slices/permissionSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
+import { useUserInfo } from '@frontend/slices/userInfoSlice';
 import { getCellContentsBetween } from '@frontend/utils/annotationUtils';
 import {
     Paper, Table, TableBody, TableContainer, TableHead, TableRow,
@@ -13,6 +15,9 @@ import { DateRangePicker } from './common/DateRangePicker';
 
 export const AnnotatorStatistics = () => {
     const theme = useTheme();
+
+    const userRole = useRole();
+    const userInfo = useUserInfo();
 
     const [users, setUsers] = useState<UserDto[]>(null);
 
@@ -32,8 +37,6 @@ export const AnnotatorStatistics = () => {
         async function fetchAllCellContents() {
             const res = getCellContentsBetween(await BackendInterface.getCellContents(), startTime, endTime);
 
-            console.log('zink', res);
-
             if (!res) {
                 setUsers([]);
 
@@ -51,12 +54,14 @@ export const AnnotatorStatistics = () => {
             const awaitedAnnotators = await Promise.all(annotators.map(fetchUserWithID));
 
             setUsers(
-                awaitedAnnotators,
+                userRole === Roles.BIOLOG
+                    ? awaitedAnnotators
+                    : awaitedAnnotators.filter(annotator => annotator.username === userInfo.userName),
             );
         }
 
         fetchAllCellContents();
-    }, [folder, startTime, endTime]);
+    }, [folder, startTime, endTime, userRole, userInfo]);
 
     return (
         <div className="list-stats">

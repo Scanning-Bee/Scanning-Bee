@@ -51,6 +51,8 @@ const permissionSlice = createSlice({
         setRole: (state, action: PayloadAction<Roles>) => {
             state.role = action.payload;
             state.permissions = ROLE_PERMISSION_TABLE[action.payload];
+
+            console.log('setting stuff', action.payload);
         },
 
         setPermissions: (state, action: PayloadAction<Permissions>) => {

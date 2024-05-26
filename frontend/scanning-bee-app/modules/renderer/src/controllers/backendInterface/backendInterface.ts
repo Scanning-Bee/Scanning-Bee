@@ -108,6 +108,7 @@ class BackendInterface {
                 url: endpoint,
                 method,
                 data,
+                timeout: 20_000,
             });
 
             return res.data;
@@ -123,7 +124,7 @@ class BackendInterface {
         }
     }
 
-    private afterAuth = async (tokens: {
+    public afterAuth = async (tokens?: {
         access_token: string;
         refresh_token: string;
     }) => {
@@ -131,8 +132,10 @@ class BackendInterface {
 
         dispatch(authorizeUser());
 
-        StorageService.setAccessToken(tokens.access_token);
-        StorageService.setRefreshToken(tokens.refresh_token);
+        if (tokens) {
+            StorageService.setAccessToken(tokens.access_token);
+            StorageService.setRefreshToken(tokens.refresh_token);
+        }
 
         const activeUser = await this.getActiveUser();
 
