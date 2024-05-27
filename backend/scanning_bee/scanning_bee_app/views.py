@@ -12,7 +12,7 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate
-from .permissions import IsBiologOrSelf
+from .permissions import IsBiologOrSelf, IsBiolog
 
 from .models import *
 from .serializers import *
@@ -38,6 +38,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.db.models import F
 
 
 class HomeView(APIView):
@@ -304,44 +305,53 @@ class CellContentList(ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         data = request.data
 
-        if not isinstance(data, list):  # Check if request data is a list for bulk creation
+        if not isinstance(data, list):
             data = [data]
 
-        created_instances = []  # To store the response data of created instances
-        errors = []  # To accumulate any errors during creation
+        instance_list = []
+        errors = []
+        users_to_update = {}
 
-        with transaction.atomic():  # Ensure the operation is atomic
+        with transaction.atomic():
             for item_data in data:
-                # if there is a user field update it, if not then add it
-                if 'user' not in item_data:
-                    item_data['user'] = request.user.id
-                else:
-                    item_data.update({'user': request.user.pk})
-
-                # round center_x and center_y to the nearest integer
-                item_data['center_x'] = round(item_data['center_x'])
-                item_data['center_y'] = round(item_data['center_y'])
-                
                 serializer = self.get_serializer(data=item_data)
-                # print('serializer', serializer)
                 if serializer.is_valid():
-                    # Create CellContent instance and link with Cell
-                    cell_content_instance = serializer.save()  # Calls the custom save method
-                    created_instances.append(serializer.data)  # Append the serialized data
+                    instance = serializer.Meta.model(**serializer.validated_data)
+
+                    # Simulate custom save logic here
+                    if instance.user_id:
+                        if instance.user_id in users_to_update:
+                            users_to_update[instance.user_id] += 1
+                        else:
+                            users_to_update[instance.user_id] = 1
+
+                    try:
+                        my_image = Image.objects.get(pk=instance.image.pk)
+                        x_pos, y_pos = my_image.x_pos, my_image.y_pos
+                        instance.timestamp = my_image.timestamp
+
+                        i_index, j_index = get_index_from_real_world(x_pos, y_pos, 0.06, [instance.center_x, instance.center_y])
+                        instance.cell = Cell.objects.filter(frame=instance.frame, i_index=i_index, j_index=j_index).first()
+                    except Image.DoesNotExist:
+                        errors.append({'image': 'Image does not exist.'})
+                        continue
+
+                    instance_list.append(instance)
                 else:
-                    # if the error is about unique set with code='unique', then ignore it
                     if 'unique' in str(serializer.errors):
                         continue
-                    errors.append(serializer.errors)  # Accumulate errors
+                    errors.append(serializer.errors)
 
-        if errors:
-            # If there were any errors, roll back and return them
-            print(f"\nErrors: {errors}\n")
-            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            # If all instances were created successfully, return their data
-            return Response(created_instances, status=status.HTTP_201_CREATED)
+            if instance_list:
+                CellContent.objects.bulk_create(instance_list)
 
+                # Update user annotation counts
+                for user_id, count in users_to_update.items():
+                    CustomUser.objects.filter(pk=user_id).update(annotation_count=F('annotation_count') + count)
+
+            if errors:
+                return Response({'errors': errors, 'created': self.get_serializer(instance_list, many=True).data}, status=status.HTTP_207_MULTI_STATUS)
+            return Response(self.get_serializer(instance_list, many=True).data, status=status.HTTP_201_CREATED)
 
 class CellContentDetail(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated, IsBiologOrSelf]
@@ -602,6 +612,7 @@ class BagDetail(RetrieveUpdateDestroyAPIView):
 
 ######################## DELETE ALL ##################################
 class DeleteAll(APIView):
+    permission_classes = [IsAuthenticated, IsBiolog]
     def delete(self, request, *args, **kwargs):
         CellContent.objects.all().delete()
         User.objects.all().delete()
@@ -613,3 +624,8 @@ class DeleteAll(APIView):
         Bag.objects.all().delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+######################## IS ONLINE ##################################
+class IsOnline(APIView):
+    def get(self, request):
+        return Response(status=status.HTTP_200_OK)

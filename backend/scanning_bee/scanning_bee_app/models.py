@@ -85,29 +85,12 @@ class CellContent(models.Model):
     center_y = models.IntegerField()
     image = models.ForeignKey(Image, on_delete=models.CASCADE)
     radius = models.IntegerField()
-    
+
     class Meta:
         unique_together = ('frame', 'content', 'center_x', 'center_y', 'image')
 
     def __str__(self):
-        return str(self.pk) + " - " + self.content.name + " - " + str(self.cell)
-
-    def save(self, *args, **kwargs):
-        created = not self.pk
-
-        if created and self.user:
-            self.user.annotation_count += 1
-            self.user.save()
-
-        my_image = Image.objects.get(pk=self.image.pk)
-        x_pos = my_image.x_pos
-        y_pos = my_image.y_pos
-        self.timestamp = my_image.timestamp
-
-        i_index, j_index =  get_index_from_real_world(x_pos, y_pos, 0.06, [self.center_x, self.center_y])
-        self.cell = Cell.objects.filter(frame=self.frame, i_index=i_index, j_index=j_index).first()
-
-        super(CellContent, self).save(*args, **kwargs)
+        return f"{self.pk} - {self.content.name} - {self.cell}"
 
     
 

@@ -74,5 +74,7 @@ urlpatterns = [
     path('bag_detail/<int:id>', views.BagDetail.as_view(), name='bag-detail'),
 
     path('delete_all', views.DeleteAll.as_view(), name='delete-all'),
+
+    path('is_online', views.IsOnline.as_view(), name='is-online')
 ]
 

@@ -5,6 +5,9 @@ import json
 from random import randint
 from scanning_bee_app.models import Cell, Frame  # Replace with the actual model import
 
+MAX_I_INDEX = 108
+MAX_J_INDEX = 134
+
 class Command(MigrateCommand):
     def handle(self, *args, **options):
         # First, run the original migrate command
@@ -33,10 +36,11 @@ class Command(MigrateCommand):
         fixture_path = './scanning_bee_app/fixtures/0005_initial_cells.json'
 
         if not os.path.exists(fixture_path):
+            self.stderr.write(self.style.WARNING(f'Generating fixture for {MAX_I_INDEX}x{MAX_J_INDEX} cells.'))
             cells = []
             pk = 1
-            for i in range(1, 117):
-                for j in range(1, 66):
+            for i in range(1, MAX_I_INDEX + 1):
+                for j in range(1, MAX_J_INDEX + 1):
                     cell = {
                         "model": "scanning_bee_app.cell",  # Replace with the actual app name
                         "pk": pk,
@@ -55,13 +59,22 @@ class Command(MigrateCommand):
 
             self.stdout.write(self.style.SUCCESS(f'Fixture generated at: {fixture_path}'))
         else:
-            self.stdout.write(self.style.SUCCESS(f'Fixture already exists at: {fixture_path}'))
+            # check if the fixtures max i and j index are the same as the current max i and j index, if not delete the fixture and regenerate it
+            with open(fixture_path) as f:
+                data = json.load(f)
+                max_i_index = max(cell['fields']['i_index'] for cell in data)
+                max_j_index = max(cell['fields']['j_index'] for cell in data)
+                if max_i_index != MAX_I_INDEX or max_j_index != MAX_J_INDEX:
+                    self.stderr.write(self.style.WARNING(f'Initial cell fixtures are not correct, generating fixture for {MAX_I_INDEX}x{MAX_J_INDEX} cells.'))
+                    os.remove(fixture_path)
+                    self.generate_initial_cells()
+
 
     def load_large_fixture(self, fixture_path):
         def check_random_cells_exist():
             for _ in range(5):  # Check 5 random cells
-                i_index = randint(1, 116)
-                j_index = randint(1, 65)
+                i_index = randint(1, MAX_I_INDEX)
+                j_index = randint(1, MAX_J_INDEX)
                 if not Cell.objects.filter(i_index=i_index, j_index=j_index, frame_id=1).exists():
                     return False
             return True
@@ -69,6 +82,8 @@ class Command(MigrateCommand):
         if check_random_cells_exist():
             self.stdout.write(self.style.SUCCESS('Random cells exist, skipping bulk load of large fixture.'))
             return
+        
+        self.stderr.write(self.style.WARNING(f'Loading fixture into database for {MAX_I_INDEX}x{MAX_J_INDEX} cells. This may take a while...'))
 
         with open(fixture_path) as f:
             data = json.load(f)

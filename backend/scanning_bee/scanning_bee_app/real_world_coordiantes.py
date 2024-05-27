@@ -54,16 +54,16 @@ def real_world_alternative(x_pos_norm, y_pos_norm, z_distance, points_2d, camera
 
 def get_index_from_coordinate(real_world_x, real_world_y):
     try:
-        if (0.08284273 <= real_world_x <= 0.4309411 and
-               0.01495806 <= real_world_y <= 0.4165364):
-            i = round((real_world_x[0] - 0.08284273) / 0.00528934)
-            j = round((real_world_y[0] - 0.01495806) / 0.00346662)
+        if (-0.05 <= real_world_x <= 0.51881993 and
+               -0.03 <= real_world_y <= 0.43529304):
+            i = round((real_world_x[0] + 0.05) / 0.00528934)
+            j = round((real_world_y[0] + 0.03) / 0.00346662)
 
             return i, j
-    
+
         else:
             raise ValueError("Invalid reaal world coordinate values..")
-        
+
     except Exception as e:
         raise(e)
 
