@@ -1,3 +1,3 @@
 cd frontend/scanning-bee-app
 
-yarn dev:watch
+yarn start:dev

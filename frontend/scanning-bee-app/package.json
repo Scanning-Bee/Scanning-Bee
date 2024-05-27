@@ -13,14 +13,14 @@
         "watch": "yarn build && ttsc --build --watch",
         "clean": "rimraf modules/*/dist dist build/code build/output",
         "stag": "webpack serve --config webpack.dev.config.js",
-        "dev": "cross-env SCANNING_BEE_DEV_MODE=true yarn run build; yarn run stag",
+        "start": "cross-env SCANNING_BEE_DEV_MODE=true yarn run build; yarn run stag",
         "bundle": "webpack --config webpack.build.config.js",
         "package": "zx build/package.mjs",
         "lint": "eslint \"modules/*/src/**/*.{tsx,ts,jsx,js}\" --cache",
         "format": "eslint \"modules/*/src/**/*.{tsx,ts,jsx,js}\" --cache --fix",
         "typecheck": "ttsc --noEmit",
         "clean:modules": "yarn clean && rimraf modules/*/node_modules node_modules",
-        "dev:watch": "yarn run build && concurrently \"yarn run watch\" \"yarn run dev\""
+        "start:dev": "yarn run build && concurrently \"yarn run watch\" \"yarn run start\""
     },
     "build": {
         "appId": "com.scanning_bee.app",

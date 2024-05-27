@@ -345,7 +345,6 @@ class CellContentList(ListCreateAPIView):
 
 class CellContentDetail(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated, IsBiologOrSelf]
-    queryset = CellContent.objects.all()
     serializer_class = CellContentSerializer
     lookup_field = 'id'
 
@@ -355,9 +354,9 @@ class CellContentDetail(RetrieveUpdateDestroyAPIView):
 
         # Check object permissions
         self.check_object_permissions(request, obj)
-
-        cell_content_obj = get_object_or_404(CellContent, user=obj)
-        serializer = CellContentSerializer(cell_content_obj)
+        cell_contents = CellContent.objects.filter(user=obj)
+        
+        serializer = CellContentSerializer(cell_contents, many=True)
         return Response(serializer.data)
 
 
