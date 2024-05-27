@@ -330,7 +330,7 @@ class BackendInterface {
 
         const imageDtos = {} as { [image_name: string]: ImageDto };
 
-        const cellContents = [] as CellContentDto[];
+        const cellContentsByImage = {} as { [image_name: string]: CellContentDto[] };
 
         let success = true;
 
@@ -389,19 +389,22 @@ class BackendInterface {
                 user: 1,
                 timestamp: `${addTrailingZeros(annotationTimestamp.toISOString())}`,
                 frame: 1,
-                image: imageDtos[imageName].id,
+                image: imageDtos[imageName]?.id,
             } as CellContentDto;
 
-            cellContents.push(obj);
+            cellContentsByImage[imageName] = cellContentsByImage[imageName] || [];
+
+            cellContentsByImage[imageName].push(obj);
         }
 
-        console.log('Cell contents:', cellContents);
+        for (const [imageName, cellContents] of Object.entries(cellContentsByImage)) {
+            if (cellContents.length > 0) {
+                const res = await this.createCellContents(cellContents);
 
-        if (cellContents.length > 0) {
-            const res = await this.createCellContents(cellContents);
-
-            if (!res) {
-                success = false;
+                if (!res) {
+                    console.log('Error while saving annotations!', imageName);
+                    success = false;
+                }
             }
         }
 
