@@ -11,13 +11,7 @@ function spawnElectron(env, inspectPort) {
     )
     .on('error', err => console.error(err))
     .on('close', code => {
-        // Error code 491 is a special code number decided by us. It basically means that the app
-        // will restart itself. See https://unix.stackexchange.com/a/604262.
-        if (code === 491) {
-            spawnElectron(env, inspectPort);
-        } else {
-            process.exit(code);
-        }
+        process.exit(code);
     })
 }
 

@@ -42,12 +42,7 @@ class MainController {
 
     private tray: Tray;
 
-    public async invoke() {
-        // TODO:
-    }
-
     async initApp() {
-        // To make the titlebar light in macos
         nativeTheme.themeSource = 'light';
 
         app.on('open-url', async (_event, url) => {
@@ -58,7 +53,6 @@ class MainController {
             this.show();
         });
 
-        // Quit when all windows are closed.
         app.on('window-all-closed', async () => {
             if (!IS_MAC) {
                 app.quit();
@@ -185,11 +179,6 @@ class MainController {
                 label: 'View',
                 submenu: [
                     {
-                        label: 'Reload',
-                        accelerator: 'CmdOrCtrl+R',
-                        click: () => this.reload(),
-                    },
-                    {
                         label: 'Enter Full Screen',
                         accelerator: (() => (IS_MAC ? 'Ctrl+Command+F' : 'F11'))(),
                         role: 'togglefullscreen',
@@ -315,10 +304,6 @@ class MainController {
         };
 
         const themeChangeHandler = async (_event: any, theme?: Theme) => {
-            console.log('hey!');
-
-            console.log(theme);
-
             const headerBackground = theme
                 ? (theme.type === 'dark' ? theme.secondaryBackground : theme.tertiaryBackground)
                 : '#DCE0E5';
@@ -498,15 +483,6 @@ class MainController {
         // On macos the context menu opens with single click, so it won't make sense to add a onclick listener
         if (!IS_MAC) {
             this.tray.on('click', () => this.show());
-        }
-    }
-
-    public async reload() {
-        if (IS_RUNNING_DEV_MODE) {
-            app.exit(491); // Webpack will restart the app for us, see webpack.dev.config.js.
-        } else {
-            app.relaunch();
-            app.quit();
         }
     }
 
