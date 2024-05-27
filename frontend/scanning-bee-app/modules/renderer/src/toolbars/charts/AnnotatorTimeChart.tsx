@@ -9,6 +9,7 @@ import {
 } from 'recharts';
 
 import BackendInterface from '../../controllers/backendInterface/backendInterface';
+import { Loading } from '../common/Loading';
 import { DateRangePicker } from './common/DateRangePicker';
 import { processAnnotatorData } from './tools/processAnnotatorData';
 
@@ -60,6 +61,8 @@ export const AnnotatorTimeChart = () => {
 
     const processedData = processAnnotatorData(data, users, startTime, endTime);
 
+    const [loading, setLoading] = useState<boolean>(true);
+
     const folder = useAnnotationsFolder();
 
     const { opacity, handleMouseEnter, handleMouseLeave } = useHighlights(users ? users.map(user => user.username) : []);
@@ -76,6 +79,7 @@ export const AnnotatorTimeChart = () => {
 
             if (!res) {
                 setUsers([]);
+                setLoading(false);
 
                 return;
             }
@@ -84,6 +88,7 @@ export const AnnotatorTimeChart = () => {
 
             if (annotators.length === 0) {
                 setUsers([]);
+                setLoading(false);
 
                 return;
             }
@@ -93,52 +98,57 @@ export const AnnotatorTimeChart = () => {
             setUsers(
                 awaitedAnnotators,
             );
+
+            setLoading(false);
         }
 
+        setLoading(true);
         fetchAllCellContents();
     }, [folder, startTime, endTime]);
 
     return (
-        <div className="list-stats">
-            <div className="Chart">
-                <AreaChart
-                    width={800}
-                    height={500}
-                    data={processedData}
-                    margin={{
-                        top: 10,
-                        right: 30,
-                        left: 0,
-                        bottom: 0,
-                    }}
-                >
+        loading
+            ? <Loading/>
+            : <div className="list-stats">
+                <div className="Chart">
+                    <AreaChart
+                        width={800}
+                        height={500}
+                        data={processedData}
+                        margin={{
+                            top: 10,
+                            right: 30,
+                            left: 0,
+                            bottom: 0,
+                        }}
+                    >
 
-                    <CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="name"/>
-                    <YAxis label={{ value: 'total opens', angle: -90, position: 'insideLeft', fontSize: 24 }}/>
+                        <CartesianGrid strokeDasharray="3 3"/>
+                        <XAxis dataKey="name"/>
+                        <YAxis label={{ value: 'total opens', angle: -90, position: 'insideLeft', fontSize: 24 }}/>
 
-                    <Tooltip itemSorter={item => (item.value as number) * (-1)}/>
-                    <Legend onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}/>
-                    {users && users.map((key, index) => <Area
-                        name={key.username}
-                        key={index}
-                        type="monotone"
-                        dataKey={key.username}
-                        stackId={1}
-                        stroke={randomColour(key.username)}
-                        strokeOpacity={0}
-                        fillOpacity={opacity[key.username]}
-                        fill={randomColour(key.username)}
-                    />)}
-                </AreaChart>
+                        <Tooltip itemSorter={item => (item.value as number) * (-1)}/>
+                        <Legend onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}/>
+                        {users && users.map((key, index) => <Area
+                            name={key.username}
+                            key={index}
+                            type="monotone"
+                            dataKey={key.username}
+                            stackId={1}
+                            stroke={randomColour(key.username)}
+                            strokeOpacity={0}
+                            fillOpacity={opacity[key.username]}
+                            fill={randomColour(key.username)}
+                        />)}
+                    </AreaChart>
+                </div>
+
+                <DateRangePicker
+                    setStartTime={setStartTime}
+                    setEndTime={setEndTime}
+                    startTime={startTime}
+                    endTime={endTime}
+                />
             </div>
-
-            <DateRangePicker
-                setStartTime={setStartTime}
-                setEndTime={setEndTime}
-                startTime={startTime}
-                endTime={endTime}
-            />
-        </div>
     );
 };

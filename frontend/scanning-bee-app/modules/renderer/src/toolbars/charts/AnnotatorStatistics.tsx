@@ -10,6 +10,7 @@ import {
 import React, { useEffect, useState } from 'react';
 
 import BackendInterface from '../../controllers/backendInterface/backendInterface';
+import { Loading } from '../common/Loading';
 import { getStyledTableCell, StyledTableRow } from '../common/StyledTable';
 import { DateRangePicker } from './common/DateRangePicker';
 
@@ -23,6 +24,8 @@ export const AnnotatorStatistics = () => {
 
     const [startTime, setStartTime] = useState<Date>(null);
     const [endTime, setEndTime] = useState<Date>(null);
+
+    const [loading, setLoading] = useState<boolean>(true);
 
     const folder = useAnnotationsFolder();
 
@@ -39,6 +42,7 @@ export const AnnotatorStatistics = () => {
 
             if (!res) {
                 setUsers([]);
+                setLoading(false);
 
                 return;
             }
@@ -51,63 +55,71 @@ export const AnnotatorStatistics = () => {
                 return;
             }
 
+            console.log(res);
             const awaitedAnnotators = await Promise.all(annotators.map(fetchUserWithID));
+            console.log(awaitedAnnotators);
 
             setUsers(
                 userRole === Roles.BIOLOG
                     ? awaitedAnnotators
                     : awaitedAnnotators.filter(annotator => annotator.username === userInfo.userName),
             );
+
+            setLoading(false);
         }
 
+        setLoading(true);
         fetchAllCellContents();
     }, [folder, startTime, endTime, userRole, userInfo]);
 
-    return (
-        <div className="list-stats">
-            <div>
-                <TableContainer className="list-active-users" component={Paper}>
-                    <Table aria-label="customized table">
-                        <TableHead>
-                            {(() => {
-                                const StyledTableCellHead = getStyledTableCell(theme.primaryBackground, theme);
-                                return <TableRow>
-                                    <StyledTableCellHead/>
-                                    <StyledTableCellHead align="left">ID</StyledTableCellHead>
-                                    <StyledTableCellHead align="left">Username</StyledTableCellHead>
-                                    <StyledTableCellHead align="left">Email</StyledTableCellHead>
-                                    <StyledTableCellHead align="left">Total Annotations</StyledTableCellHead>
-                                </TableRow>;
-                            })()}
-                        </TableHead>
-                        <TableBody>
-                            {users && users.map((row, index) => {
-                                const cellColour = (index % 2) ? `${theme.secondaryBackground}` : `${theme.tertiaryBackground}`;
+    return loading
+        ? <Loading />
+        : (
+            <div className="list-stats">
+                <div>
+                    <TableContainer className="list-active-users" component={Paper}>
+                        <Table aria-label="customized table">
+                            <TableHead>
+                                {(() => {
+                                    const StyledTableCellHead = getStyledTableCell(theme.primaryBackground, theme);
+                                    return <TableRow>
+                                        <StyledTableCellHead/>
+                                        <StyledTableCellHead align="left">ID</StyledTableCellHead>
+                                        <StyledTableCellHead align="left">Username</StyledTableCellHead>
+                                        <StyledTableCellHead align="left">Email</StyledTableCellHead>
+                                        <StyledTableCellHead align="left">Total Annotations</StyledTableCellHead>
+                                    </TableRow>;
+                                })()}
+                            </TableHead>
+                            <TableBody>
+                                {users && users.map((row, index) => {
+                                    const cellColour = (index % 2) ? `${theme.secondaryBackground}` : `${theme.tertiaryBackground}`;
 
-                                const StyledTableCellStat = getStyledTableCell(cellColour, theme);
+                                    const StyledTableCellStat = getStyledTableCell(cellColour, theme);
 
-                                return (
-                                    <StyledTableRow key={index}>
-                                        <StyledTableCellStat component="th" scope="row">
-                                            {index + 1}
-                                        </StyledTableCellStat>
-                                        <StyledTableCellStat align="left">{row.id}</StyledTableCellStat>
-                                        <StyledTableCellStat align="left">{row.username}</StyledTableCellStat>
-                                        <StyledTableCellStat align="right">{row.email}</StyledTableCellStat>
-                                        <StyledTableCellStat align="right">{row.annotation_count}</StyledTableCellStat>
-                                    </StyledTableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                                    return (
+                                        <StyledTableRow key={index}>
+                                            <StyledTableCellStat component="th" scope="row">
+                                                {index + 1}
+                                            </StyledTableCellStat>
+                                            <StyledTableCellStat align="left">{row.id}</StyledTableCellStat>
+                                            <StyledTableCellStat align="left">{row.username}</StyledTableCellStat>
+                                            <StyledTableCellStat align="right">{row.email}</StyledTableCellStat>
+                                            <StyledTableCellStat align="right">{row.annotation_count}</StyledTableCellStat>
+                                        </StyledTableRow>
+                                    );
+                                })}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </div>
+
+                <DateRangePicker
+                    startTime={startTime}
+                    setStartTime={setStartTime}
+                    endTime={endTime}
+                    setEndTime={setEndTime}
+                />
             </div>
-
-            <DateRangePicker
-                startTime={startTime}
-                setStartTime={setStartTime}
-                endTime={endTime}
-                setEndTime={setEndTime}
-            />
-        </div>);
+        );
 };

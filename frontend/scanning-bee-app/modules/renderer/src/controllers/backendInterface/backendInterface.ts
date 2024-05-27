@@ -252,6 +252,8 @@ class BackendInterface {
     public getCellContentsBeforeTimestamp = async (timestamp: number) => {
         const allCellContents = await this.getCellContents();
 
+        if (!allCellContents) return [];
+
         return allCellContents.filter(cellContent => new Date(cellContent.timestamp).getTime() < timestamp);
     };
 

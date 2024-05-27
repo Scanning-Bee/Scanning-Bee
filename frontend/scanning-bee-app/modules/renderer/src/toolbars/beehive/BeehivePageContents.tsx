@@ -17,6 +17,7 @@ import { useDispatch } from 'react-redux';
 
 import { OccludingBeeBase } from '../../views/base/OccludingBeeBase';
 import { HexagonView } from '../../views/HexagonView';
+import { Loading } from '../common/Loading';
 import { TimeAdjuster } from './TimeAdjuster';
 
 export const BeehivePageContents = () => {
@@ -37,13 +38,18 @@ export const BeehivePageContents = () => {
     const [wasAnimationPlaying, setWasAnimationPlaying] = useState(false);
     const [animationPaused, setAnimationPaused] = useState(false);
 
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         async function fetchAllCells() {
             const cellContents = await BackendInterface.getBeehiveData(shownDataTimestamp);
 
             setCells(cellContents);
+
+            setLoading(false);
         }
 
+        setLoading(true);
         fetchAllCells();
     }, [shownDataTimestamp]);
 
@@ -86,43 +92,45 @@ export const BeehivePageContents = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [shownDataTimestamp, isAnimationPlaying, animationSpeed, start, end]);
 
-    return (
-        <div
-            id='beehive-container'
-        >
-            {
-                cells.map(cell => <div
-                    key={cell.id}
-                    className='beehive-cell'
-                    style={{
-                        left: `${cell.x * viewScale}px`,
-                        top: `${cell.y * viewScale}px`,
-                    }}
-                    onClick={() => {
-                        setSelectedCell(cell);
-                        setCellDetailDialogOpen(true);
-                    }}
-                >
-                    <HexagonView
-                        color={CellTypeColours[cell.cellType]}
-                        scale={viewScale}
-                    />
-                    {
-                        cell.cellType === CellType.BEE_OCCLUDED
+    return loading
+        ? <Loading />
+        : (
+            <div
+                id='beehive-container'
+            >
+                {
+                    cells.map(cell => <div
+                        key={cell.id}
+                        className='beehive-cell'
+                        style={{
+                            left: `${cell.x * viewScale}px`,
+                            top: `${cell.y * viewScale}px`,
+                        }}
+                        onClick={() => {
+                            setSelectedCell(cell);
+                            setCellDetailDialogOpen(true);
+                        }}
+                    >
+                        <HexagonView
+                            color={CellTypeColours[cell.cellType]}
+                            scale={viewScale}
+                        />
+                        {
+                            cell.cellType === CellType.BEE_OCCLUDED
                                 && <OccludingBeeBase color='white' scale={viewScale} />
-                    }
-                </div>)
-            }
+                        }
+                    </div>)
+                }
 
-            <CellDetailDialog
-                cellDetailDialogOpen={cellDetailDialogOpen}
-                setCellDetailDialogOpen={setCellDetailDialogOpen}
-                cell={selectedCell}
-            />
+                <CellDetailDialog
+                    cellDetailDialogOpen={cellDetailDialogOpen}
+                    setCellDetailDialogOpen={setCellDetailDialogOpen}
+                    cell={selectedCell}
+                />
 
-            <TimeAdjuster
-                setAnimationPaused={setAnimationPaused}
-            />
-        </div>
-    );
+                <TimeAdjuster
+                    setAnimationPaused={setAnimationPaused}
+                />
+            </div>
+        );
 };
