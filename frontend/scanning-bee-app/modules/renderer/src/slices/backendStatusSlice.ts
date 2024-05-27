@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux';
+import backendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import { RootState } from '@frontend/store';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -51,6 +52,7 @@ export const setBackendOnline = (isOnline: boolean) => {
     }
 
     dispatch(setStatus('offline'));
+    backendInterface.logout();
 };
 
 export const resetBackendStatus = () => {

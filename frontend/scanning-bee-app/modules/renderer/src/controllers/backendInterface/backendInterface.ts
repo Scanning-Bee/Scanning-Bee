@@ -252,6 +252,8 @@ class BackendInterface {
     public getCellContentsBeforeTimestamp = async (timestamp: number) => {
         const allCellContents = await this.getCellContents();
 
+        if (!allCellContents) return [];
+
         return allCellContents.filter(cellContent => new Date(cellContent.timestamp).getTime() < timestamp);
     };
 
@@ -273,6 +275,9 @@ class BackendInterface {
 
     public createCellContent = async (cellContent: CellContentDto) => this
         .apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.POST.CREATE, 'post', cellContent);
+
+    public createCellContents = async (cellContents: CellContentDto[]) => this
+        .apiQuery<CellContentDto[]>(BACKEND_ENDPOINTS.CELL_CONTENT.POST.CREATE, 'post', cellContents);
 
     public deleteCellContent = async (id: CellContentID) => this
         .apiQuery<CellContentDto>(BACKEND_ENDPOINTS.CELL_CONTENT.DELETE.BY_ID(id), 'delete');
@@ -327,6 +332,8 @@ class BackendInterface {
 
         const imageDtos = {} as { [image_name: string]: ImageDto };
 
+        const cellContentsByImage = {} as { [image_name: string]: CellContentDto[] };
+
         let success = true;
 
         AppToaster.show({
@@ -352,6 +359,7 @@ class BackendInterface {
             } */
 
             if (!Object.keys(imageDtos).includes(imageName)) {
+                console.log('Creating image:', imageName);
                 const matchingImages = await this.getImageByLocationAndTimestamp(
                     imageMetadata.x_pos,
                     imageMetadata.y_pos,
@@ -383,13 +391,22 @@ class BackendInterface {
                 user: 1,
                 timestamp: `${addTrailingZeros(annotationTimestamp.toISOString())}`,
                 frame: 1,
-                image: imageDtos[imageName].id,
+                image: imageDtos[imageName]?.id,
             } as CellContentDto;
 
-            // eslint-disable-next-line no-await-in-loop
-            const res = await this.createCellContent(obj);
-            if (!res) {
-                success = false;
+            cellContentsByImage[imageName] = cellContentsByImage[imageName] || [];
+
+            cellContentsByImage[imageName].push(obj);
+        }
+
+        for (const [imageName, cellContents] of Object.entries(cellContentsByImage)) {
+            if (cellContents.length > 0) {
+                const res = await this.createCellContents(cellContents);
+
+                if (!res) {
+                    console.log('Error while saving annotations!', imageName);
+                    success = false;
+                }
             }
         }
 
