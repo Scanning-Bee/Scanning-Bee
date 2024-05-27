@@ -319,11 +319,11 @@ class CellContentList(ListCreateAPIView):
                     instance = serializer.Meta.model(**serializer.validated_data)
 
                     # Simulate custom save logic here
-                    if instance.user_id:
-                        if instance.user_id in users_to_update:
-                            users_to_update[instance.user_id] += 1
+                    if instance.user.pk:
+                        if instance.user.pk in users_to_update:
+                            users_to_update[instance.user.pk] += 1
                         else:
-                            users_to_update[instance.user_id] = 1
+                            users_to_update[instance.user.pk] = 1
 
                     try:
                         my_image = Image.objects.get(pk=instance.image.pk)
@@ -331,7 +331,7 @@ class CellContentList(ListCreateAPIView):
                         instance.timestamp = my_image.timestamp
 
                         i_index, j_index = get_index_from_real_world(x_pos, y_pos, 0.06, [instance.center_x, instance.center_y])
-                        instance.cell = Cell.objects.filter(frame=instance.frame, i_index=i_index, j_index=j_index).first()
+                        instance.cell = Cell.objects.filter(frame=instance.frame.pk, i_index=i_index, j_index=j_index).first()
                     except Image.DoesNotExist:
                         errors.append({'image': 'Image does not exist.'})
                         continue
