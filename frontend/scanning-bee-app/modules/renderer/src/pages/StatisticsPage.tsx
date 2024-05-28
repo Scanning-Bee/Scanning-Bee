@@ -42,6 +42,7 @@ export const StatisticsPage = () => {
                 defaultSelectedTabId='general'
                 selectedTabId={activeTab}
                 vertical
+                renderActiveTabPanelOnly
                 className={`stats-tabs stats-tabs-${theme.title}`}
             >
                 <Tab

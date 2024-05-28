@@ -56,7 +56,7 @@ class BackendInterface {
 
         this.apiClient = axios.create({
             baseURL: ENDPOINT_URL,
-            timeout: 10_000,
+            timeout: 120_000,
         });
 
         this.apiClient.interceptors.request.use((config) => {
@@ -72,7 +72,9 @@ class BackendInterface {
         this.apiClient.interceptors.response.use(
             response => response,
             (error) => {
-                if (error.response.status === 401) {
+                console.log(error);
+
+                if (error.response?.status === 401) {
                     StorageService.clearTokens();
                     (window as any).store.dispatch(unauthorizeUser());
                     (window as any).RendererController.setPage('login');
@@ -122,7 +124,7 @@ class BackendInterface {
                 url: endpoint,
                 method,
                 data,
-                timeout: 20_000,
+                timeout: 120_000,
             });
 
             return res.data;
@@ -259,9 +261,12 @@ class BackendInterface {
     public getCellContents = async () => this.apiQuery<CellContentDto[]>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.LIST, 'get');
 
     public getCellContentsCached = async (forceUpdate: boolean = false) => {
-        if (!this.cache || this.cache.cellContents.length === 0 || forceUpdate) {
+        if (!this.cache || !this.cache.cellContents || this.cache.cellContents.length === 0 || forceUpdate) {
+            console.log('Updating cell contents cache...');
             this.cache.cellContents = await this.getCellContents();
         }
+
+        console.log('Returning cell contents cache...');
 
         return this.cache.cellContents;
     };
