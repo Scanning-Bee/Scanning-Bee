@@ -74,7 +74,8 @@ export const AnnotatorTimeChart = () => {
         }
 
         async function fetchAllCellContents() {
-            const res = getCellContentsBetween(await BackendInterface.getCellContents(), startTime, endTime);
+            const cachedContents = await BackendInterface.getCellContentsCached();
+            const res = getCellContentsBetween(cachedContents, startTime, endTime);
             setData(res);
 
             if (!res) {

@@ -38,7 +38,8 @@ export const AnnotatorStatistics = () => {
         }
 
         async function fetchAllCellContents() {
-            const res = getCellContentsBetween(await BackendInterface.getCellContents(), startTime, endTime);
+            const cachedContents = await BackendInterface.getCellContentsCached();
+            const res = getCellContentsBetween(cachedContents, startTime, endTime);
 
             if (!res) {
                 setUsers([]);

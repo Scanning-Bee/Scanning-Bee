@@ -40,10 +40,20 @@ import {
 
 type APIMethods = 'get' | 'post' | 'put' | 'delete';
 
+type Cache = {
+    cellContents: CellContentDto[];
+};
+
 class BackendInterface {
     apiClient: AxiosInstance = null;
 
+    cache: Cache = null;
+
     constructor() {
+        this.cache = {
+            cellContents: [],
+        };
+
         this.apiClient = axios.create({
             baseURL: ENDPOINT_URL,
             timeout: 10_000,
@@ -72,6 +82,10 @@ class BackendInterface {
             },
         );
     }
+
+    public updateCache = async () => {
+        this.cache.cellContents = await this.getCellContents();
+    };
 
     public openFolderAtLocation = (folder: string) => {
         ipcRenderer.send(RENDERER_QUERIES.OPEN_FOLDER_AT_LOCATION, folder);
@@ -244,6 +258,14 @@ class BackendInterface {
     // * CELL CONTENT
     public getCellContents = async () => this.apiQuery<CellContentDto[]>(BACKEND_ENDPOINTS.CELL_CONTENT.GET.LIST, 'get');
 
+    public getCellContentsCached = async (forceUpdate: boolean = false) => {
+        if (!this.cache || this.cache.cellContents.length === 0 || forceUpdate) {
+            this.cache.cellContents = await this.getCellContents();
+        }
+
+        return this.cache.cellContents;
+    };
+
     /**
      * used to get the state of the cells at a certain timestamp.
      * @param timestamp
@@ -253,6 +275,12 @@ class BackendInterface {
         const allCellContents = await this.getCellContents();
 
         if (!allCellContents) return [];
+
+        return allCellContents.filter(cellContent => new Date(cellContent.timestamp).getTime() < timestamp);
+    };
+
+    public getCellContentsBeforeTimestampCached = async (timestamp: number, forceUpdate: boolean = false) => {
+        const allCellContents = await this.getCellContentsCached(forceUpdate);
 
         return allCellContents.filter(cellContent => new Date(cellContent.timestamp).getTime() < timestamp);
     };
@@ -500,6 +528,7 @@ class BackendInterface {
      */
     public getBeehiveData = async (
         timestampToLookFor?: number,
+        forceUpdate: boolean = false,
     ): Promise<BeehiveCell[]> => {
         console.log(
             'Getting beehive data',
@@ -512,8 +541,9 @@ class BackendInterface {
         const cellWidth = 48;
         const cellHeight = 42;
 
-        const cellContents = await this.getCellContentsBeforeTimestamp(
+        const cellContents = await this.getCellContentsBeforeTimestampCached(
             timestampToLookFor || new Date().getTime(),
+            forceUpdate,
         );
 
         cellContents.map((cellContent) => {
