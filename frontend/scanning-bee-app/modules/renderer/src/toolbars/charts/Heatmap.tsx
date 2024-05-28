@@ -1,7 +1,6 @@
 import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import { CellContentDto } from '@frontend/controllers/backendInterface/payloadTypes';
 import CellType from '@frontend/models/cellType';
-import { useAnnotationsFolder } from '@frontend/slices/annotationSlice';
 import { getCellTypeFromNumber } from '@frontend/utils/annotationUtils';
 // @ts-ignore
 import h337 from 'heatmap.js';
@@ -23,8 +22,6 @@ export const getHeatmapContainer = (): HTMLElement => {
 };
 
 export const HeatmapMounter = () => {
-    const folder = useAnnotationsFolder();
-
     const [cellContents, setCellContents] = useState<CellContentDto[]>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -45,7 +42,7 @@ export const HeatmapMounter = () => {
 
         setLoading(true);
         fetchAllCellContents();
-    }, [folder]);
+    }, []);
 
     useEffect(() => {
         const container = getHeatmapContainer();
@@ -64,7 +61,7 @@ export const HeatmapMounter = () => {
             .filter(annotation => !shownCellType || getCellTypeFromNumber(annotation.content as number) === shownCellType)
             .map(annotation => ({
                 x: annotation.cell_indices[0] * 6,
-                y: 648 - annotation.cell_indices[1] * 6,
+                y: annotation.cell_indices[1] * 6,
                 value: 1,
             })) : [];
 

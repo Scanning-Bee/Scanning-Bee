@@ -1,6 +1,5 @@
 import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
 import { CellContentDto } from '@frontend/controllers/backendInterface/payloadTypes';
-import { useAnnotationsFolder } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { getCellTypeFromNumber } from '@frontend/utils/annotationUtils';
 import { CellTypeColours } from '@frontend/utils/colours';
@@ -26,8 +25,6 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 export const CellTypeChart = () => {
     const theme = useTheme();
 
-    const folder = useAnnotationsFolder();
-
     const [cellContents, setCellContents] = useState<CellContentDto[]>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -46,7 +43,7 @@ export const CellTypeChart = () => {
 
         setLoading(true);
         fetchAllCellContents();
-    }, [folder]);
+    }, []);
 
     if (!cellContents || loading) {
         return <Loading />;

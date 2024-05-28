@@ -1,5 +1,4 @@
 import { Divider, Icon, Tab, Tabs } from '@blueprintjs/core';
-import { useAnnotationsFolder } from '@frontend/slices/annotationSlice';
 import { Roles, useRole } from '@frontend/slices/permissionSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { AnnotatorStatistics } from '@frontend/toolbars/charts/AnnotatorStatistics';
@@ -10,22 +9,14 @@ import { XYChart } from '@frontend/toolbars/charts/XYChart';
 import { CellTypeInfo } from '@frontend/toolbars/common/CellTypeInfo';
 import React, { useState } from 'react';
 
-import { PickFolderPage } from './PickFolderPage';
-
 type TabType = 'cell-types' | 'xy-coordinates' | 'heatmap' | 'annotator-stats';
 
 export const StatisticsPage = () => {
-    const folder = useAnnotationsFolder();
-
     const userRole = useRole();
 
     const theme = useTheme();
 
     const [activeTab, setActiveTab] = useState<TabType>('cell-types');
-
-    if (!folder) {
-        return <PickFolderPage />;
-    }
 
     return (
         <div style={{

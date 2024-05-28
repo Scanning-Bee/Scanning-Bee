@@ -1,6 +1,5 @@
 /* eslint-disable no-await-in-loop */
 import { CellContentDto, UserDto } from '@frontend/controllers/backendInterface/payloadTypes';
-import { useAnnotationsFolder } from '@frontend/slices/annotationSlice';
 import { getCellContentsBetween } from '@frontend/utils/annotationUtils';
 import { randomColour } from '@frontend/utils/colours';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -63,8 +62,6 @@ export const AnnotatorTimeChart = () => {
 
     const [loading, setLoading] = useState<boolean>(true);
 
-    const folder = useAnnotationsFolder();
-
     const { opacity, handleMouseEnter, handleMouseLeave } = useHighlights(users ? users.map(user => user.username) : []);
 
     useEffect(() => {
@@ -105,7 +102,7 @@ export const AnnotatorTimeChart = () => {
 
         setLoading(true);
         fetchAllCellContents();
-    }, [folder, startTime, endTime]);
+    }, [startTime, endTime]);
 
     return (
         loading

@@ -1,5 +1,4 @@
 import { UserDto } from '@frontend/controllers/backendInterface/payloadTypes';
-import { useAnnotationsFolder } from '@frontend/slices/annotationSlice';
 import { Roles, useRole } from '@frontend/slices/permissionSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
 import { useUserInfo } from '@frontend/slices/userInfoSlice';
@@ -26,8 +25,6 @@ export const AnnotatorStatistics = () => {
     const [endTime, setEndTime] = useState<Date>(null);
 
     const [loading, setLoading] = useState<boolean>(true);
-
-    const folder = useAnnotationsFolder();
 
     useEffect(() => {
         async function fetchUserWithID(id: number) {
@@ -71,7 +68,7 @@ export const AnnotatorStatistics = () => {
 
         setLoading(true);
         fetchAllCellContents();
-    }, [folder, startTime, endTime, userRole, userInfo]);
+    }, [startTime, endTime, userRole, userInfo]);
 
     return loading
         ? <Loading />
