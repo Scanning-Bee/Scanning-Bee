@@ -38,7 +38,7 @@ export const XYChart = () => {
 
     const data = cellContents.map(annotation => ({
         x: annotation.cell_indices[0],
-        y: annotation.cell_indices[1],
+        y: 648 - annotation.cell_indices[1],
         cell_type: getCellTypeFromNumber(annotation.content as number),
     }));
 

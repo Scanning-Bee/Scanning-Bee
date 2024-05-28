@@ -172,7 +172,7 @@ export const HeaderTooltip = (props: {
 
     const folder = useAnnotationsFolder();
 
-    const hideFolderActionsMenu = props.page !== 'statistics' && props.page !== 'manual-annotator';
+    const hideFolderActionsMenu = props.page !== 'manual-annotator';
 
     return (<div
         className="header-container flex-center header-container-left"
