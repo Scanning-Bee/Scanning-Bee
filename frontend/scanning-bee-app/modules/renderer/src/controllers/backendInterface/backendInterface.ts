@@ -56,7 +56,7 @@ class BackendInterface {
 
         this.apiClient = axios.create({
             baseURL: ENDPOINT_URL,
-            timeout: 120_000,
+            timeout: 600_000,
         });
 
         this.apiClient.interceptors.request.use((config) => {
@@ -124,7 +124,7 @@ class BackendInterface {
                 url: endpoint,
                 method,
                 data,
-                timeout: 120_000,
+                timeout: 600_000,
             });
 
             return res.data;

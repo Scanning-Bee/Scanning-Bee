@@ -1,7 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 
-import BackendInterface from './controllers/backendInterface/backendInterface';
 import { HotkeyHandler } from './Hotkeys';
 import { BeehivePage } from './pages/BeehivePage';
 import { HomePage } from './pages/HomePage';
@@ -57,12 +56,10 @@ const App = (props: {
                         case 'settings':
                             return <SettingsPage />;
                         case 'statistics':
-                            BackendInterface.updateCache();
                             return <StatisticsPage />;
                         case 'login':
                             return <LoginPage setPage={setPage} />;
                         case 'beehive':
-                            BackendInterface.updateCache();
                             return <BeehivePage />;
                         default:
                             return <div>Page not found</div>;

@@ -1,9 +1,13 @@
-import { useAnnotations } from '@frontend/slices/annotationSlice';
+import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
+import { CellContentDto } from '@frontend/controllers/backendInterface/payloadTypes';
+import { useAnnotationsFolder } from '@frontend/slices/annotationSlice';
 import { useTheme } from '@frontend/slices/themeSlice';
+import { getCellTypeFromNumber } from '@frontend/utils/annotationUtils';
 import { CellTypeColours } from '@frontend/utils/colours';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Cell, Pie, PieChart, Tooltip } from 'recharts';
 
+import { Loading } from '../common/Loading';
 import { TooltipContent } from './TooltipContent';
 
 const RADIAN = Math.PI / 180;
@@ -21,10 +25,35 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 
 export const CellTypeChart = () => {
     const theme = useTheme();
-    const annotations = useAnnotations();
 
-    const cellTypeCount = annotations.reduce((acc, annotation) => {
-        const cellType = annotation.cell_type;
+    const folder = useAnnotationsFolder();
+
+    const [cellContents, setCellContents] = useState<CellContentDto[]>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        async function fetchAllCellContents() {
+            const cachedContents = await BackendInterface.getCellContentsCached();
+
+            if (!cachedContents) {
+                setCellContents([]);
+            } else {
+                setCellContents(cachedContents);
+            }
+
+            setLoading(false);
+        }
+
+        setLoading(true);
+        fetchAllCellContents();
+    }, [folder]);
+
+    if (!cellContents || loading) {
+        return <Loading />;
+    }
+
+    const cellTypeCount = cellContents.reduce((acc, annotation) => {
+        const cellType = getCellTypeFromNumber(annotation.content as number);
         if (cellType in acc) {
             acc[cellType] += 1;
         } else {

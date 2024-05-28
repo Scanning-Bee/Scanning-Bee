@@ -15,7 +15,7 @@ export const Loading = () => {
                 style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '10px' }}
             />
             <p style={{ textAlign: 'center', color: theme.secondaryForeground }}>
-                Loading...
+                Loading... Please wait.
             </p>
         </div>
     );

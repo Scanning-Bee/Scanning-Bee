@@ -1,10 +1,14 @@
+import BackendInterface from '@frontend/controllers/backendInterface/backendInterface';
+import { CellContentDto } from '@frontend/controllers/backendInterface/payloadTypes';
 import CellType from '@frontend/models/cellType';
-import { useAnnotations } from '@frontend/slices/annotationSlice';
+import { useAnnotationsFolder } from '@frontend/slices/annotationSlice';
+import { getCellTypeFromNumber } from '@frontend/utils/annotationUtils';
 // @ts-ignore
 import h337 from 'heatmap.js';
 import React, { useEffect, useState } from 'react';
 
 import { CellTypePickerMenu } from '../common/CellTypePickerMenu';
+import { Loading } from '../common/Loading';
 
 export const HEATMAP_CONTAINER_ID = 'heatmap-container';
 
@@ -19,9 +23,29 @@ export const getHeatmapContainer = (): HTMLElement => {
 };
 
 export const HeatmapMounter = () => {
-    const annotations = useAnnotations();
+    const folder = useAnnotationsFolder();
+
+    const [cellContents, setCellContents] = useState<CellContentDto[]>(null);
+    const [loading, setLoading] = useState<boolean>(true);
 
     const [shownCellType, setShownCellType] = useState<CellType>(null);
+
+    useEffect(() => {
+        async function fetchAllCellContents() {
+            const cachedContents = await BackendInterface.getCellContentsCached();
+
+            if (!cachedContents) {
+                setCellContents([]);
+            } else {
+                setCellContents(cachedContents);
+            }
+
+            setLoading(false);
+        }
+
+        setLoading(true);
+        fetchAllCellContents();
+    }, [folder]);
 
     useEffect(() => {
         const container = getHeatmapContainer();
@@ -36,13 +60,13 @@ export const HeatmapMounter = () => {
             container,
         });
 
-        const dataPoints = annotations
-            .filter(annotation => !shownCellType || annotation.cell_type === shownCellType)
+        const dataPoints = cellContents ? cellContents
+            .filter(annotation => !shownCellType || getCellTypeFromNumber(annotation.content as number) === shownCellType)
             .map(annotation => ({
-                x: annotation.center[0] / (12 / 5),
-                y: 450 - annotation.center[1] / (12 / 5),
+                x: annotation.cell_indices[0] * 6,
+                y: 648 - annotation.cell_indices[1] * 6,
                 value: 1,
-            }));
+            })) : [];
 
         const max = 1;
         const min = 0;
@@ -56,7 +80,22 @@ export const HeatmapMounter = () => {
 
         heatmapInstance.setData(data);
         heatmapInstance.repaint();
-    }, [shownCellType, annotations]);
+    }, [shownCellType, cellContents, loading]);
+
+    if (!cellContents || loading) {
+        return <>
+            <Loading />
+            <div
+                style={{
+                    width: '800px',
+                    height: '450px',
+                    display: 'none',
+                }}
+                className='heatmap-grid'
+                id={HEATMAP_CONTAINER_ID}
+            />
+        </>;
+    }
 
     return (
         <div
@@ -67,8 +106,8 @@ export const HeatmapMounter = () => {
             >for {shownCellType || 'all cells'}</h3>
             <div
                 style={{
-                    width: '800px',
-                    height: '450px',
+                    width: '804px',
+                    height: '648px',
                 }}
                 className='heatmap-grid'
                 id={HEATMAP_CONTAINER_ID}
