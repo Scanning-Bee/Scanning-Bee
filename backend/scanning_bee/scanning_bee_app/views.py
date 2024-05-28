@@ -20,6 +20,7 @@ from .real_world_coordiantes import get_index_from_real_world
 
 from datetime import datetime, timezone
 
+
 import sys
 import os
 import yaml
@@ -314,16 +315,19 @@ class CellContentList(ListCreateAPIView):
 
         with transaction.atomic():
             for item_data in data:
+                item_data['center_x'] = round(item_data['center_x'])
+                item_data['center_y'] = round(item_data['center_y'])
                 serializer = self.get_serializer(data=item_data)
+    
                 if serializer.is_valid():
                     instance = serializer.Meta.model(**serializer.validated_data)
 
                     # Simulate custom save logic here
-                    if instance.user.pk:
-                        if instance.user.pk in users_to_update:
-                            users_to_update[instance.user.pk] += 1
+                    if request.user.pk:
+                        if request.user.pk in users_to_update:
+                            users_to_update[request.user.pk] += 1
                         else:
-                            users_to_update[instance.user.pk] = 1
+                            users_to_update[request.user.pk] = 1
 
                     try:
                         my_image = Image.objects.get(pk=instance.image.pk)
@@ -335,13 +339,11 @@ class CellContentList(ListCreateAPIView):
                     except Image.DoesNotExist:
                         errors.append({'image': 'Image does not exist.'})
                         continue
-
                     instance_list.append(instance)
                 else:
                     if 'unique' in str(serializer.errors):
                         continue
                     errors.append(serializer.errors)
-
             if instance_list:
                 CellContent.objects.bulk_create(instance_list)
 
