@@ -1,4 +1,4 @@
-# [Scanning Bee](https://senior.ceng.metu.edu.tr/2024/Scanning-Bee)
+# [Scanning Bee](https://scanning-bee.github.io)
 
 The repository for the source code for Scanning Bee.
 
